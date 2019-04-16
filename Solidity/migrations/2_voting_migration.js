@@ -1,14 +1,13 @@
-var Voting = artifacts.require("./Voting.sol");
-var VotingCore = artifacts.require('./VotingCore.sol');
-
-const sellingPrice = 1000000000000000; //WEI
-const productName = 'Calculus Textbook';
+var VotingRegistry = artifacts.require('VotingRegistry');
+var VotingCore = artifacts.require('VotingCore');
 
 module.exports = function(deployer, network, accounts) {
-//   deployer.deploy(Voting, accounts[0],sellingPrice,productName).then(function() {
-//   	return deployer.deploy(SellingGenerator)
-//   })
-  deployer.deploy(VotingCore).then(function() {
-  	console.log('success');
-  })
-};
+    deployer.deploy(VotingRegistry)
+        .then(() => {
+            const votingRegistryAddress = VotingRegistry.address;
+            return deployer.deploy(VotingCore, votingRegistryAddress);
+        })
+        .then(() => {
+            console.log('success');
+        })
+  };
