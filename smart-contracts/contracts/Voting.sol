@@ -27,10 +27,14 @@ contract Voting {
     return (voted[_address] == true);
   }
 
+  function _optionCheck(uint _option) private view returns (bool) {
+    return (_option < optionsAmount);
+  }
+
   function vote(uint option) public {
     require(!isExpired());
     require(!_isVoted(msg.sender));
-    require(option < optionsAmount);
+    require(_optionCheck(option));
     voters[msg.sender] = option;
     voted[msg.sender] = true;
     votes[option] += 1;
@@ -49,7 +53,7 @@ contract Voting {
 
   function getVotesByIndex(uint _index) public view returns (uint) {
     require(isExpired());
-    require(_index <= optionsAmount);
+    require(_optionCheck(_index));
     return votes[_index];
   }
 
