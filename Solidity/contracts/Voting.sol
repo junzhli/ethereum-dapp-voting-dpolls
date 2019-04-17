@@ -18,14 +18,24 @@ contract Voting {
     votesAmount = 0;
   }
 
+  function isVoted(address _address) public view returns (bool) {
+    return (voted[_address] == true);
+  }
+
   function vote(uint option) public {
     require(!isExpired());
-    require(voted[msg.sender] != true);
+    require(isVoted(msg.sender));
     require(option <= options);
     voters[msg.sender] = option;
     voted[msg.sender] = true;
     votes[option] += 1;
     votesAmount++;
+  }
+
+  function getMyOption() public view returns (uint) {
+    require(isExpired());
+    require(isVoted(msg.sender));
+    return voters[msg.sender];
   }
 
   function maxOptions() public view returns (uint) {
