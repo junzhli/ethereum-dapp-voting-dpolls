@@ -5,20 +5,27 @@ import "./Voting.sol";
 // set options
 contract VotingRegistry {
 
-  address admin;
-  Voting[] votings;
+  address private admin;
+  Voting[] private votings;
 
   constructor() public {
     admin = msg.sender;
   }
 
-  function setAdmin(address _admin) public {
-    require(msg.sender == admin);
+  modifier adminOnly() {
+    require(msg.sender == admin || tx.origin == admin);
+    _;
+  }
+
+  function getAdmin() public view returns (address) {
+    return admin;
+  }
+
+  function setAdmin(address _admin) adminOnly public {
     admin = _admin;
   }
 
-  function depositVoting(Voting _voting) public {
-    require(msg.sender == admin);
+  function depositVoting(Voting _voting) adminOnly public {
     votings.push(_voting);
   }
 

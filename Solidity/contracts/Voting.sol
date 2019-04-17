@@ -8,20 +8,24 @@ contract Voting {
   mapping(address => uint) voters;
   mapping(address => bool) voted;
   mapping(uint => uint) votes;
+  uint votesAmount;
   
 
   constructor(uint _options, uint _expiryBlockNumber) public {
     chairperson = msg.sender;
     options = _options;
     expiryBlockNumber = _expiryBlockNumber;
+    votesAmount = 0;
   }
 
   function vote(uint option) public {
     require(!isExpired());
+    require(voted[msg.sender] != true);
     require(option <= options);
     voters[msg.sender] = option;
     voted[msg.sender] = true;
     votes[option] += 1;
+    votesAmount++;
   }
 
   function maxOptions() public view returns (uint) {
@@ -36,5 +40,9 @@ contract Voting {
 
   function isExpired() public view returns (bool) {
     return (block.number > expiryBlockNumber);
+  }
+
+  function currentVotes() public view returns (uint) {
+    return votesAmount;
   }
 }
