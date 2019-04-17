@@ -6,6 +6,7 @@ contract VotingRegistry {
 
   address private admin;
   Voting[] private votings;
+  mapping(address => bool) votingIsExisting;
 
   constructor() public {
     admin = msg.sender;
@@ -25,7 +26,9 @@ contract VotingRegistry {
   }
 
   function depositVoting(Voting _voting) adminOnly public {
+    require(votingIsExisting[address(_voting)] != true);
     votings.push(_voting);
+    votingIsExisting[address(_voting)] = true;
   }
 
   function getAmountVotings() public view returns (uint) {
