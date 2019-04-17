@@ -344,7 +344,7 @@ const VOTING_REGISTRY_CONTRACT_ADDRESS = '0xFFc3865c6770B493D7903Fe90942c7E491A9
 const VOTING_REGISTRY = new web3.eth.Contract(VOTING_REGISTRY_CONTRACT_ABI, VOTING_REGISTRY_CONTRACT_ADDRESS);
 
 // const VOTING_CONTRACT
-const VOTING_CONTRACT_ADDRESS = '0x00dc53089B8a618F263c66073049Bd68084fFB8d';
+const VOTING_CONTRACT_ADDRESS = '0x332b934BdF5eB032C0262429E78a919cc507242e';
 const VOTING = new web3.eth.Contract(VOTING_CONTRACT_ABI, VOTING_CONTRACT_ADDRESS);
 
 // getAdmin
@@ -380,29 +380,29 @@ const createVote = async (options, expiryBlockNumber) => {
     return sendSignedTransaction(rawTx, 'create-voting');
 }
 
-const run = async () => {
-  let currentAmountVotings = await getCurrentAmountVotings();
-  console.log('currentAmountVotings: ' + currentAmountVotings);
-  const options = 3;
-  const expiryBlockNumber = await web3.eth.getBlockNumber() + 5;
-  console.log('current expiryBlockNumber ' + expiryBlockNumber);
-  const txid = await createVote(options, expiryBlockNumber)
-  console.log('success');
-  console.log('txid: ' + txid);
-  const receipt = await web3.eth.getTransactionReceipt(txid);
-  console.log('got receipt: ' + JSON.stringify(receipt));
-  currentAmountVotings = await getCurrentAmountVotings();
-  console.log('currentAmountVotings: ' + currentAmountVotings);
-}
+// const run = async () => {
+//   let currentAmountVotings = await getCurrentAmountVotings();
+//   console.log('currentAmountVotings: ' + currentAmountVotings);
+//   const options = 3;
+//   const expiryBlockNumber = await web3.eth.getBlockNumber() + 5;
+//   console.log('current expiryBlockNumber ' + expiryBlockNumber);
+//   const txid = await createVote(options, expiryBlockNumber)
+//   console.log('success');
+//   console.log('txid: ' + txid);
+//   const receipt = await web3.eth.getTransactionReceipt(txid);
+//   console.log('got receipt: ' + JSON.stringify(receipt));
+//   currentAmountVotings = await getCurrentAmountVotings();
+//   console.log('currentAmountVotings: ' + currentAmountVotings);
+// }
 
-run()
-  .then(() => {
-    console.log('run success');
-  })
-  .catch((error) => {
-    console.log('run error');
-    console.log(error);
-  })
+// run()
+//   .then(() => {
+//     console.log('run success');
+//   })
+//   .catch((error) => {
+//     console.log('run error');
+//     console.log(error);
+//   })
 
 // vote
 
@@ -414,25 +414,25 @@ const vote = async (option) => {
   return sendSignedTransaction(rawTx, 'vote');
 }
 
-// const run = async () => {
-//   const option = 1;
-//   console.log('myVote: ' + option + ' for ' + VOTING_CONTRACT_ADDRESS);
-//   const txid = await vote(option)
-//   console.log('success');
-//   console.log('txid: ' + txid);
-//   const receipt = await web3.eth.getTransactionReceipt(txid);
-//   console.log('got receipt: ' + JSON.stringify(receipt));
+const run = async () => {
+  const option = 1;
+  console.log('myVote: ' + option + ' for ' + VOTING_CONTRACT_ADDRESS);
+  const txid = await vote(option)
+  console.log('success');
+  console.log('txid: ' + txid);
+  const receipt = await web3.eth.getTransactionReceipt(txid);
+  console.log('got receipt: ' + JSON.stringify(receipt));
   
-// }
+}
 
-// run()
-//   .then(() => {
-//     console.log('run success');
-//   })
-//   .catch((error) => {
-//     console.log('run error');
-//     console.log(error);
-//   })
+run()
+  .then(() => {
+    console.log('run success');
+  })
+  .catch((error) => {
+    console.log('run error');
+    console.log(error);
+  })
 
 // currentVotes
 VOTING.methods.currentVotes().call()
