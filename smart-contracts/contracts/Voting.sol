@@ -5,18 +5,24 @@ contract Voting {
   uint private optionsAmount;
   address private chairperson;
   uint private expiryBlockNumber;
+  bytes32[] optionTitles;
   mapping(address => uint) private voters;
   mapping(address => bool) private voted;
   mapping(uint => uint) private votes;
   uint private votesAmount;
   
 
-  constructor(uint _optionsAmount, uint _expiryBlockNumber) public {
+  constructor(bytes32[] memory _optionTitles, uint _expiryBlockNumber) public {
     require(_expiryBlockNumber > block.number);
+    require(_optionTitles.length <= 256);
     chairperson = msg.sender;
-    optionsAmount = _optionsAmount;
+    optionsAmount = _optionTitles.length;
     expiryBlockNumber = _expiryBlockNumber;
     votesAmount = 0;
+    
+    for (uint i = 0; i < _optionTitles.length; i++) {
+      optionTitles.push(_optionTitles[0]);
+    }
   }
 
   function isVoted() private view returns (bool) {
@@ -49,6 +55,11 @@ contract Voting {
 
   function getOptionsAmount() public view returns (uint) {
     return optionsAmount;
+  }
+
+  function getOptionTitleByIndex(uint _index) public view returns (bytes32) {
+    require(_optionCheck(_index));
+    return optionTitles[_index];
   }
 
   function getVotesByIndex(uint _index) public view returns (uint) {

@@ -34,8 +34,8 @@ contract VotingCore {
     votingRegistry = _votingRegistry;
   }
 
-  function createVote(uint options, uint expiryBlockNumber) adminOnly public {
-    Voting voting = new Voting(options, expiryBlockNumber);
+  function createVote(bytes32[] memory optionTitles, uint expiryBlockNumber) adminOnly public {
+    Voting voting = new Voting(optionTitles, expiryBlockNumber);
     VotingRegistry registry = VotingRegistry(votingRegistry);
     registry.depositVoting(voting);
     emit newVoting(address(voting));

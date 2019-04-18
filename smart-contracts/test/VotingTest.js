@@ -12,7 +12,8 @@ contract("Voting", function(accounts) {
     let testingAccountVoter3;
     let testingAccountVoter4;
 
-    let optionsAmount;    
+    let optionsAmount;
+    let optionTitles;
     let expiryBlockNumber;
     let VotingInstance;
 
@@ -32,10 +33,11 @@ contract("Voting", function(accounts) {
         testingAccountVoter2 = accounts[2];
         testingAccountVoter3 = accounts[3];
         testingAccountVoter4 = accounts[4];
-        optionsAmount = 3;
+        optionTitles = [web3.utils.asciiToHex('Allen'), web3.utils.asciiToHex('Bob'), web3.utils.asciiToHex('Alice')];
+        optionsAmount = optionTitles.length;
         startWithBlockNumber = await web3.eth.getBlockNumber()
         expiryBlockNumber = startWithBlockNumber + 1 + 1 + 2; // ahead by 4 blocks;
-        VotingInstance = await Voting.new(optionsAmount, expiryBlockNumber, {from: testingAccountContractAdmin});
+        VotingInstance = await Voting.new(optionTitles, expiryBlockNumber, {from: testingAccountContractAdmin});
     });
 
     it("should remain in initial state", async () => {
