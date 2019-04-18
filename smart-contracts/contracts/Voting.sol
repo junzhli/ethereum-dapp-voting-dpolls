@@ -14,7 +14,7 @@ contract Voting {
 
   constructor(bytes32[] memory _optionTitles, uint _expiryBlockNumber) public {
     require(_expiryBlockNumber > block.number);
-    require(_optionTitles.length <= 256);
+    require(_optionTitles.length <= 256); // we allow a max number of 256 options for each vote
     chairperson = msg.sender;
     optionsAmount = _optionTitles.length;
     expiryBlockNumber = _expiryBlockNumber;
