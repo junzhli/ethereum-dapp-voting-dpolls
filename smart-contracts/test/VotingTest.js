@@ -38,7 +38,7 @@ contract("Voting", function(accounts) {
         optionTitlesHex = optionTitles.map(title => web3.utils.utf8ToHex(title));
         optionsAmount = optionTitles.length;
         startWithBlockNumber = await web3.eth.getBlockNumber()
-        expiryBlockNumber = startWithBlockNumber + 1 + 1 + 2; // ahead by 4 blocks;
+        expiryBlockNumber = startWithBlockNumber + 1 + 1 + 3; // ahead by 4 blocks;
         VotingInstance = await Voting.new(optionTitlesHex, expiryBlockNumber, {from: testingAccountContractAdmin});
     });
 
@@ -57,24 +57,26 @@ contract("Voting", function(accounts) {
         assert.equal(web3.utils.hexToUtf8(await VotingInstance.getOptionTitleByIndex(2)), optionTitles[2]);
     });
 
-    it("people being voted and unable to watch result or his/her vote until it expires", async () => {
+    it("people can vote only once and are unable to watch result or his/her vote until it expires", async () => {
         votedOption1 = 0;
         await VotingInstance.vote(votedOption1, { from: testingAccountVoter1 });
         assert.equal(await VotingInstance.currentVotes(), 1);
         assert.equal(await web3.eth.getBlockNumber(), startWithBlockNumber + 2);
         await catchRevert(VotingInstance.getMyOption({ from: testingAccountVoter1 }));
 
+        await catchRevert(VotingInstance.vote(votedOption1, { from: testingAccountVoter1 })); // block height increases
+
         votedOption2 = 1;
         await VotingInstance.vote(votedOption2, { from: testingAccountVoter2 });
         assert.equal(await VotingInstance.currentVotes(), 2);
-        assert.equal(await web3.eth.getBlockNumber(), startWithBlockNumber + 3);
+        assert.equal(await web3.eth.getBlockNumber(), startWithBlockNumber + 4);
         await catchRevert(VotingInstance.getMyOption({ from: testingAccountVoter2 }));
         assert.equal(await VotingInstance.isExpired(), false);
 
         votedOption3 = 1;
         await VotingInstance.vote(votedOption3, { from: testingAccountVoter3 });
         assert.equal(await VotingInstance.currentVotes(), 3);
-        assert.equal(await web3.eth.getBlockNumber(), startWithBlockNumber + 4);
+        assert.equal(await web3.eth.getBlockNumber(), startWithBlockNumber + 5);
         assert.equal(await VotingInstance.isExpired(), true);
 
         // we assume now the voting has expired
