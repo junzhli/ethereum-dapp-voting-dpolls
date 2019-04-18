@@ -21,7 +21,7 @@ contract Voting {
     votesAmount = 0;
     
     for (uint i = 0; i < _optionTitles.length; i++) {
-      optionTitles.push(_optionTitles[0]);
+      optionTitles.push(_optionTitles[i]);
     }
   }
 

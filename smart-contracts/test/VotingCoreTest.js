@@ -16,10 +16,12 @@ contract("VotingCore", function(accounts) {
     let VotingCoreInstance;
 
     let optionTitles;
+    let optionTitlesHex;
     let expiryBlockNumber;
 
     beforeEach('setup contract for each test', async () => {
-        optionTitles = [web3.utils.asciiToHex('Allen'), web3.utils.asciiToHex('Bob'), web3.utils.asciiToHex('Alice')];
+        optionTitles = ['Allen', 'Bob', 'Alice'];
+        optionTitlesHex = optionTitles.map(title => web3.utils.utf8ToHex(title));
         expiryBlockNumber = 999;
         testingAccountContractAdmin = accounts[0];
         testingAccountNotContractAdmin = accounts[1];
@@ -33,7 +35,7 @@ contract("VotingCore", function(accounts) {
         assert.equal(await VotingCoreInstance.getAdmin(), testingAccountContractAdmin);
         await catchRevert(VotingCoreInstance.setAdmin(testingAccountNewContractAdmin, { from: testingAccountNotContractAdmin }));
         await catchRevert(VotingCoreInstance.setRegistry(NewVotingRegistryInstance.address, { from: testingAccountNotContractAdmin }));
-        await catchRevert(VotingCoreInstance.createVote(optionTitles, expiryBlockNumber, { from: testingAccountNotContractAdmin }));
+        await catchRevert(VotingCoreInstance.createVote(optionTitlesHex, expiryBlockNumber, { from: testingAccountNotContractAdmin }));
     });
 
     it("replace current admin with new one", async () => {
@@ -47,7 +49,7 @@ contract("VotingCore", function(accounts) {
     });
 
     it("create a vote and deposit it to the registry", async () => {
-        await VotingCoreInstance.createVote(optionTitles, expiryBlockNumber, { from: testingAccountContractAdmin });
+        await VotingCoreInstance.createVote(optionTitlesHex, expiryBlockNumber, { from: testingAccountContractAdmin });
         assert.equal(await VotingRegistryInstance.getAmountVotings(), 1);
     });
 });
