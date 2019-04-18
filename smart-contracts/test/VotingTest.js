@@ -38,7 +38,7 @@ contract("Voting", function(accounts) {
         optionTitlesHex = optionTitles.map(title => web3.utils.utf8ToHex(title));
         optionsAmount = optionTitles.length;
         startWithBlockNumber = await web3.eth.getBlockNumber()
-        expiryBlockNumber = startWithBlockNumber + 1 + 1 + 3; // ahead by 4 blocks;
+        expiryBlockNumber = startWithBlockNumber + 1 + 1 + 3; // ahead by 5 blocks;
         VotingInstance = await Voting.new(optionTitlesHex, expiryBlockNumber, {from: testingAccountContractAdmin});
     });
 
