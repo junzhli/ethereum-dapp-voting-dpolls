@@ -58,6 +58,7 @@ contract("Voting", function(accounts) {
     });
 
     it("people can vote only once and are unable to watch result or his/her vote until it expires", async () => {
+        // we assume that auto mining on Ganache private blockchain is enabled that it automatically increases block height while a new transaction submitted
         votedOption1 = 0;
         await VotingInstance.vote(votedOption1, { from: testingAccountVoter1 });
         assert.equal(await VotingInstance.currentVotes(), 1);
@@ -79,7 +80,7 @@ contract("Voting", function(accounts) {
         assert.equal(await web3.eth.getBlockNumber(), startWithBlockNumber + 5);
         assert.equal(await VotingInstance.isExpired(), true);
 
-        // we assume now the voting has expired
+        // we assume now the voting is expired
         assert.equal(await VotingInstance.getMyOption(testingAccountVoter3), votedOption3);
 
         votedOption4 = 0;
