@@ -15,11 +15,15 @@ contract("VotingRegistry", function(accounts) {
     let VotingInstance;
     let Voting2Instance;
 
+    let title;
+    let titleHex;
     let optionTitles;
     let optionTitlesHex;
     let expiryBlockNumber;
 
     beforeEach('setup contract for each test', async () => {
+        title = 'Who is the best?';
+        titleHex = web3.utils.utf8ToHex(title);
         optionTitles = ['Allen', 'Bob', 'Alice'];
         optionTitlesHex = optionTitles.map(title => web3.utils.utf8ToHex(title));
         expiryBlockNumber = 999;
@@ -27,8 +31,8 @@ contract("VotingRegistry", function(accounts) {
         testingAccountNotContractAdmin = accounts[1];
         testingAccountNewContractAdmin = accounts[2];
         VotingRegistryInstance = await VotingRegistry.new({from: testingAccountContractAdmin});
-        VotingInstance = await Voting.new(optionTitlesHex, expiryBlockNumber, {from: testingAccountContractAdmin});
-        Voting2Instance = await Voting.new(optionTitlesHex, expiryBlockNumber, {from: testingAccountContractAdmin});
+        VotingInstance = await Voting.new(titleHex, optionTitlesHex, expiryBlockNumber, {from: testingAccountContractAdmin});
+        Voting2Instance = await Voting.new(titleHex, optionTitlesHex, expiryBlockNumber, {from: testingAccountContractAdmin});
     });
 
     it("get current admin with getAdmin and get some methods restricted with adminOnly modifier", async () => {

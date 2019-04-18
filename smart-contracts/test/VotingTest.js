@@ -12,6 +12,8 @@ contract("Voting", function(accounts) {
     let testingAccountVoter3;
     let testingAccountVoter4;
 
+    let title;
+    let titleHex;
     let optionsAmount;
     let optionTitles;
     let optionTitlesHex;
@@ -34,12 +36,14 @@ contract("Voting", function(accounts) {
         testingAccountVoter2 = accounts[2];
         testingAccountVoter3 = accounts[3];
         testingAccountVoter4 = accounts[4];
+        title = 'Who is the best?';
+        titleHex = web3.utils.utf8ToHex(title);
         optionTitles = ['Allen', 'Bob', 'Alice'];
         optionTitlesHex = optionTitles.map(title => web3.utils.utf8ToHex(title));
         optionsAmount = optionTitles.length;
         startWithBlockNumber = await web3.eth.getBlockNumber()
         expiryBlockNumber = startWithBlockNumber + 1 + 1 + 3; // ahead by 5 blocks;
-        VotingInstance = await Voting.new(optionTitlesHex, expiryBlockNumber, {from: testingAccountContractAdmin});
+        VotingInstance = await Voting.new(titleHex, optionTitlesHex, expiryBlockNumber, {from: testingAccountContractAdmin});
     });
 
     it("should remain in initial state", async () => {
@@ -51,7 +55,8 @@ contract("Voting", function(accounts) {
         assert.equal(currentVotes, 0);
     });
 
-    it("people can see all options, including titles", async () => {
+    it("people can see all options and its title", async () => {
+        assert.equal(web3.utils.hexToUtf8(await VotingInstance.getTitle()), title);
         assert.equal(web3.utils.hexToUtf8(await VotingInstance.getOptionTitleByIndex(0)), optionTitles[0]);
         assert.equal(web3.utils.hexToUtf8(await VotingInstance.getOptionTitleByIndex(1)), optionTitles[1]);
         assert.equal(web3.utils.hexToUtf8(await VotingInstance.getOptionTitleByIndex(2)), optionTitles[2]);

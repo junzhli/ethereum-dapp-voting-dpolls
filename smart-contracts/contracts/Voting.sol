@@ -2,20 +2,22 @@ pragma solidity ^0.5.0;
 
 
 contract Voting {
+  bytes32 private title;
   uint private optionsAmount;
   address private chairperson;
   uint private expiryBlockNumber;
-  bytes32[] optionTitles;
+  bytes32[] private optionTitles;
   mapping(address => uint) private voters;
   mapping(address => bool) private voted;
   mapping(uint => uint) private votes;
   uint private votesAmount;
   
 
-  constructor(bytes32[] memory _optionTitles, uint _expiryBlockNumber) public {
+  constructor(bytes32 _title, bytes32[] memory _optionTitles, uint _expiryBlockNumber) public {
     require(_expiryBlockNumber > block.number);
     require(_optionTitles.length <= 256 && _optionTitles.length > 0); // we allow a max number of 256 options for each vote
     chairperson = msg.sender;
+    title = _title;
     optionsAmount = _optionTitles.length;
     expiryBlockNumber = _expiryBlockNumber;
     votesAmount = 0;
@@ -47,6 +49,10 @@ contract Voting {
     require(isExpired());
     require(isVoted(_address));
     return voters[_address];
+  }
+
+  function getTitle() public view returns (bytes32) {
+    return title;
   }
 
   function getOptionsAmount() public view returns (uint) {
