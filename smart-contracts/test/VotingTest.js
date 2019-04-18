@@ -62,7 +62,7 @@ contract("Voting", function(accounts) {
         await VotingInstance.vote(votedOption1, { from: testingAccountVoter1 });
         assert.equal(await VotingInstance.currentVotes(), 1);
         assert.equal(await web3.eth.getBlockNumber(), startWithBlockNumber + 2);
-        await catchRevert(VotingInstance.getMyOption({ from: testingAccountVoter1 }));
+        await catchRevert(VotingInstance.getMyOption(testingAccountVoter1));
 
         await catchRevert(VotingInstance.vote(votedOption1, { from: testingAccountVoter1 })); // block height increases
 
@@ -70,7 +70,7 @@ contract("Voting", function(accounts) {
         await VotingInstance.vote(votedOption2, { from: testingAccountVoter2 });
         assert.equal(await VotingInstance.currentVotes(), 2);
         assert.equal(await web3.eth.getBlockNumber(), startWithBlockNumber + 4);
-        await catchRevert(VotingInstance.getMyOption({ from: testingAccountVoter2 }));
+        await catchRevert(VotingInstance.getMyOption(testingAccountVoter2));
         assert.equal(await VotingInstance.isExpired(), false);
 
         votedOption3 = 1;
@@ -80,7 +80,7 @@ contract("Voting", function(accounts) {
         assert.equal(await VotingInstance.isExpired(), true);
 
         // we assume now the voting has expired
-        assert.equal(await VotingInstance.getMyOption({ from: testingAccountVoter3 }), votedOption3);
+        assert.equal(await VotingInstance.getMyOption(testingAccountVoter3), votedOption3);
 
         votedOption4 = 0;
         await catchRevert(VotingInstance.vote(votedOption4, { from: testingAccountVoter4 }));

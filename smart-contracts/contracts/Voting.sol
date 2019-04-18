@@ -25,11 +25,7 @@ contract Voting {
     }
   }
 
-  function isVoted() private view returns (bool) {
-    return (voted[msg.sender] == true);
-  }
-
-  function _isVoted(address _address) private view returns (bool) {
+  function isVoted(address _address) public view returns (bool) {
     return (voted[_address] == true);
   }
 
@@ -39,7 +35,7 @@ contract Voting {
 
   function vote(uint option) public {
     require(!isExpired());
-    require(!_isVoted(msg.sender));
+    require(!isVoted(msg.sender));
     require(_optionCheck(option));
     voters[msg.sender] = option;
     voted[msg.sender] = true;
@@ -47,10 +43,10 @@ contract Voting {
     votesAmount++;
   }
 
-  function getMyOption() public view returns (uint) {
+  function getMyOption(address _address) public view returns (uint) {
     require(isExpired());
-    require(_isVoted(msg.sender));
-    return voters[msg.sender];
+    require(isVoted(_address));
+    return voters[_address];
   }
 
   function getOptionsAmount() public view returns (uint) {
