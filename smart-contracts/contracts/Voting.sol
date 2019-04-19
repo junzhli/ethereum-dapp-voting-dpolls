@@ -16,7 +16,7 @@ contract Voting {
   constructor(bytes32 _title, bytes32[] memory _optionTitles, uint _expiryBlockNumber) public {
     require(_expiryBlockNumber > block.number);
     require(_optionTitles.length <= 256 && _optionTitles.length > 0); // we allow a max number of 256 options for each vote
-    chairperson = msg.sender;
+    chairperson = tx.origin;
     title = _title;
     optionsAmount = _optionTitles.length;
     expiryBlockNumber = _expiryBlockNumber;
@@ -25,6 +25,10 @@ contract Voting {
     for (uint i = 0; i < _optionTitles.length; i++) {
       optionTitles.push(_optionTitles[i]);
     }
+  }
+
+  function getChairperson() public view returns (address) {
+    return chairperson;
   }
 
   function isVoted(address _address) public view returns (bool) {

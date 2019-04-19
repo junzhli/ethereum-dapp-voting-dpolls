@@ -13,7 +13,7 @@ contract VotingRegistry {
   }
 
   modifier adminOnly() {
-    require(msg.sender == admin || tx.origin == admin);
+    require(msg.sender == admin);
     _;
   }
 

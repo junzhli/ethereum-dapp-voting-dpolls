@@ -1,11 +1,20 @@
+var VotingHostsRegistry = artifacts.require('VotingHostsRegistry');
 var VotingRegistry = artifacts.require('VotingRegistry');
 var VotingCore = artifacts.require('VotingCore');
 
 module.exports = function(deployer, network, accounts) {
-    deployer.deploy(VotingRegistry)
+    let votingHostsRegistryAddress;
+    let votingRegistryAddress;
+    const depositAccountAddress = accounts[5];
+
+    deployer.deploy(VotingHostsRegistry)
         .then(() => {
-            const votingRegistryAddress = VotingRegistry.address;
-            return deployer.deploy(VotingCore, votingRegistryAddress);
+            votingHostsRegistryAddress = VotingHostsRegistry.address;
+            return deployer.deploy(VotingRegistry);
+        })
+        .then(() => {
+            votingRegistryAddress = VotingRegistry.address;
+            return deployer.deploy(VotingCore, votingRegistryAddress, votingHostsRegistryAddress, depositAccountAddress);
         })
         .then(() => {
             console.log('success');
