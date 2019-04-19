@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 contract VotingHostsRegistry {
   enum Membership { DEFAULT, CITIZEN, DIAMOND }
-  uint MAX_TIMES_PER_HOST = 10;
+  uint constant MAX_TIMES_PER_HOST = 10;
 
   address private admin;
   mapping(address => Membership) private hosts;

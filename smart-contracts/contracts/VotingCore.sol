@@ -32,6 +32,10 @@ contract VotingCore {
     _;
   }
 
+  /**
+   * Getter and setters
+   */
+
   function getAdmin() public view returns (address) {
     return admin;
   }
@@ -64,6 +68,33 @@ contract VotingCore {
     votingRegistry = _votingRegistry;
   }
 
+  /**
+   * Proxied methods for VotingRegistry
+   */
+
+  function getAmountVotings() public view returns (uint) {
+    VotingRegistry registry = VotingRegistry(votingRegistry);
+    return registry.getAmountVotings();
+  }
+
+  function getVotingItemByIndex(uint _index) public view returns (address) {
+    VotingRegistry registry = VotingRegistry(votingRegistry);
+    return registry.getVotingItemByIndex(_index);
+  }
+
+  /**
+   * Proxied methods for VotingHostsRegistry
+   */
+
+  function getMembership(address _address) public view returns (uint) {
+    VotingHostsRegistry hostsRegistry = VotingHostsRegistry(votingHostsRegistry);
+    return uint(hostsRegistry.getMembership(_address));
+  }
+
+  /**
+   * Core functionality
+   */
+
   function createVoting(bytes32 title, bytes32[] memory optionTitles, uint expiryBlockNumber) hostOnly(msg.sender) public {
     Voting voting = new Voting(title, optionTitles, expiryBlockNumber);
     VotingRegistry registry = VotingRegistry(votingRegistry);
@@ -77,15 +108,6 @@ contract VotingCore {
     hostsRegistry.depositHost(msg.sender, memberType);
   }
 
-  function getMembership(address _address) public view returns (uint) {
-    VotingHostsRegistry hostsRegistry = VotingHostsRegistry(votingHostsRegistry);
-    return uint(hostsRegistry.getMembership(_address));
-  }
-
-  function withdrawEther() adminOnly public {
-    depositAccount.transfer(address(this).balance);
-  }
-
   function _checkMembership(uint _value) internal pure returns (VotingHostsRegistry.Membership) {
     require(_value == ONE_ETHER || _value == TEN_ETHERS);
     if (_value == ONE_ETHER) {
@@ -93,5 +115,9 @@ contract VotingCore {
     } else if (_value == TEN_ETHERS) {
       return VotingHostsRegistry.Membership.DIAMOND;
     }
+  }
+
+  function withdrawEther() adminOnly public {
+    depositAccount.transfer(address(this).balance);
   }
 }
