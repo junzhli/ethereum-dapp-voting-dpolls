@@ -13,7 +13,7 @@ A Dapp project proposed in NTU DApp development course
     * **Unlimited**
 
 ### Table of Contents
-* (smart-contract)[#smart-contracts]
+* [smart-contract](#smart-contracts)
   * Smart contracts on Ethereum blockchain
 * web3
   * test stuffs
