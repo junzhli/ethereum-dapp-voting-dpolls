@@ -22,3 +22,11 @@ A Dapp project proposed in NTU DApp development course
 
 Smart Contracts
 --------------------
+#### Prerequisites
+* Truffle - blockchain development framework
+* Ganache - private blockchain network
+
+#### Run testing units
+```shell
+$ truffle test
+```
