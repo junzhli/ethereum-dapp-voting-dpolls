@@ -30,6 +30,12 @@ Smart Contracts
 * Truffle - blockchain development framework
 * Ganache - private blockchain network
 
+#### Components
+* VotingCore - Core functionality
+* VotingHostsRegistry - Maintain a list of registered hosts and memberships
+* VotingRegistry - Maintain a list of active/inactive polls
+* Voting - A poll entity
+
 #### Run testing units
 ```shell
 $ truffle test
