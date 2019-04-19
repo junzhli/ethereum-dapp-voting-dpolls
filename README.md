@@ -11,9 +11,9 @@ A Dapp project proposed in NTU DApp development course
   * Poll closed on a specific block number
 * Be a host by applying for a membership
 * Membership Plan
-  * As a CITIZEN paying for 1 ETH
+  * 1 ETH for CITIZEN
     * A max number of 10 times creating a poll
-  * As a DIAMOND paying for 10 ETH
+  * 10 ETH for DIAMOND
     * **Unlimited**
 
 ### Table of Contents
