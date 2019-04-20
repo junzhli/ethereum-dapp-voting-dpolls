@@ -9,6 +9,7 @@ A Dapp project proposed in NTU DApp development course
   * Anyone can vote for polls
   * Adding up to 256 options for a poll
   * Poll closed on a specific block number
+  * Anyone can view results at the end of polls
 * Be a host by applying for a membership
 * Membership Plan
   * 1 ETH for CITIZEN
@@ -16,8 +17,8 @@ A Dapp project proposed in NTU DApp development course
   * 10 ETH for DIAMOND
     * **Unlimited**
 * Contract administration
-  * setAdmin
-  * withdraw funds from smart contract
+  * Set admin
+  * Withdraw funds from smart contract
 
 ### Table of Contents
 * [smart-contract](#smart-contracts)
