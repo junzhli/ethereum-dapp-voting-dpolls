@@ -31,8 +31,8 @@ contract("VotingRegistry", function(accounts) {
         testingAccountNotContractAdmin = accounts[1];
         testingAccountNewContractAdmin = accounts[2];
         VotingRegistryInstance = await VotingRegistry.new({from: testingAccountContractAdmin});
-        VotingInstance = await Voting.new(titleHex, optionTitlesHex, expiryBlockNumber, {from: testingAccountContractAdmin});
-        Voting2Instance = await Voting.new(titleHex, optionTitlesHex, expiryBlockNumber, {from: testingAccountContractAdmin});
+        VotingInstance = await Voting.new(titleHex, optionTitlesHex, expiryBlockNumber, testingAccountContractAdmin, {from: testingAccountContractAdmin});
+        Voting2Instance = await Voting.new(titleHex, optionTitlesHex, expiryBlockNumber, testingAccountContractAdmin, {from: testingAccountContractAdmin});
     });
 
     it("get current admin with getAdmin and get some methods restricted with adminOnly modifier", async () => {

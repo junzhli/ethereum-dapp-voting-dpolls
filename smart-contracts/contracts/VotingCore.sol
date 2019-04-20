@@ -28,7 +28,7 @@ contract VotingCore {
   }
 
   modifier adminOnly() {
-    require(msg.sender == admin || tx.origin == admin);
+    require(msg.sender == admin);
     _;
   }
 
@@ -96,7 +96,7 @@ contract VotingCore {
    */
 
   function createVoting(bytes32 title, bytes32[] memory optionTitles, uint expiryBlockNumber) hostOnly(msg.sender) public {
-    Voting voting = new Voting(title, optionTitles, expiryBlockNumber);
+    Voting voting = new Voting(title, optionTitles, expiryBlockNumber, msg.sender);
     VotingRegistry registry = VotingRegistry(votingRegistry);
     registry.depositVoting(voting);
     emit newVoting(address(voting));

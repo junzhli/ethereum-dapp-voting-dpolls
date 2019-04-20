@@ -13,10 +13,10 @@ contract Voting {
   uint private votesAmount;
   
 
-  constructor(bytes32 _title, bytes32[] memory _optionTitles, uint _expiryBlockNumber) public {
+  constructor(bytes32 _title, bytes32[] memory _optionTitles, uint _expiryBlockNumber, address _admin) public {
     require(_expiryBlockNumber > block.number);
     require(_optionTitles.length <= 256 && _optionTitles.length > 0); // we allow a max number of 256 options for each vote
-    chairperson = tx.origin;
+    chairperson = _admin;
     title = _title;
     optionsAmount = _optionTitles.length;
     expiryBlockNumber = _expiryBlockNumber;
