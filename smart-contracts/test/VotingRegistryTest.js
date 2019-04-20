@@ -1,4 +1,4 @@
-const catchRevert = require('../helper/exception').catchRevert;
+const catchRevert = require('./helper/exception').catchRevert;
 const VotingRegistry = artifacts.require('./VotingRegistry');
 const Voting = artifacts.require('./Voting');
 

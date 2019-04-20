@@ -1,17 +1,9 @@
-const catchRevert = require('../helper/exception').catchRevert;
+const catchRevert = require('./helper/exception').catchRevert;
+const { Membership } = require('./constant');
 const VotingHostsRegistry = artifacts.require('./VotingHostsRegistry');
 
 
-contract("VotingHostsRegistry", function(accounts) {
-    /**
-     * Constants
-     */
-    const Membership = {
-        NOBODY: 0,
-        CITIZEN: 1,
-        DIAMOND: 2
-    }
-    
+contract("VotingHostsRegistry", function(accounts) {  
     /**
      * Test accounts
      */
@@ -23,12 +15,6 @@ contract("VotingHostsRegistry", function(accounts) {
     let testingAccountWithDiamondMembership;
 
     let VotingHostsRegistryInstance;
-
-    // let title;
-    // let titleHex;
-    // let optionTitles;
-    // let optionTitlesHex;
-    // let expiryBlockNumber;
 
     beforeEach('setup contract for each test', async () => {
         testingAccountContractAdmin = accounts[0];

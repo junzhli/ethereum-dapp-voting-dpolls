@@ -1,4 +1,5 @@
-const catchRevert = require('../helper/exception').catchRevert;
+const catchRevert = require('./helper/exception').catchRevert;
+const { Membership, MembershipPricing } = require('./constant');
 const VotingHostsRegistry = artifacts.require('./VotingHostsRegistry');
 const VotingRegistry = artifacts.require('./VotingRegistry');
 const VotingCore = artifacts.require('./VotingCore');
@@ -82,12 +83,10 @@ contract("VotingCore", function(accounts) {
     });
 
     it("apply for a 'CITIZEN' voting host, create a vote, deposit it to the registry and withdraw ethers", async () => {
-        const fee = 1; // ether
-        const CITIZEN = 1;
-        const DIAMOND = 2;
+        const fee = MembershipPricing.CITIZEN; // ether
         const balanceBeforeApply = await web3.eth.getBalance(VotingCoreInstance.address);
         await VotingCoreInstance.applyAsHost({ from: testingAccountVotingHost, value: web3.utils.toWei(web3.utils.toBN(String(fee)), 'ether')});
-        assert.equal(await VotingCoreInstance.getMembership(testingAccountVotingHost, { from: testingAccountVotingHost }), CITIZEN);
+        assert.equal(await VotingCoreInstance.getMembership(testingAccountVotingHost, { from: testingAccountVotingHost }), Membership.CITIZEN);
         await VotingCoreInstance.createVoting(titleHex, optionTitlesHex, expiryBlockNumber, { from: testingAccountVotingHost });
         assert.equal(await VotingRegistryInstance.getAmountVotings(), 1);
         assert.equal(await web3.eth.getBalance(VotingCoreInstance.address) - balanceBeforeApply, fee * (10 ** 18));
