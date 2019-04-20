@@ -15,6 +15,9 @@ A Dapp project proposed in NTU DApp development course
     * A max number of 10 times creating a poll
   * 10 ETH for DIAMOND
     * **Unlimited**
+* Contract administration
+  * setAdmin
+  * withdraw funds from smart contract
 
 ### Table of Contents
 * [smart-contract](#smart-contracts)
