@@ -1,11 +1,7 @@
 import React from 'react';
 import { IMainBannerProps, IMainBannerStates } from './types/MainBanner';
 
-interface TEST {
-    blockNumberInterval: any
-}
-
-class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates, TEST> {
+class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
     private checkBlockNumberInterval: any;
     private checkAccountAddressInterval: any;
     

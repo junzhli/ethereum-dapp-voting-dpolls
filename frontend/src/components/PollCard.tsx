@@ -2,8 +2,11 @@ import React from 'react';
 import { IPollCardProps, IPollCardStates } from './types/PollCard';
 
 class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
+    private contract: any;
+
     constructor(props: IPollCardProps) {
         super(props);
+        this.contract = new this.props.web3.eth.Contract()
 
         this.state = {
             isExpired: null
