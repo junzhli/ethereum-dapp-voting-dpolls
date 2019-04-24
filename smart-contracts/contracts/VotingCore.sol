@@ -27,10 +27,6 @@ contract VotingCore is Permissioned {
     _;
   }
 
-  function setAdmin(address _admin) adminOnly public {
-    admin = _admin;
-  }
-
   function setDepositAccount(address payable _depositAccount) adminOnly public {
     depositAccount = _depositAccount;
   }
