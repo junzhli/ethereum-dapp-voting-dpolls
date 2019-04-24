@@ -22,8 +22,8 @@ contract VotingCore is Permissioned {
   }
 
   modifier hostOnly(address _address) {
-    VotingHostRegistry hostsRegistry = VotingHostRegistry(votingHostRegistry);
-    require(hostsRegistry.isHost(_address));
+    VotingHostRegistry hostRegistry = VotingHostRegistry(votingHostRegistry);
+    require(hostRegistry.isHost(_address));
     _;
   }
 
@@ -31,8 +31,8 @@ contract VotingCore is Permissioned {
     depositAccount = _depositAccount;
   }
 
-  function setVotingHostRegistry(address _votingHostsRegistry) adminOnly public {
-    votingHostRegistry = _votingHostsRegistry;
+  function setVotingHostRegistry(address _votingHostRegistry) adminOnly public {
+    votingHostRegistry = _votingHostRegistry;
   }
 
   function setVotingRegistry(address _votingRegistry) adminOnly public {
@@ -50,8 +50,8 @@ contract VotingCore is Permissioned {
   }
 
   function getMembership(address _address) public view returns (uint) {
-    VotingHostRegistry hostsRegistry = VotingHostRegistry(votingHostRegistry);
-    return uint(hostsRegistry.getMembership(_address));
+    VotingHostRegistry hostRegistry = VotingHostRegistry(votingHostRegistry);
+    return uint(hostRegistry.getMembership(_address));
   }
 
   function createVoting(bytes32 title, bytes32[] memory optionTitles, uint expiryBlockNumber) hostOnly(msg.sender) public {
@@ -62,9 +62,9 @@ contract VotingCore is Permissioned {
   }
 
   function applyAsHost() public payable {
-    VotingHostRegistry hostsRegistry = VotingHostRegistry(votingHostRegistry);
+    VotingHostRegistry hostRegistry = VotingHostRegistry(votingHostRegistry);
     VotingHostRegistry.Membership memberType = _checkMembership(msg.value);
-    hostsRegistry.depositHost(msg.sender, memberType);
+    hostRegistry.depositHost(msg.sender, memberType);
   }
 
   function _checkMembership(uint _value) internal pure returns (VotingHostRegistry.Membership) {
