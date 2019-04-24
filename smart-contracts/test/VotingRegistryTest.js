@@ -36,14 +36,14 @@ contract("VotingRegistry", function(accounts) {
     });
 
     it("get current admin with getAdmin and get some methods restricted with adminOnly modifier", async () => {
-        assert.equal(await VotingRegistryInstance.getAdmin(), testingAccountContractAdmin);
+        assert.equal(await VotingRegistryInstance.admin(), testingAccountContractAdmin);
         await catchRevert(VotingRegistryInstance.setAdmin(testingAccountNewContractAdmin, { from: testingAccountNotContractAdmin }));
         await catchRevert(VotingRegistryInstance.depositVoting(VotingInstance.address, { from: testingAccountNotContractAdmin })); // wierd here: argument type is contract (Voting) but error occured. we put Voting instance's address here and it passes the test
     });
 
     it("replace current admin with new one", async () => {
         await VotingRegistryInstance.setAdmin(testingAccountNewContractAdmin, { from: testingAccountContractAdmin });
-        assert.equal(await VotingRegistryInstance.getAdmin(), testingAccountNewContractAdmin);
+        assert.equal(await VotingRegistryInstance.admin(), testingAccountNewContractAdmin);
     });
 
     it("deposit votings to the registry", async () => {

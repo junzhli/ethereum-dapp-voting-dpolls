@@ -1,28 +1,13 @@
 pragma solidity ^0.5.0;
-
+import "./baseContracts/Permissioned.sol";
 import "./Voting.sol";
 
-contract VotingRegistry {
-
-  address private admin;
+contract VotingRegistry is Permissioned {
   Voting[] private votings;
-  mapping(address => bool) votingIsExisting;
+  mapping(address => bool) private votingIsExisting;
 
   constructor() public {
     admin = msg.sender;
-  }
-
-  modifier adminOnly() {
-    require(msg.sender == admin);
-    _;
-  }
-
-  function getAdmin() public view returns (address) {
-    return admin;
-  }
-
-  function setAdmin(address _admin) adminOnly public {
-    admin = _admin;
   }
 
   function depositVoting(Voting _voting) adminOnly public {

@@ -1,29 +1,16 @@
 pragma solidity ^0.5.0;
+import './baseContracts/Permissioned.sol';
 
-contract VotingHostsRegistry {
+contract VotingHostsRegistry is Permissioned {
   enum Membership { DEFAULT, CITIZEN, DIAMOND }
   uint constant MAX_TIMES_PER_HOST = 10;
 
-  address private admin;
   mapping(address => Membership) private hosts;
   mapping(address => uint) private usedTimes;
   mapping(address => bool) private hasApplied;
 
   constructor() public {
     admin = msg.sender;
-  }
-
-  modifier adminOnly() {
-    require(msg.sender == admin);
-    _;
-  }
-
-  function getAdmin() public view returns (address) {
-    return admin;
-  }
-
-  function setAdmin(address _admin) adminOnly public {
-    admin = _admin;
   }
 
   function depositHost(address _address, Membership _level) adminOnly external {

@@ -2,17 +2,16 @@ pragma solidity ^0.5.0;
 
 
 contract Voting {
-  bytes32 private title;
-  uint private optionsAmount;
-  address private chairperson;
-  uint private expiryBlockNumber;
+  bytes32 public title;
+  uint public optionsAmount;
+  address public chairperson;
+  uint public expiryBlockNumber;
   bytes32[] private optionTitles;
   mapping(address => uint) private voters;
   mapping(address => bool) private voted;
   mapping(uint => uint) private votes;
-  uint private votesAmount;
+  uint public votesAmount;
   
-
   constructor(bytes32 _title, bytes32[] memory _optionTitles, uint _expiryBlockNumber, address _admin) public {
     require(_expiryBlockNumber > block.number);
     require(_optionTitles.length <= 256 && _optionTitles.length > 0); // we allow a max number of 256 options for each vote
@@ -20,15 +19,8 @@ contract Voting {
     title = _title;
     optionsAmount = _optionTitles.length;
     expiryBlockNumber = _expiryBlockNumber;
+    optionTitles = _optionTitles;
     votesAmount = 0;
-    
-    for (uint i = 0; i < _optionTitles.length; i++) {
-      optionTitles.push(_optionTitles[i]);
-    }
-  }
-
-  function getChairperson() public view returns (address) {
-    return chairperson;
   }
 
   function isVoted(address _address) public view returns (bool) {
@@ -55,14 +47,6 @@ contract Voting {
     return voters[_address];
   }
 
-  function getTitle() public view returns (bytes32) {
-    return title;
-  }
-
-  function getOptionsAmount() public view returns (uint) {
-    return optionsAmount;
-  }
-
   function getOptionTitleByIndex(uint _index) public view returns (bytes32) {
     require(_optionCheck(_index));
     return optionTitles[_index];
@@ -76,9 +60,5 @@ contract Voting {
 
   function isExpired() public view returns (bool) {
     return (block.number > expiryBlockNumber);
-  }
-
-  function currentVotes() public view returns (uint) {
-    return votesAmount;
   }
 }
