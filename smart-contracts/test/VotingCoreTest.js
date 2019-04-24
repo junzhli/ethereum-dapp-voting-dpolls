@@ -50,9 +50,9 @@ contract("VotingCore", function(accounts) {
     });
 
     it("get current admin with getAdmin and get some methods restricted with adminOnly modifier", async () => {
-        assert.equal(await VotingCoreInstance.getAdmin(), testingAccountContractAdmin);
+        assert.equal(await VotingCoreInstance.admin(), testingAccountContractAdmin);
         await catchRevert(VotingCoreInstance.setAdmin(testingAccountNewContractAdmin, { from: testingAccountNotContractAdmin }));
-        await catchRevert(VotingCoreInstance.setRegistry(NewVotingRegistryInstance.address, { from: testingAccountNotContractAdmin }));
+        await catchRevert(VotingCoreInstance.setVotingsRegistry(NewVotingRegistryInstance.address, { from: testingAccountNotContractAdmin }));
         await catchRevert(VotingCoreInstance.setDepositAccount(testingNewDepositAccount, { from: testingAccountNotContractAdmin }));
         await catchRevert(VotingCoreInstance.setVotingHostsRegistry(NewVotingHostsRegistryInstance.address, { from: testingAccountNotContractAdmin }));
         await catchRevert(VotingCoreInstance.createVoting(titleHex, optionTitlesHex, expiryBlockNumber, { from: testingAccountNotContractAdmin }));
@@ -60,22 +60,22 @@ contract("VotingCore", function(accounts) {
 
     it("replace current admin with new one", async () => {
         await VotingCoreInstance.setAdmin(testingAccountNewContractAdmin, { from: testingAccountContractAdmin });
-        assert.equal(await VotingCoreInstance.getAdmin(), testingAccountNewContractAdmin);
+        assert.equal(await VotingCoreInstance.admin(), testingAccountNewContractAdmin);
     });
 
     it("replace current registry with new one", async () => {
-        await VotingCoreInstance.setRegistry(NewVotingRegistryInstance.address, { from: testingAccountContractAdmin });
-        assert.equal(await VotingCoreInstance.getRegistry(), NewVotingRegistryInstance.address);
+        await VotingCoreInstance.setVotingsRegistry(NewVotingRegistryInstance.address, { from: testingAccountContractAdmin });
+        assert.equal(await VotingCoreInstance.votingsRegistry(), NewVotingRegistryInstance.address);
     });
 
     it("replace current deposit account with new one", async () => {
         await VotingCoreInstance.setDepositAccount(testingNewDepositAccount, { from: testingAccountContractAdmin });
-        assert.equal(await VotingCoreInstance.getDepositAccount(), testingNewDepositAccount);
+        assert.equal(await VotingCoreInstance.depositAccount(), testingNewDepositAccount);
     });
 
     it("replace current hosts registry with new one", async () => {
         await VotingCoreInstance.setVotingHostsRegistry(NewVotingHostsRegistryInstance.address, { from: testingAccountContractAdmin });
-        assert.equal(await VotingCoreInstance.getVotingHostsRegistry(), NewVotingHostsRegistryInstance.address);
+        assert.equal(await VotingCoreInstance.votingHostsRegistry(), NewVotingHostsRegistryInstance.address);
     });
 
     it("create a vote from a non-voting host", async () => {

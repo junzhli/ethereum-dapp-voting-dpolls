@@ -1,22 +1,22 @@
 pragma solidity ^0.5.0;
+import './baseContracts/Permissioned.sol';
 import './Voting.sol';
 import './VotingRegistry.sol';
 import './VotingHostsRegistry.sol';
 
-contract VotingCore {
-  address private admin;
-  address private votingRegistry;
-  address private votingHostsRegistry;
-  address payable depositAccount;
+contract VotingCore is Permissioned {
+  address public votingsRegistry;
+  address public votingHostsRegistry;
+  address payable public depositAccount;
 
   event newVoting(address _voting);
 
   uint constant ONE_ETHER = 1e18;
   uint constant TEN_ETHERS = 10 * 1e18;
 
-  constructor(address _votingRegistry, address _votingHostsRegistry, address payable _depositAccount) public {
+  constructor(address _votingsRegistry, address _votingHostsRegistry, address payable _depositAccount) public {
     admin = msg.sender;
-    votingRegistry = _votingRegistry;
+    votingsRegistry = _votingsRegistry;
     votingHostsRegistry = _votingHostsRegistry;
     depositAccount = _depositAccount;
   }
@@ -27,77 +27,40 @@ contract VotingCore {
     _;
   }
 
-  modifier adminOnly() {
-    require(msg.sender == admin);
-    _;
-  }
-
-  /**
-   * Getter and setters
-   */
-
-  function getAdmin() public view returns (address) {
-    return admin;
-  }
-
   function setAdmin(address _admin) adminOnly public {
     admin = _admin;
-  }
-
-  function getDepositAccount() public view returns (address) {
-    return depositAccount;
   }
 
   function setDepositAccount(address payable _depositAccount) adminOnly public {
     depositAccount = _depositAccount;
   }
 
-  function getVotingHostsRegistry() public view returns (address) {
-    return votingHostsRegistry;
-  }
-
   function setVotingHostsRegistry(address _votingHostsRegistry) adminOnly public {
     votingHostsRegistry = _votingHostsRegistry;
   }
 
-  function getRegistry() public view returns (address) {
-    return votingRegistry;
+  function setVotingsRegistry(address _votingsRegistry) adminOnly public {
+    votingsRegistry = _votingsRegistry;
   }
-
-  function setRegistry(address _votingRegistry) adminOnly public {
-    votingRegistry = _votingRegistry;
-  }
-
-  /**
-   * Proxied methods for VotingRegistry
-   */
 
   function getAmountVotings() public view returns (uint) {
-    VotingRegistry registry = VotingRegistry(votingRegistry);
+    VotingRegistry registry = VotingRegistry(votingsRegistry);
     return registry.getAmountVotings();
   }
 
   function getVotingItemByIndex(uint _index) public view returns (address) {
-    VotingRegistry registry = VotingRegistry(votingRegistry);
+    VotingRegistry registry = VotingRegistry(votingsRegistry);
     return registry.getVotingItemByIndex(_index);
   }
-
-  /**
-   * Proxied methods for VotingHostsRegistry
-   */
 
   function getMembership(address _address) public view returns (uint) {
     VotingHostsRegistry hostsRegistry = VotingHostsRegistry(votingHostsRegistry);
     return uint(hostsRegistry.getMembership(_address));
   }
 
-  /**
-   * Core functionality
-   */
-
   function createVoting(bytes32 title, bytes32[] memory optionTitles, uint expiryBlockNumber) hostOnly(msg.sender) public {
     Voting voting = new Voting(title, optionTitles, expiryBlockNumber, msg.sender);
-    VotingRegistry registry = VotingRegistry(votingRegistry);
+    VotingRegistry registry = VotingRegistry(votingsRegistry);
     registry.depositVoting(voting);
     emit newVoting(address(voting));
   }

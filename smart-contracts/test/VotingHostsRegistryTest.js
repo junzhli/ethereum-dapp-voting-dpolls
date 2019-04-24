@@ -27,7 +27,7 @@ contract("VotingHostsRegistry", function(accounts) {
     });
 
     it("get current admin with getAdmin and get some methods restricted with adminOnly modifier", async () => {
-        assert.equal(await VotingHostsRegistryInstance.getAdmin(), testingAccountContractAdmin);
+        assert.equal(await VotingHostsRegistryInstance.admin(), testingAccountContractAdmin);
         await catchRevert(VotingHostsRegistryInstance.setAdmin(testingAccountNewContractAdmin, { from: testingAccountNotContractAdmin }));
         await catchRevert(VotingHostsRegistryInstance.depositHost(testingAccountWithCitizenMembership, Membership.CITIZEN, { from: testingAccountNotContractAdmin }));
         await catchRevert(VotingHostsRegistryInstance.setRecordForHost(testingAccountWithCitizenMembership, { from: testingAccountNotContractAdmin }));
@@ -35,7 +35,7 @@ contract("VotingHostsRegistry", function(accounts) {
 
     it("replace current admin with new one", async () => {
         await VotingHostsRegistryInstance.setAdmin(testingAccountNewContractAdmin, { from: testingAccountContractAdmin });
-        assert.equal(await VotingHostsRegistryInstance.getAdmin(), testingAccountNewContractAdmin);
+        assert.equal(await VotingHostsRegistryInstance.admin(), testingAccountNewContractAdmin);
     });
 
     it("deposit a host with 'CITIZEN' membership to the registry, set a few records until it downgrades the membership", async () => {
