@@ -1,6 +1,6 @@
 const catchRevert = require('./helper/exception').catchRevert;
 const { Membership, MembershipPricing } = require('./constant');
-const VotingHostsRegistry = artifacts.require('./VotingHostsRegistry');
+const VotingHostRegistry = artifacts.require('./VotingHostRegistry');
 const VotingRegistry = artifacts.require('./VotingRegistry');
 const VotingCore = artifacts.require('./VotingCore');
 
@@ -16,8 +16,8 @@ contract("VotingCore", function(accounts) {
     let testingDepositAccount;
     let testingNewDepositAccount;
 
-    let VotingHostsRegistryInstance;
-    let NewVotingHostsRegistryInstance;
+    let VotingHostRegistryInstance;
+    let NewVotingHostRegistryInstance;
     let VotingRegistryInstance;
     let NewVotingRegistryInstance;
     let VotingCoreInstance;
@@ -40,21 +40,21 @@ contract("VotingCore", function(accounts) {
         testingAccountVotingHost = accounts[3];
         testingDepositAccount = accounts[4];
         testingNewDepositAccount = accounts[5];
-        VotingHostsRegistryInstance = await VotingHostsRegistry.new({from: testingAccountContractAdmin});
-        NewVotingHostsRegistryInstance = await VotingHostsRegistry.new({from: testingAccountContractAdmin});
+        VotingHostRegistryInstance = await VotingHostRegistry.new({from: testingAccountContractAdmin});
+        NewVotingHostRegistryInstance = await VotingHostRegistry.new({from: testingAccountContractAdmin});
         VotingRegistryInstance = await VotingRegistry.new({from: testingAccountContractAdmin});
         NewVotingRegistryInstance = await VotingRegistry.new({from: testingAccountContractAdmin});
-        VotingCoreInstance = await VotingCore.new(VotingRegistryInstance.address, VotingHostsRegistryInstance.address, testingDepositAccount, {from: testingAccountContractAdmin});
+        VotingCoreInstance = await VotingCore.new(VotingRegistryInstance.address, VotingHostRegistryInstance.address, testingDepositAccount, {from: testingAccountContractAdmin});
         await VotingRegistryInstance.setAdmin(VotingCoreInstance.address, {from: testingAccountContractAdmin});
-        await VotingHostsRegistryInstance.setAdmin(VotingCoreInstance.address, {from: testingAccountContractAdmin});
+        await VotingHostRegistryInstance.setAdmin(VotingCoreInstance.address, {from: testingAccountContractAdmin});
     });
 
     it("get current admin with getAdmin and get some methods restricted with adminOnly modifier", async () => {
         assert.equal(await VotingCoreInstance.admin(), testingAccountContractAdmin);
         await catchRevert(VotingCoreInstance.setAdmin(testingAccountNewContractAdmin, { from: testingAccountNotContractAdmin }));
-        await catchRevert(VotingCoreInstance.setVotingsRegistry(NewVotingRegistryInstance.address, { from: testingAccountNotContractAdmin }));
+        await catchRevert(VotingCoreInstance.setVotingRegistry(NewVotingRegistryInstance.address, { from: testingAccountNotContractAdmin }));
         await catchRevert(VotingCoreInstance.setDepositAccount(testingNewDepositAccount, { from: testingAccountNotContractAdmin }));
-        await catchRevert(VotingCoreInstance.setVotingHostsRegistry(NewVotingHostsRegistryInstance.address, { from: testingAccountNotContractAdmin }));
+        await catchRevert(VotingCoreInstance.setVotingHostRegistry(NewVotingHostRegistryInstance.address, { from: testingAccountNotContractAdmin }));
         await catchRevert(VotingCoreInstance.createVoting(titleHex, optionTitlesHex, expiryBlockNumber, { from: testingAccountNotContractAdmin }));
     });
 
@@ -64,8 +64,8 @@ contract("VotingCore", function(accounts) {
     });
 
     it("replace current registry with new one", async () => {
-        await VotingCoreInstance.setVotingsRegistry(NewVotingRegistryInstance.address, { from: testingAccountContractAdmin });
-        assert.equal(await VotingCoreInstance.votingsRegistry(), NewVotingRegistryInstance.address);
+        await VotingCoreInstance.setVotingRegistry(NewVotingRegistryInstance.address, { from: testingAccountContractAdmin });
+        assert.equal(await VotingCoreInstance.votingRegistry(), NewVotingRegistryInstance.address);
     });
 
     it("replace current deposit account with new one", async () => {
@@ -74,8 +74,8 @@ contract("VotingCore", function(accounts) {
     });
 
     it("replace current hosts registry with new one", async () => {
-        await VotingCoreInstance.setVotingHostsRegistry(NewVotingHostsRegistryInstance.address, { from: testingAccountContractAdmin });
-        assert.equal(await VotingCoreInstance.votingHostsRegistry(), NewVotingHostsRegistryInstance.address);
+        await VotingCoreInstance.setVotingHostRegistry(NewVotingHostRegistryInstance.address, { from: testingAccountContractAdmin });
+        assert.equal(await VotingCoreInstance.votingHostRegistry(), NewVotingHostRegistryInstance.address);
     });
 
     it("create a vote from a non-voting host", async () => {

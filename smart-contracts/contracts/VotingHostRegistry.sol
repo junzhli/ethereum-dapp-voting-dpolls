@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 import './baseContracts/Permissioned.sol';
 
-contract VotingHostsRegistry is Permissioned {
+contract VotingHostRegistry is Permissioned {
   enum Membership { DEFAULT, CITIZEN, DIAMOND }
   uint constant MAX_TIMES_PER_HOST = 10;
 

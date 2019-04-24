@@ -36,7 +36,7 @@ Smart Contracts
 
 #### Components
 * VotingCore - Core functionality
-* VotingHostsRegistry - Maintain a list of registered hosts and memberships
+* VotingHostRegistry - Maintain a list of registered hosts and memberships
 * VotingRegistry - Maintain a list of active/inactive polls
 * Voting - A poll entity
 
