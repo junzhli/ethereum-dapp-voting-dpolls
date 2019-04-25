@@ -59,6 +59,7 @@ process.env.NODE_PATH = (process.env.NODE_PATH || '')
 // Grab NODE_ENV and REACT_APP_* environment variables and prepare them to be
 // injected into the application via DefinePlugin in Webpack configuration.
 const REACT_APP = /^REACT_APP_/i;
+const ENV_PREFIX = 'REACT_APP_'; // the above one without regex
 
 function getClientEnvironment(publicUrl) {
   const raw = Object.keys(process.env)
@@ -89,5 +90,22 @@ function getClientEnvironment(publicUrl) {
 
   return { raw, stringified };
 }
+
+// =======================
+/**
+ * Environment variable checks
+ */
+const ENV_VARS = [
+  'VOTING_CORE_ADDRESS'
+];
+
+ENV_VARS.forEach(value => {
+  const valuePrefixed = ENV_PREFIX + value;
+  if (!process.env[valuePrefixed] || (process.env[valuePrefixed] === '')) {
+    throw new Error('Env variable: ' + valuePrefixed + ' not set property');
+  }
+});
+
+// =======================
 
 module.exports = getClientEnvironment;

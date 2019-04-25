@@ -2,10 +2,13 @@
 /// <reference types="react" />
 /// <reference types="react-dom" />
 
+import { Address } from './types';
+
 declare namespace NodeJS {
   interface ProcessEnv {
     NODE_ENV: 'development' | 'production' | 'test';
     PUBLIC_URL: string;
+    REACT_APP_VOTING_CORE_ADDRESS: Address;
   }
 }
 

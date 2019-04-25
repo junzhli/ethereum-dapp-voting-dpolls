@@ -1,8 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Web3 from 'web3';
+import { Provider } from 'react-redux';
+import store from './store';
 import { IIndexStates } from './types';
 import MainBanner from './components/MainBanner';
+import MainListingPoll from './components/MainListingPoll';
 
 /**
  * global declaration
@@ -13,7 +16,7 @@ declare global {
     }
 }
 
-class App extends React.Component<any, IIndexStates> {
+class App extends React.Component<{}, IIndexStates> {
     constructor (props: {}) {
         super(props);
         let web3 = null;
@@ -45,7 +48,8 @@ class App extends React.Component<any, IIndexStates> {
         } else {
             return (
                 <div>
-                    <MainBanner web3={ this.state.web3 } />
+                    <MainBanner web3={this.state.web3} />
+                    <MainListingPoll web3={this.state.web3} />
                 </div>
             )
         }
@@ -59,6 +63,8 @@ class App extends React.Component<any, IIndexStates> {
 const rootElement = document.getElementById('root');
 
 ReactDOM.render(
-    <App />,
+    <Provider store={store}>
+        <App />
+    </Provider>,
     rootElement
 )

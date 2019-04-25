@@ -1,5 +1,9 @@
-import React from 'react';
-import { IMainBannerProps, IMainBannerStates } from './types/MainBanner';
+import React, { Dispatch } from 'react';
+import { IMainBannerProps, IMainBannerStates, IStateFromProps, IPropsFromDispatch, IInnerProps } from './types/MainBanner';
+import { StoreState } from '../store/types';
+import { ETHActionType, BlockHeightType } from '../actions/types/eth';
+import { setBlockHeight } from '../actions/eth';
+import { connect } from 'react-redux';
 
 class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
     private checkBlockNumberInterval: any;
@@ -10,7 +14,6 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
         this.checkBlockNumberInterval = null;
         this.checkAccountAddressInterval = null;
         this.state = {
-            blockNumber: null,
             accountAddress: null,
             isLoaded: false
         }
@@ -19,10 +22,8 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
     async componentDidMount() {
         this.checkBlockNumberInterval = setInterval(async () => {
             const blockNumber = await this.props.web3.eth.getBlockNumber();
-            if (blockNumber !== this.state.blockNumber) {
-                this.setState({
-                    blockNumber
-                });
+            if (blockNumber !== this.props.blockHeight) {
+                this.props.setBlockHeight(blockNumber);
             }
         }, 1000);
 
@@ -45,7 +46,7 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
         return (
             <div id="banner">
                 <div id="block-height">
-                    Block height: { this.state.blockNumber }
+                    Block height: { this.props.blockHeight }
                 </div>
                 <div id="account-address">
                     Account address: { this.state.accountAddress }
@@ -55,4 +56,19 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
     }
 }
 
-export default MainBanner;
+const mapStateToProps = (state: StoreState, ownProps: IInnerProps): IStateFromProps => {
+    return {
+        blockHeight: state.ethMisc.blockHeight
+    }
+}
+
+const mapDispatchToProps = (dispatch: Dispatch<ETHActionType>, ownProps: IInnerProps): IPropsFromDispatch => {
+    return {
+        setBlockHeight: (blockHeight: BlockHeightType) => dispatch(setBlockHeight(blockHeight))
+    }
+}
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(MainBanner);
