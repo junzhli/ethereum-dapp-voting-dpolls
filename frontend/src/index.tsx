@@ -6,6 +6,7 @@ import store from './store';
 import { IIndexStates } from './types';
 import MainBanner from './components/MainBanner';
 import MainListingPoll from './components/MainListingPoll';
+import 'semantic-ui-css/semantic.min.css';
 
 /**
  * global declaration
@@ -13,6 +14,7 @@ import MainListingPoll from './components/MainListingPoll';
 declare global {
     interface Window {
         web3: any;
+        ethereum: any;
     }
 }
 
@@ -20,17 +22,21 @@ class App extends React.Component<{}, IIndexStates> {
     constructor (props: {}) {
         super(props);
         let web3 = null;
+        let approved = false;
 
         // Checking if Web3 has been injected by the browser (Mist/MetaMask)
         if (typeof window.web3 !== 'undefined') {
-            // Use Mist/MetaMask's provider
             web3 = new Web3(window.web3.currentProvider);
         } else {
             console.log('No web3? You should consider trying MetaMask!');
         }
 
         this.state = {
-            web3
+            web3,
+            approved,
+            voting: {
+                selector: null
+            }
         };
     }
 
@@ -49,6 +55,7 @@ class App extends React.Component<{}, IIndexStates> {
             return (
                 <div>
                     <MainBanner web3={this.state.web3} />
+                    <br></br>
                     <MainListingPoll web3={this.state.web3} />
                 </div>
             )

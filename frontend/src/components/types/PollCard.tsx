@@ -1,5 +1,5 @@
 import { Address } from "../../types";
-import { BlockHeightType } from "../../actions/types/eth";
+import { BlockHeightType, AddressType } from "../../actions/types/eth";
 
 export interface IInnerProps {
     web3: any;
@@ -7,7 +7,8 @@ export interface IInnerProps {
 }
 
 export interface IStateFromProps {
-    blockHeight: BlockHeightType
+    accountAddress: AddressType | null;
+    blockHeight: BlockHeightType;
 }
 
 export type IPollCardProps = IInnerProps & IStateFromProps;
@@ -15,7 +16,9 @@ export type IPollCardProps = IInnerProps & IStateFromProps;
 export interface IPollCardStates {
     externalData: {
         isExpired: boolean | null,
+        isVoted: boolean | null,
         expiryBlockNumber: number,
-        title: string
+        title: string,
+        options: string[]
     } | null;
 }

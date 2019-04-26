@@ -1,7 +1,8 @@
-import { BlockHeightType } from "../../actions/types/eth";
+import { BlockHeightType, AddressType } from "../../actions/types/eth";
 
 export interface IEthMisc {
-    blockHeight: BlockHeightType
+    blockHeight: BlockHeightType,
+    accountAddress: AddressType | null
 }
 
 export interface StoreState {

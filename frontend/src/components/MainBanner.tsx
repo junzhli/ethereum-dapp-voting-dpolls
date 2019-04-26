@@ -1,8 +1,8 @@
 import React, { Dispatch } from 'react';
 import { IMainBannerProps, IMainBannerStates, IStateFromProps, IPropsFromDispatch, IInnerProps } from './types/MainBanner';
 import { StoreState } from '../store/types';
-import { ETHActionType, BlockHeightType } from '../actions/types/eth';
-import { setBlockHeight } from '../actions/eth';
+import { ETHActionType, BlockHeightType, AddressType } from '../actions/types/eth';
+import { setBlockHeight, setAccountAddress } from '../actions/eth';
 import { connect } from 'react-redux';
 
 class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
@@ -14,7 +14,6 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
         this.checkBlockNumberInterval = null;
         this.checkAccountAddressInterval = null;
         this.state = {
-            accountAddress: null,
             isLoaded: false
         }
     }
@@ -29,10 +28,8 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
 
         this.checkAccountAddressInterval = setInterval(async () => {
             const accountAddress = await this.props.web3.eth.getAccounts();
-            if (accountAddress[0] !== this.state.accountAddress) {
-                this.setState({
-                    accountAddress
-                });
+            if (accountAddress[0] !== this.props.accountAddress) {
+                this.props.setAccountAddress(accountAddress[0]);
             }
         }, 1000)
     }
@@ -49,7 +46,7 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                     Block height: { this.props.blockHeight }
                 </div>
                 <div id="account-address">
-                    Account address: { this.state.accountAddress }
+                    Account address: { this.props.accountAddress }
                 </div>
             </div>
         )
@@ -58,13 +55,15 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
 
 const mapStateToProps = (state: StoreState, ownProps: IInnerProps): IStateFromProps => {
     return {
-        blockHeight: state.ethMisc.blockHeight
+        blockHeight: state.ethMisc.blockHeight,
+        accountAddress: state.ethMisc.accountAddress
     }
 }
 
 const mapDispatchToProps = (dispatch: Dispatch<ETHActionType>, ownProps: IInnerProps): IPropsFromDispatch => {
     return {
-        setBlockHeight: (blockHeight: BlockHeightType) => dispatch(setBlockHeight(blockHeight))
+        setBlockHeight: (blockHeight: BlockHeightType) => dispatch(setBlockHeight(blockHeight)),
+        setAccountAddress: (accountAddress: AddressType) => dispatch(setAccountAddress(accountAddress))
     }
 }
 

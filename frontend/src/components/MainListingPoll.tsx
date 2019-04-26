@@ -59,7 +59,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                 return (
                     this.state.polls && this.state.polls.map(pollAddress => {
                         return (
-                            <PollCard web3={this.props.web3} address={pollAddress} />
+                            <PollCard web3={this.props.web3} address={pollAddress} key={pollAddress} />
                         )
                     })
                 )
