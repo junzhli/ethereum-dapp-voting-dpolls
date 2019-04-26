@@ -15,7 +15,6 @@ contract VotingCore is Permissioned {
   uint constant TEN_ETHERS = 10 * 1e18;
 
   constructor(address _votingRegistry, address _votingHostRegistry, address payable _depositAccount) public {
-    admin = msg.sender;
     votingRegistry = _votingRegistry;
     votingHostRegistry = _votingHostRegistry;
     depositAccount = _depositAccount;

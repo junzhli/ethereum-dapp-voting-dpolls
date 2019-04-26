@@ -6,10 +6,6 @@ contract VotingRegistry is Permissioned {
   Voting[] private votings;
   mapping(address => bool) private votingIsExisting;
 
-  constructor() public {
-    admin = msg.sender;
-  }
-
   function depositVoting(Voting _voting) adminOnly public {
     require(votingIsExisting[address(_voting)] != true);
     votings.push(_voting);

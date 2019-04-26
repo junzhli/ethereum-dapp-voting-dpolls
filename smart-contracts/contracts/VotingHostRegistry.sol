@@ -9,10 +9,6 @@ contract VotingHostRegistry is Permissioned {
   mapping(address => uint) private usedTimes;
   mapping(address => bool) private hasApplied;
 
-  constructor() public {
-    admin = msg.sender;
-  }
-
   function depositHost(address _address, Membership _level) adminOnly external {
     require(hasApplied[_address] != true);
     hosts[_address] = _level;
