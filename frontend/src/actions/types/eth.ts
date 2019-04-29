@@ -1,4 +1,6 @@
-import { SET_BLOCK_HEIGHT, SET_ACCOUNT_ADDRESS } from "../constant";
+import { SET_BLOCK_HEIGHT, SET_ACCOUNT_ADDRESS, SET_MEMBERSHIP } from "../constant";
+import { IMainBanner } from "../../components/types/MainBanner";
+import { Membership } from "../../types";
 
 export type BlockHeightType = number;
 export type AddressType = string;
@@ -13,4 +15,9 @@ export interface ISetAccountAddress {
     payload: AddressType
 };
 
-export type ETHActionType = ISetBlockHeight | ISetAccountAddress;
+export interface ISetMembership {
+    type: typeof SET_MEMBERSHIP,
+    payload: Membership
+}
+
+export type ETHActionType = ISetBlockHeight | ISetAccountAddress | ISetMembership;

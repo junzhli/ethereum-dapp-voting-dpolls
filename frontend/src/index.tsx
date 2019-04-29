@@ -7,6 +7,7 @@ import { IIndexStates } from './types';
 import MainBanner from './components/MainBanner';
 import MainListingPoll from './components/MainListingPoll';
 import 'semantic-ui-css/semantic.min.css';
+import { Container, Divider } from 'semantic-ui-react';
 
 /**
  * global declaration
@@ -54,9 +55,19 @@ class App extends React.Component<{}, IIndexStates> {
         } else {
             return (
                 <div>
-                    <MainBanner web3={this.state.web3} />
-                    <br></br>
-                    <MainListingPoll web3={this.state.web3} />
+                    {   
+                        <Container>
+                            <MainBanner web3={this.state.web3} />
+                        </Container>
+                    }
+                    {
+                        <Divider clearing></Divider>
+                    }
+                    {
+                        <Container>
+                            <MainListingPoll web3={this.state.web3} />
+                        </Container>
+                    }
                 </div>
             )
         }

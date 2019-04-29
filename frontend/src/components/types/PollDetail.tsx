@@ -1,21 +1,31 @@
 import { BlockHeightType, AddressType } from "../../actions/types/eth";
 
-export interface IInnerProps {
-    web3: any;
-    contract: any;
-    address: AddressType;
-    title: string;
-    options: string[];
-    expiryBlockHeight: BlockHeightType;
-    isExpired: boolean;
-    isVoted: boolean;
+export namespace IPollDetail {
+    export interface IInnerProps {
+        web3: any;
+        contract: any;
+        address: AddressType;
+        title: string;
+        options: string[];
+        expiryBlockHeight: BlockHeightType;
+        isExpired: boolean;
+        isVoted: boolean;
+    }
+    
+    export interface IStateFromProps {
+        accountAddress: AddressType | null;
+    }
 }
 
-export interface IStateFromProps {
-    accountAddress: AddressType | null;
-}
-
-export type IPollDetailProps = IInnerProps & IStateFromProps;
+export type IPollDetailProps = IPollDetail.IInnerProps & IPollDetail.IStateFromProps;
 
 export interface IPollDetailStates {
+    waitingMessage: {
+        show: boolean,
+        message: string | null
+    };
+    errorMessage: {
+        show: boolean,
+        message: string | null
+    };
 }

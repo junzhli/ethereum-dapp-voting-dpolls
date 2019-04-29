@@ -1,6 +1,6 @@
 import { AddressType } from "../actions/types/eth";
 
-export const sendTransaction = (web3: any, from: AddressType, to: AddressType, data: string = '', value: number = 0) => {
+export const sendTransaction = (web3: any, from: AddressType, to: AddressType, data: string = '', value: number = 0): Promise<string> => {
     return new Promise((res, rej) => {
         web3.eth.sendTransaction(
             {
