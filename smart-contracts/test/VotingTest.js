@@ -62,13 +62,12 @@ contract("Voting", function(accounts) {
         assert.equal(web3.utils.hexToUtf8(await VotingInstance.getOptionTitleByIndex(2)), optionTitles[2]);
     });
 
-    it("people can vote only once and are unable to watch result or his/her vote until it expires", async () => {
+    it("people can vote only once and are unable to watch result until it expires", async () => {
         // we assume that auto mining on Ganache private blockchain is enabled that it automatically increases block height while a new transaction submitted
         votedOption1 = 0;
         await VotingInstance.vote(votedOption1, { from: testingAccountVoter1 });
         assert.equal(await VotingInstance.votesAmount(), 1);
         assert.equal(await web3.eth.getBlockNumber(), startWithBlockNumber + 2);
-        await catchRevert(VotingInstance.getMyOption(testingAccountVoter1));
 
         await catchRevert(VotingInstance.vote(votedOption1, { from: testingAccountVoter1 })); // block height increases
 
@@ -76,7 +75,6 @@ contract("Voting", function(accounts) {
         await VotingInstance.vote(votedOption2, { from: testingAccountVoter2 });
         assert.equal(await VotingInstance.votesAmount(), 2);
         assert.equal(await web3.eth.getBlockNumber(), startWithBlockNumber + 4);
-        await catchRevert(VotingInstance.getMyOption(testingAccountVoter2));
         assert.equal(await VotingInstance.isExpired(), false);
 
         votedOption3 = 1;
