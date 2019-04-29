@@ -42,7 +42,6 @@ contract Voting {
   }
 
   function getMyOption(address _address) public view returns (uint) {
-    require(isExpired());
     require(isVoted(_address));
     return voters[_address];
   }
