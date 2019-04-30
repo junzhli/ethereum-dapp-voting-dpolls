@@ -21,6 +21,7 @@ export interface IPollCardStates {
         isVoted: boolean | null,
         expiryBlockNumber: number,
         title: string,
-        options: string[]
+        options: string[],
+        votesAmount: number
     } | null;
 }

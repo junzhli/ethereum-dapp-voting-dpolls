@@ -73,6 +73,7 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
         for (let i = 0; i < amountOptions; i++) {
             options.push(this.props.web3.utils.hexToUtf8(await this.contract.methods.getOptionTitleByIndex(i).call()) as string);
         }
+        const votesAmount = (await this.contract.methods.votesAmount().call()).toNumber();
 
         this.setState({
             externalData: {
@@ -80,7 +81,8 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
                 isExpired,
                 isVoted,
                 options,
-                title
+                title,
+                votesAmount
             }
         })
     }
@@ -138,7 +140,13 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
                                 { this.state.externalData && this.state.externalData.title }
                             </Item.Header>
                             <Item.Extra>
+                                <Icon color='red' name='user outline' /> { this.props.address }
+                            </Item.Extra>
+                            <Item.Extra>
                                 { (this.state.externalData && this.state.externalData.isExpired) ? <Icon color='red' name='close' /> : <Icon color='green' name='check' /> } Expired at { this.state.externalData && this.state.externalData.expiryBlockNumber }
+                            </Item.Extra>
+                            <Item.Extra>
+                                <Icon color='brown' name='users' /> { this.state.externalData && this.state.externalData.votesAmount } votes
                             </Item.Extra>
                         </Item.Content>
                         <PollDetail 

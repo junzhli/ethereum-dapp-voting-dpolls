@@ -1,15 +1,18 @@
-import React from 'react';
-import { Modal, Button, Header, Image, Message, Icon } from 'semantic-ui-react';
+import React, { SyntheticEvent } from 'react';
+import { Modal, Button, Header, Image, Message, Icon, Form, Checkbox } from 'semantic-ui-react';
 import { IPollDetailProps, IPollDetailStates, IPollDetail } from './types/PollDetail';
 import { sendTransaction } from '../utils/web3';
 import { StoreState } from '../store/types';
 import { connect } from 'react-redux';
+import { VOTING_ABI } from '../constants/contractABIs';
 
 class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
     private checkConfirmedInterval: any;
+    private contract: any;
 
     constructor(props: IPollDetailProps) {
         super(props);
+        this.contract = new this.props.web3.eth.Contract(VOTING_ABI, this.props.address);
         this.checkConfirmedInterval = null;
         this.state = {
             waitingMessage: {
@@ -19,7 +22,24 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             errorMessage: {
                 show: false,
                 message: null
-            }
+            },
+            votingMessage: {
+                selectedIndex: null,
+                selectedOption: null
+            },
+            votedOption: null
+        }
+    }
+
+    async componentWillMount() {
+        if (this.props.isVoted) {
+            const selectedIndex = (await this.contract.methods.getMyOption(this.props.accountAddress).call()).toNumber();
+            this.setState({
+                votingMessage: {
+                    selectedIndex,
+                    selectedOption: this.props.options[selectedIndex]
+                }
+            })
         }
     }
 
@@ -30,6 +50,17 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
     }
 
     async vote(option: number) {
+        this.setState({
+            errorMessage: {
+                show: false,
+                message: null
+            },
+            waitingMessage: {
+                show: true,
+                message: 'Waiting for user prompt...'
+            }
+        })
+
         const web3 = this.props.web3;
         const from = this.props.accountAddress as string;
         const to = this.props.address;
@@ -71,12 +102,25 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             }, 1000);
         } catch (error) {
             this.setState({
+                waitingMessage: {
+                    show: false,
+                    message: null
+                },
                 errorMessage: {
                     show: true,
                     message: error.message
                 }
             })
         }
+    }
+
+    handleOptionVoted(event: SyntheticEvent, object: any) {
+        this.setState({
+            votingMessage: {
+                selectedIndex: object.value,
+                selectedOption: object.name
+            }
+        })
     }
 
     render() {
@@ -123,7 +167,39 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                             <div>
                                 Expiry Block Height: {this.props.expiryBlockHeight}
                             </div>
+                            <Form>
+                                {
+                                    this.props.options.map((option, index) => {
+                                        return (
+                                            <Form.Field>
+                                                <Checkbox
+                                                    radio
+                                                    label={option}
+                                                    name={option}
+                                                    value={index}
+                                                    checked={this.state.votingMessage.selectedIndex === index}
+                                                    onChange={this.handleOptionVoted.bind(this)}
+                                                    disabled={this.props.isVoted}
+                                                />
+                                            </Form.Field>
+                                        )
+                                    })
+                                }
+                                {
+                                    this.state.votingMessage.selectedOption && (
+                                        <Form.Field>
+                                            { this.props.isVoted ? ('You haved voted for') : ('You are voting for')} <b>{ this.state.votingMessage.selectedOption }</b>
+                                        </Form.Field>
+                                    )
+                                }
+                            </Form>
                             {
+                                (this.state.votingMessage.selectedIndex !== null && !this.props.isVoted) && (
+                                    <Button content='Vote!' onClick={() => this.vote(this.state.votingMessage.selectedIndex as number)}/>
+                                )
+                            }
+                            
+                            {/* {
                                 this.props.options.map((option, index) => {
                                     return (
                                         <div key={option}>
@@ -133,7 +209,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                                             {
                                                 !this.props.isVoted && (
                                                     <div>
-                                                        <button onClick={() => this.vote(index)}>Vote</button>
+                                                        <Button onClick={() => this.vote(index)}>Vote</Button>
                                                     </div>
                                                 )
                                             }
@@ -141,7 +217,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                                         </div>
                                     )
                                 })
-                            }
+                            } */}
                         </Modal.Description>
                     </Modal.Content>
                 </Modal>
