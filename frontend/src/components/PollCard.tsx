@@ -113,15 +113,17 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
             case 'non-loaded-completely':
                 return (
                     <Segment color='teal'>
+                        <Placeholder style={{ height: 56, width: 56 }}>
+                            <Placeholder.Image />
+                        </Placeholder>
                         <Placeholder>
-                            <Placeholder style={{ height: 150, width: 150 }}>
-                                <Placeholder.Image />
-                            </Placeholder>
                             <Placeholder.Paragraph>
-                            <Placeholder.Line />
-                            <Placeholder.Line />
-                            <Placeholder.Line />
-                            <Placeholder.Line />
+                                <Placeholder.Line />
+                            </Placeholder.Paragraph>
+                            <Placeholder.Paragraph>
+                                <Placeholder.Line />
+                                <Placeholder.Line />
+                                <Placeholder.Line />
                             </Placeholder.Paragraph>
                         </Placeholder>
                     </Segment>

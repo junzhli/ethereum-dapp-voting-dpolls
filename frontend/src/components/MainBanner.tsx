@@ -8,6 +8,7 @@ import { Membership } from '../types';
 import { VOTING_CORE_ABI } from '../constants/contractABIs';
 import style from './MainBanner.module.css';
 import MembershipUpgrade from './MembershipUpgrade';
+import { Header, Icon, Menu, Input } from 'semantic-ui-react';
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
@@ -62,7 +63,34 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
     render() {
         return (
             <div className={style['main-banner']}>
-                <div id="block-height">
+                <div className={[style.banner, style.center].join(' ')}>
+                    <div className={style.logo}>
+                        <Header inverted as='h2'>
+                            <Icon name='plug' />
+                            <Header.Content>dPolls</Header.Content>
+                        </Header>
+                    </div>
+                    <div className={style.menu}>
+                        <Menu secondary inverted>
+                            <Menu.Item name='Home' active={true} onClick={() => {}} />
+                            <Menu.Item
+                            name='Create'
+                            active={false}
+                            onClick={() => {}}
+                            />
+                            <Menu.Menu position='right'>
+                            <Menu.Item
+                                name='Upgrade'
+                                active={false}
+                                onClick={() => {}}
+                            />
+                            </Menu.Menu>
+                        </Menu>
+                    </div>
+                </div>
+                
+                
+                {/* <div id="block-height">
                 Block height: { this.props.blockHeight }
                 </div>
                 <div id="account-address">
@@ -73,7 +101,7 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                 </div>
                 <div id="upgrade">
                     <MembershipUpgrade web3={this.props.web3} />
-                </div>
+                </div> */}
             </div>
         )
     }

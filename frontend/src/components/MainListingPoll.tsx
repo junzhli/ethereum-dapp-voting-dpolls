@@ -3,9 +3,10 @@ import { IMainListingPollProps, IMainListingPollState, IMainListingPoll } from '
 import { VOTING_CORE_ABI } from '../constants/contractABIs';
 import { Address } from '../types';
 import PollCard from './PollCard';
-import { Item, Icon, Loader } from 'semantic-ui-react';
+import { Item, Icon, Loader, Header } from 'semantic-ui-react';
 import { StoreState } from '../store/types';
 import { connect } from 'react-redux';
+import style from './MainListingPoll.module.css';
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 
@@ -25,7 +26,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         const polls: Address[] = [];
         for (let i = 0; i < amountPolls; i++) {
             const pollAddress = await this.contract.methods.getVotingItemByIndex(i).call();
-            polls.push(pollAddress);
+            polls.unshift(pollAddress);
         }
 
         return {
@@ -74,7 +75,12 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                 if (this.state.polls && this.state.polls.length === 0) {
                     return (
                         <Item.Group>
-                            No poll for now...
+                            <div className={style.center}>
+                                <Icon name='bullhorn' size='massive' />
+                                <Header>
+                                    No poll for now...
+                                </Header>
+                            </div>
                         </Item.Group>
                     )
                 }

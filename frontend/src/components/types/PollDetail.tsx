@@ -32,5 +32,8 @@ export interface IPollDetailStates {
         selectedIndex: number | null,
         selectedOption: string | null
     };
+    successfulMessage: {
+        show: boolean
+    };
     votedOption: number | null;
 }

@@ -6,15 +6,18 @@ import { StoreState } from '../store/types';
 import { connect } from 'react-redux';
 import { VOTING_ABI } from '../constants/contractABIs';
 import style from './PollDetail.module.css';
+import commonStyle from '../commons/styles/index.module.css';
 
 class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
     private checkConfirmedInterval: any;
+    private setTimeoutHolder: any;
     private contract: any;
 
     constructor(props: IPollDetailProps) {
         super(props);
         this.contract = new this.props.web3.eth.Contract(VOTING_ABI, this.props.address);
         this.checkConfirmedInterval = null;
+        this.setTimeoutHolder = null;
         this.state = {
             waitingMessage: {
                 show: false,
@@ -27,6 +30,9 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             votingMessage: {
                 selectedIndex: null,
                 selectedOption: null
+            },
+            successfulMessage: {
+                show: false
             },
             votedOption: null
         }
@@ -47,6 +53,10 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
     componentWillUnmount() {
         if (this.checkConfirmedInterval) {
             clearInterval(this.checkConfirmedInterval);
+        }
+
+        if (this.setTimeoutHolder) {
+            clearTimeout(this.setTimeoutHolder);
         }
     }
 
@@ -91,9 +101,19 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                             waitingMessage: {
                                 show: false,
                                 message: null
+                            },
+                            successfulMessage: {
+                                show: true
                             }
                         });
                         clearInterval(this.checkConfirmedInterval);
+                        this.setTimeoutHolder = setTimeout(() => {
+                            this.setState({
+                                successfulMessage: {
+                                    show: false
+                                }
+                            })
+                        }, 5000);
                     }
                 } catch (error) {
                     // we skip any error
@@ -112,6 +132,15 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                     message: error.message
                 }
             })
+
+            this.setTimeoutHolder = setTimeout(() => {
+                this.setState({
+                    errorMessage: {
+                        show: false,
+                        message: null
+                    }
+                })
+            }, 5000);
         }
     }
 
@@ -134,28 +163,6 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                         <Icon name='arrow right' />
                     </Button.Content>
                 </Button>}>
-                    {
-                        this.state.waitingMessage.show && (
-                            <Message icon>
-                                <Icon name='circle notched' loading />
-                                <Message.Content>
-                                <Message.Header>Just a few seconds</Message.Header>
-                                {this.state.waitingMessage.message}
-                                </Message.Content>
-                            </Message>
-                        )
-                    }
-                    {
-                        this.state.errorMessage.show && (
-                            <Message
-                                error
-                                header='There was some errors with your submission'
-                                list={[
-                                this.state.errorMessage.message,
-                                ]}
-                            />
-                        )
-                    }
                     <Modal.Header>Poll detail</Modal.Header>
                     <Modal.Content image>
                         {/* <Image
@@ -164,6 +171,36 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                             src="https://react.semantic-ui.com/images/avatar/large/rachel.png"
                         /> */}
                         <Modal.Description>
+                            {
+                                this.state.waitingMessage.show && (
+                                    <Message icon>
+                                        <Icon name='circle notched' loading />
+                                        <Message.Content>
+                                        <Message.Header>Just a few seconds</Message.Header>
+                                        {this.state.waitingMessage.message}
+                                        </Message.Content>
+                                    </Message>
+                                )
+                            }
+                            {
+                                this.state.errorMessage.show && (
+                                    <Message
+                                        error
+                                        header='There was some errors with your submission'
+                                        list={[
+                                            this.state.errorMessage.message,
+                                        ]}
+                                    />
+                                )
+                            }
+                            {
+                                this.state.successfulMessage.show && (
+                                    <Message positive>
+                                        <Message.Header>You vote successfully!</Message.Header>
+                                        <p>Your transaction has been confirmed.</p>
+                                    </Message>
+                                )
+                            }
                             <Header>{this.props.title}</Header>
                             <div>
                                 Expiry Block Height: {this.props.expiryBlockHeight}

@@ -13,3 +13,24 @@
     -moz-box-shadow: 1px 8px 11px 1px rgba(201,199,201,1);
     box-shadow: 1px 8px 11px 1px rgba(201,199,201,1);
 }
+
+.banner {
+    width: 1000px;
+    overflow: hidden; /* will contain if #first is longer than #second */
+}
+
+.logo {
+    padding: 5px;
+    width: 150px;
+    float:left; /* add this */
+}
+
+.menu {
+    overflow: hidden; /* if you don't want #second to wrap below #first */
+    float: right;
+}
+
+.center {
+    margin: auto;
+    width: 75%;
+}
