@@ -5,6 +5,7 @@ import { sendTransaction } from '../utils/web3';
 import { StoreState } from '../store/types';
 import { connect } from 'react-redux';
 import { VOTING_ABI } from '../constants/contractABIs';
+import style from './PollDetail.module.css';
 
 class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
     private checkConfirmedInterval: any;
@@ -125,7 +126,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
 
     render() {
         return (
-            <div>
+            <div className={style['align-right']}>
                 <Modal dimmer={true} trigger={
                 <Button animated>
                     <Button.Content visible>Detail</Button.Content>

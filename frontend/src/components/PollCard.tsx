@@ -4,7 +4,9 @@ import { IPollCardProps, IPollCardStates, IPollCard } from './types/PollCard';
 import { VOTING_ABI } from '../constants/contractABIs';
 import { StoreState } from '../store/types';
 import PollDetail from './PollDetail';
-import { Item, Placeholder, Icon } from 'semantic-ui-react';
+import { Item, Placeholder, Icon, Segment, Header, Button } from 'semantic-ui-react';
+import commonStyle from '../commons/styles/index.module.css';
+import style from './PollCard.module.css';
 
 class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     private contract: any;
@@ -50,13 +52,17 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
         }
     }
 
-    componentDidUpdate(prevProps: IPollCardProps) {
+    async componentDidUpdate(prevProps: IPollCardProps) {
         const isExpired = this.checkIfExpired();
+        const isVoted = await this.checkIfVoted();
+        const votesAmount = (await this.contract.methods.votesAmount().call()).toNumber();
         if (this.state.externalData) {
-            if (isExpired !== this.state.externalData.isExpired) {
+            if (isExpired !== this.state.externalData.isExpired || votesAmount !== this.state.externalData.votesAmount) {
                 this.setState({
                     externalData: Object.assign(this.state.externalData, {
-                        isExpired
+                        isExpired,
+                        isVoted,
+                        votesAmount
                     })
                 })
             }
@@ -104,61 +110,60 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
 
         switch (state) {
             case 'loading':
-                return (
-                    <Item>
-                        <Item.Content>
-                            <Placeholder>
-                                <Placeholder.Header image>
-                                <Placeholder.Line />
-                                <Placeholder.Line />
-                                </Placeholder.Header>
-                            </Placeholder>
-                        </Item.Content>
-                    </Item>
-                )
             case 'non-loaded-completely':
                 return (
-                    <Item>
-                        <Item.Content>
-                            <Placeholder>
-                                <Placeholder.Header image>
-                                <Placeholder.Line />
-                                <Placeholder.Line />
-                                </Placeholder.Header>
+                    <Segment color='teal'>
+                        <Placeholder>
+                            <Placeholder style={{ height: 150, width: 150 }}>
+                                <Placeholder.Image />
                             </Placeholder>
-                        </Item.Content>
-                    </Item>
+                            <Placeholder.Paragraph>
+                            <Placeholder.Line />
+                            <Placeholder.Line />
+                            <Placeholder.Line />
+                            <Placeholder.Line />
+                            </Placeholder.Paragraph>
+                        </Placeholder>
+                    </Segment>
                 )
             case 'completed':
                 return (
-                    <Item>                    
-                        {/* <Item.Image size='medium' src='/images/wireframe/image.png' /> */}
-                        <Icon size='huge' name='hand peace outline' />
-                        <Item.Content>
+                    // <Item>
+                        <Segment color='teal'>
+                            {/* <Item.Image size='medium' src='/images/wireframe/image.png' /> */}
+                            <div className={style['top-bottom-border']}>
+                                <Icon size='huge' name='hand paper outline' />
+                            </div>
                             
-                            <Item.Header>
-                                { this.state.externalData && this.state.externalData.title }
-                            </Item.Header>
-                            <Item.Extra>
-                                <Icon color='red' name='user outline' /> { this.props.address }
-                            </Item.Extra>
-                            <Item.Extra>
-                                { (this.state.externalData && this.state.externalData.isExpired) ? <Icon color='red' name='close' /> : <Icon color='green' name='check' /> } Expired at { this.state.externalData && this.state.externalData.expiryBlockNumber }
-                            </Item.Extra>
-                            <Item.Extra>
-                                <Icon color='brown' name='users' /> { this.state.externalData && this.state.externalData.votesAmount } votes
-                            </Item.Extra>
-                        </Item.Content>
-                        <PollDetail 
-                        web3={this.props.web3} 
-                        address={this.props.address} 
-                        title={(this.state.externalData && this.state.externalData.title) as string} 
-                        options={(this.state.externalData && this.state.externalData.options) as string[]} 
-                        expiryBlockHeight={(this.state.externalData && this.state.externalData.expiryBlockNumber) as number} 
-                        isExpired={(this.state.externalData && this.state.externalData.isExpired) as boolean} 
-                        isVoted={(this.state.externalData && this.state.externalData.isVoted) as boolean} 
-                        contract={this.contract} />
-                    </Item>
+                            <Item.Content className={style['top-bottom-border']}>
+                                <Header as='h2'>
+                                    { this.state.externalData && this.state.externalData.title }
+                                </Header>
+                                
+                                {/* <Item.Header>
+                                    
+                                </Item.Header> */}
+                                <Item.Extra>
+                                    <Icon color='red' name='user outline' /> { this.props.address }
+                                </Item.Extra>
+                                <Item.Extra>
+                                    { (this.state.externalData && this.state.externalData.isExpired) ? <Icon color='red' name='close' /> : <Icon color='green' name='check' /> } Expired at { this.state.externalData && this.state.externalData.expiryBlockNumber }
+                                </Item.Extra>
+                                <Item.Extra>
+                                    <Icon color='brown' name='users' /> { this.state.externalData && this.state.externalData.votesAmount } votes
+                                </Item.Extra>
+                            </Item.Content>
+                            <PollDetail 
+                            web3={this.props.web3} 
+                            address={this.props.address} 
+                            title={(this.state.externalData && this.state.externalData.title) as string} 
+                            options={(this.state.externalData && this.state.externalData.options) as string[]} 
+                            expiryBlockHeight={(this.state.externalData && this.state.externalData.expiryBlockNumber) as number} 
+                            isExpired={(this.state.externalData && this.state.externalData.isExpired) as boolean} 
+                            isVoted={(this.state.externalData && this.state.externalData.isVoted) as boolean} 
+                            contract={this.contract} />
+                        </Segment>
+                    // </Item>
                 )
         }
     }

@@ -1,9 +1,9 @@
 import { SET_BLOCK_HEIGHT, SET_ACCOUNT_ADDRESS, SET_MEMBERSHIP } from "../constant";
 import { IMainBanner } from "../../components/types/MainBanner";
-import { Membership } from "../../types";
+import { Membership, Address } from "../../types";
 
 export type BlockHeightType = number;
-export type AddressType = string;
+export type AddressType = Address;
 
 export interface ISetBlockHeight {
     type: typeof SET_BLOCK_HEIGHT,

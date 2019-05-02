@@ -6,6 +6,8 @@ import { setBlockHeight, setAccountAddress, setMembership } from '../actions/eth
 import { connect } from 'react-redux';
 import { Membership } from '../types';
 import { VOTING_CORE_ABI } from '../constants/contractABIs';
+import style from './MainBanner.module.css';
+import MembershipUpgrade from './MembershipUpgrade';
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
@@ -59,15 +61,18 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
 
     render() {
         return (
-            <div id="banner">
+            <div className={style['main-banner']}>
                 <div id="block-height">
-                    Block height: { this.props.blockHeight }
+                Block height: { this.props.blockHeight }
                 </div>
                 <div id="account-address">
                     Account address: { this.props.accountAddress }
                 </div>
                 <div id="membership">
                     Membership: { this.showMembership() }
+                </div>
+                <div id="upgrade">
+                    <MembershipUpgrade web3={this.props.web3} />
                 </div>
             </div>
         )
