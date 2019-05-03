@@ -79,7 +79,18 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                             onClick={() => {}}
                             />
                             <Menu.Menu position='right'>
-                            <MembershipUpgrade web3={this.props.web3} />
+                            {
+                                (this.props.membership === Membership.NO_BODY) ? (
+                                    <MembershipUpgrade web3={this.props.web3} />
+                                ) : (
+                                    <Menu.Item
+                                    name='     '
+                                    active={false}
+                                    onClick={() => {}}
+                                    disabled
+                                    />
+                                )
+                            }
                             </Menu.Menu>
                         </Menu>
                     </div>

@@ -51,7 +51,7 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                                     </div>
                                     <Button content='Upgrade now' primary disabled={this.props.membership !== Membership.NO_BODY} />
                                     {
-                                        (this.props.membership !== Membership.NO_BODY) && (
+                                        (this.props.membership === Membership.CITIZEN) && (
                                             <div className={style['note-below']}>(Already)</div>
                                         )
                                     }
@@ -84,6 +84,11 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                                         <Image src={diamondImage} verticalAlign='middle' />
                                     </div>
                                     <Button content='Upgrade now' primary disabled={(this.props.membership !== Membership.CITIZEN) && (this.props.membership !== Membership.NO_BODY)} />
+                                    {
+                                        (this.props.membership === Membership.DIAMOND) && (
+                                            <div className={style['note-below']}>(Already)</div>
+                                        )
+                                    }
                                 </div>
                             </Segment>
                         </Grid.Column>
