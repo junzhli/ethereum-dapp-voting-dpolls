@@ -1,0 +1,53 @@
+.center {
+    margin: auto;
+    width: 80%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.plan-square {
+    height: 400px;
+    width: 300px;
+}
+
+.plan-name {
+    width: 120px;
+    text-align: center;
+}
+
+.inline-container {
+    display: table;
+}
+
+.inline-component {
+    display: table-cell;
+}
+
+.title-center {
+    text-align: center;
+}
+
+.plan-citizen-title {
+    width: inherit;
+}
+
+.plan-diamond-title {
+    width: 115px;
+}
+
+.price {
+    text-align: center;
+    font-size: 40px;
+    color: grey;
+}
+
+.darker-span {
+    filter: brightness(50%);
+    z-index: 9999;
+}
+
+.note-below {
+    text-align: center;
+    color: darkgrey;
+    font-style: italic
+}

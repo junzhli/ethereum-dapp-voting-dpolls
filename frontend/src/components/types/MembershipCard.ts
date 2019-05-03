@@ -1,4 +1,5 @@
 import { BlockHeightType, AddressType } from "../../actions/types/eth";
+import { Membership } from "../../types";
 
 export namespace IMembershipUpgrade {
     export interface IInnerProps {
@@ -8,6 +9,11 @@ export namespace IMembershipUpgrade {
     export interface IStateFromProps {
         accountAddress: AddressType | null;
         blockHeight: BlockHeightType;
+        membership: Membership | null;
+    }
+
+    export interface IPropsFromDispatch {
+        setMembership: (nextMembership: Membership) => void;
     }
 }
 

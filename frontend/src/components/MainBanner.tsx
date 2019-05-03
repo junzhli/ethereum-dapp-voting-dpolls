@@ -79,11 +79,7 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                             onClick={() => {}}
                             />
                             <Menu.Menu position='right'>
-                            <Menu.Item
-                                name='Upgrade'
-                                active={false}
-                                onClick={() => {}}
-                            />
+                            <MembershipUpgrade web3={this.props.web3} />
                             </Menu.Menu>
                         </Menu>
                     </div>
