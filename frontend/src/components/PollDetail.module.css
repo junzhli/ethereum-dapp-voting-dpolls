@@ -4,3 +4,11 @@
     margin-top: -40px;
     width: 100px;
 }
+
+.inline-left {
+    float:left
+}
+
+.inline-right {
+    float:right
+}

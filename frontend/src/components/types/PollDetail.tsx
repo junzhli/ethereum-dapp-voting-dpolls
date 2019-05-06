@@ -1,4 +1,5 @@
 import { BlockHeightType, AddressType } from "../../actions/types/eth";
+import { ChartData } from "react-chartjs-2";
 
 export namespace IPollDetail {
     export interface IInnerProps {
@@ -10,6 +11,7 @@ export namespace IPollDetail {
         expiryBlockHeight: BlockHeightType;
         isExpired: boolean;
         isVoted: boolean;
+        votesAmount: number;
     }
     
     export interface IStateFromProps {
@@ -36,4 +38,8 @@ export interface IPollDetailStates {
         show: boolean
     };
     votedOption: number | null;
+    votesByIndex: number[] | null;
+    chart: {
+        option: ChartData<Chart.ChartData>;
+    } | null;
 }

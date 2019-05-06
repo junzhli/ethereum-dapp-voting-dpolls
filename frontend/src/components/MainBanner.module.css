@@ -27,7 +27,8 @@
 
 .menu {
     overflow: hidden; /* if you don't want #second to wrap below #first */
-    float: right;
+    float: left;
+    padding-left: 40%;
 }
 
 .center {

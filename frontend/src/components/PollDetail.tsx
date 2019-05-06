@@ -5,8 +5,8 @@ import { sendTransaction } from '../utils/web3';
 import { StoreState } from '../store/types';
 import { connect } from 'react-redux';
 import { VOTING_ABI } from '../constants/contractABIs';
+import { Pie, ChartData } from 'react-chartjs-2';
 import style from './PollDetail.module.css';
-import commonStyle from '../commons/styles/index.module.css';
 
 class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
     private checkConfirmedInterval: any;
@@ -34,8 +34,24 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             successfulMessage: {
                 show: false
             },
-            votedOption: null
-        }
+            votedOption: null,
+            chart: null,
+            votesByIndex: null
+        };
+    }
+
+    async componentDidMount() {
+        const votesByIndex = await this.fetchVotesByIndex();
+        this.setState({
+            votesByIndex
+        });
+
+        const chartOptions = this.fetchChartOption();
+        this.setState({
+            chart: {
+                option: chartOptions
+            }
+        })
     }
 
     async componentWillMount() {
@@ -59,6 +75,20 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             clearTimeout(this.setTimeoutHolder);
         }
     }
+
+    async componentDidUpdate(prevProps: IPollDetailProps) {
+        const votesByIndex = await this.fetchVotesByIndex();
+        this.setState({
+            votesByIndex
+        });
+    }
+
+    dynamicColors() {
+        var r = Math.floor(Math.random() * 255);
+        var g = Math.floor(Math.random() * 255);
+        var b = Math.floor(Math.random() * 255);
+        return "rgb(" + r + "," + g + "," + b + ")";
+     };
 
     async vote(option: number) {
         this.setState({
@@ -97,6 +127,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                 try {
                     const receipt = await this.props.web3.eth.getTransactionReceipt(txid);
                     if (receipt) {
+                        const chartOptions = await this.fetchChartOption();
                         this.setState({
                             waitingMessage: {
                                 show: false,
@@ -104,6 +135,9 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                             },
                             successfulMessage: {
                                 show: true
+                            },
+                            chart: {
+                                option: chartOptions
                             }
                         });
                         clearInterval(this.checkConfirmedInterval);
@@ -151,6 +185,36 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                 selectedOption: object.name
             }
         })
+    }
+
+    async fetchVotesByIndex() {
+        const votesByIndex: number[] = [];
+        for (let i = 0; i < this.props.options.length; i++) {
+            const votes = (await this.contract.methods.getVotesByIndex(i).call()).toNumber();
+            votesByIndex.push(votes);
+        }
+        return votesByIndex;
+    }
+
+    fetchChartOption() {
+        const titlesByIndex = [];
+        const randomBackgroundsByIndex = [];
+        const votesByIndex = this.state.votesByIndex || new Array(this.props.options.length).fill(0);
+        for (let i = 0; i < this.props.options.length; i++) {
+            const title = this.props.options[i];
+            titlesByIndex.push(title);
+            const color = this.dynamicColors();
+            randomBackgroundsByIndex.push(color);
+        }
+
+        return {
+            labels: titlesByIndex,
+            datasets: [{
+                data: votesByIndex,
+                backgroundColor: randomBackgroundsByIndex,
+                hoverBackgroundColor: randomBackgroundsByIndex
+            }]
+        }
     }
 
     render() {
@@ -203,59 +267,54 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                             }
                             <Header>{this.props.title}</Header>
                             <div>
-                                Expiry Block Height: {this.props.expiryBlockHeight}
-                            </div>
-                            <Form>
-                                {
-                                    this.props.options.map((option, index) => {
-                                        return (
-                                            <Form.Field>
-                                                <Checkbox
-                                                    radio
-                                                    label={option}
-                                                    name={option}
-                                                    value={index}
-                                                    checked={this.state.votingMessage.selectedIndex === index}
-                                                    onChange={this.handleOptionVoted.bind(this)}
-                                                    disabled={this.props.isVoted}
-                                                />
-                                            </Form.Field>
-                                        )
-                                    })
-                                }
-                                {
-                                    this.state.votingMessage.selectedOption && (
-                                        <Form.Field>
-                                            { this.props.isVoted ? ('You haved voted for') : ('You are voting for')} <b>{ this.state.votingMessage.selectedOption }</b>
-                                        </Form.Field>
-                                    )
-                                }
-                            </Form>
-                            {
-                                (this.state.votingMessage.selectedIndex !== null && !this.props.isVoted) && (
-                                    <Button content='Vote!' onClick={() => this.vote(this.state.votingMessage.selectedIndex as number)}/>
-                                )
-                            }
-                            
-                            {/* {
-                                this.props.options.map((option, index) => {
-                                    return (
-                                        <div key={option}>
-                                            <div>
-                                                {index}: {option}
-                                            </div>
-                                            {
-                                                !this.props.isVoted && (
-                                                    <div>
-                                                        <Button onClick={() => this.vote(index)}>Vote</Button>
-                                                    </div>
+                                <div className={style['inline-left']}>
+                                    <div>
+                                        Expiry Block Height: {this.props.expiryBlockHeight}
+                                    </div>
+                                    <Form>
+                                        {
+                                            this.props.options.map((option, index) => {
+                                                return (
+                                                    <Form.Field>
+                                                        <Checkbox
+                                                            radio
+                                                            label={
+                                                                (this.state.votesByIndex && this.props.votesAmount > 0) ? (
+                                                                    option + ' (' + Math.floor((this.state.votesByIndex[index] / this.props.votesAmount) * 100) + '%)'
+                                                                ) : option
+                                                            }
+                                                            name={option}
+                                                            value={index}
+                                                            checked={this.state.votingMessage.selectedIndex === index}
+                                                            onChange={this.handleOptionVoted.bind(this)}
+                                                            disabled={this.props.isVoted}
+                                                        />
+                                                    </Form.Field>
                                                 )
-                                            }
-                                            
-                                        </div>
-                                    )
-                                })
-                            } */}
+                                            })
+                                        }
+                                        {
+                                            this.state.votingMessage.selectedOption && (
+                                                <Form.Field>
+                                                    { this.props.isVoted ? ('You haved voted for') : ('You are voting for')} <b>{ this.state.votingMessage.selectedOption }</b>
+                                                </Form.Field>
+                                            )
+                                        }
+                                    </Form>
+                                    {
+                                        (this.state.votingMessage.selectedIndex !== null && !this.props.isVoted) && (
+                                            <Button content='Vote!' onClick={() => this.vote(this.state.votingMessage.selectedIndex as number)}/>
+                                        )
+                                    }
+                                </div>
+                                <div className={style['inline-right']}>
+                                    {
+                                        (this.state.chart && (
+                                            <Pie data={this.state.chart.option as ChartData<Chart.ChartData>} options={{cutoutPercentage: 8, legend: {display: false}}} />
+                                        ))
+                                    }
+                                </div>
+                            </div>
                         </Modal.Description>
                     </Modal.Content>
                 </Modal>

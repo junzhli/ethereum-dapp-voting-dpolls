@@ -1,5 +1,5 @@
 import React, { Dispatch } from 'react';
-import { IMembershipUpgradeProps, IMembershipUpgradeStates, IMembershipUpgrade } from './types/MembershipCard';
+import { IMembershipUpgradeProps, IMembershipUpgradeStates, IMembershipUpgrade } from './types/MembershipUpgrade';
 import { Modal, Button, Header, Image, Segment, Grid, Form, Divider, Label, Dimmer, Message, Icon, Menu } from 'semantic-ui-react';
 import { StoreState } from '../store/types';
 import { connect } from 'react-redux';

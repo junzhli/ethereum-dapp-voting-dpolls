@@ -160,6 +160,7 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
                             address={this.props.address} 
                             title={(this.state.externalData && this.state.externalData.title) as string} 
                             options={(this.state.externalData && this.state.externalData.options) as string[]} 
+                            votesAmount={(this.state.externalData && this.state.externalData.votesAmount) as number}
                             expiryBlockHeight={(this.state.externalData && this.state.externalData.expiryBlockNumber) as number} 
                             isExpired={(this.state.externalData && this.state.externalData.isExpired) as boolean} 
                             isVoted={(this.state.externalData && this.state.externalData.isVoted) as boolean} 
