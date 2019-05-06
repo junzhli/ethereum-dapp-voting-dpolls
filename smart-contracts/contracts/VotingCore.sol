@@ -55,9 +55,11 @@ contract VotingCore is Permissioned {
 
   function createVoting(bytes32 title, bytes32[] memory optionTitles, uint expiryBlockNumber) hostOnly(msg.sender) public {
     Voting voting = new Voting(title, optionTitles, expiryBlockNumber, msg.sender);
+    VotingHostRegistry hostRegistry = VotingHostRegistry(votingHostRegistry);
     VotingRegistry registry = VotingRegistry(votingRegistry);
     registry.depositVoting(voting);
     emit newVoting(address(voting));
+    hostRegistry.setRecordForHost(msg.sender);
   }
 
   function applyAsHost() public payable {

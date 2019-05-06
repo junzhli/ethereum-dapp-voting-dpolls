@@ -62,7 +62,7 @@ contract("Voting", function(accounts) {
         assert.equal(web3.utils.hexToUtf8(await VotingInstance.getOptionTitleByIndex(2)), optionTitles[2]);
     });
 
-    it("people can vote only once and are unable to watch result until it expires", async () => {
+    it("people can vote only once and are able to watch result", async () => {
         // we assume that auto mining on Ganache private blockchain is enabled that it automatically increases block height while a new transaction submitted
         votedOption1 = 0;
         await VotingInstance.vote(votedOption1, { from: testingAccountVoter1 });

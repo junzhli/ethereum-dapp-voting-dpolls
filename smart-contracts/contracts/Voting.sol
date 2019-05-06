@@ -52,7 +52,6 @@ contract Voting {
   }
 
   function getVotesByIndex(uint _index) public view returns (uint) {
-    require(isExpired());
     require(_optionCheck(_index));
     return votes[_index];
   }
