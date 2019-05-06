@@ -17,7 +17,18 @@ export namespace IMembershipUpgrade {
     }
 }
 
-export type IMembershipUpgradeProps = IMembershipUpgrade.IInnerProps & IMembershipUpgrade.IStateFromProps;
+export type IMembershipUpgradeProps = IMembershipUpgrade.IInnerProps & IMembershipUpgrade.IStateFromProps & IMembershipUpgrade.IPropsFromDispatch;
 
 export interface IMembershipUpgradeStates {
+    waitingMessage: {
+        show: boolean,
+        message: string | null
+    };
+    errorMessage: {
+        show: boolean,
+        message: string | null
+    };
+    successfulMessage: {
+        show: boolean
+    };
 }

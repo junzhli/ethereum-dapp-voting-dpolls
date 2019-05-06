@@ -6,8 +6,8 @@
 }
 
 .plan-square {
-    height: 400px;
-    width: 300px;
+    height: inherit;
+    width: inherit;
 }
 
 .plan-name {
@@ -28,11 +28,12 @@
 }
 
 .plan-citizen-title {
-    width: inherit;
+    width: 1%;
 }
 
 .plan-diamond-title {
-    width: 115px;
+    text-align: left;
+    padding-left: 10%;
 }
 
 .price {
@@ -50,4 +51,10 @@
     text-align: center;
     color: darkgrey;
     font-style: italic
+}
+
+@media (max-width: 768px) {
+    .plan-diamond-title {
+        padding-left: 0%;
+    }
 }
