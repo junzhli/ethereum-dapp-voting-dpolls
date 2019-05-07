@@ -1,0 +1,12 @@
+.listing {
+    float:left;
+    width: 60%;
+}
+
+.profile {
+    float:right;
+    width: 35%;
+    padding-top: 100px;
+    padding-left: 1%;
+    margin-right: 1%;
+}

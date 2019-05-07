@@ -7,8 +7,9 @@ import { IIndexStates } from './types';
 import MainBanner from './components/MainBanner';
 import MainListingPoll from './components/MainListingPoll';
 import 'semantic-ui-css/semantic.min.css';
-import { Container, Divider } from 'semantic-ui-react';
-import style from './commons/styles/index.module.css';
+import commonStyle from './commons/styles/index.module.css';
+import style from './index.module.css';
+import Profile from './components/Profile';
 
 /**
  * global declaration
@@ -60,10 +61,15 @@ class App extends React.Component<{}, IIndexStates> {
                         <MainBanner web3={this.state.web3} />
                     </div>
                     
-                    <div className={style.border}>
-                        <Container>
-                            <MainListingPoll web3={this.state.web3} />
-                        </Container>
+                    <div>
+                        <div className={[commonStyle.border, style['listing']].join(' ')}>
+                            {/* <Container> */}
+                                <MainListingPoll web3={this.state.web3} />
+                            {/* </Container> */}
+                        </div>
+                        <div className={style['profile']}>
+                            <Profile web3={this.state.web3} />
+                        </div>
                     </div>
                 </div>
             )
