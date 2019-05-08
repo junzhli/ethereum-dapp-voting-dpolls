@@ -1,4 +1,5 @@
 import { BlockHeightType, AddressType } from "../../actions/types/eth";
+import { Membership } from "../../types";
 
 export namespace IProfile {
     export interface IInnerProps {
@@ -6,7 +7,9 @@ export namespace IProfile {
     }
     
     export interface IStateFromProps {
-        accountAddress: AddressType | null;
+        blockHeight: BlockHeightType,
+        accountAddress: AddressType | null,
+        membership: Membership | null,
     }
 }
 

@@ -61,11 +61,11 @@ class App extends React.Component<{}, IIndexStates> {
                         <MainBanner web3={this.state.web3} />
                     </div>
                     
-                    <div>
-                        <div className={[commonStyle.border, style['listing']].join(' ')}>
-                            {/* <Container> */}
+                    <div className={style['content-part']}>
+                        <div className={[commonStyle.border, style['listing-outer']].join(' ')}>
+                            <div className={style['listing-inner']}>
                                 <MainListingPoll web3={this.state.web3} />
-                            {/* </Container> */}
+                            </div>
                         </div>
                         <div className={style['profile']}>
                             <Profile web3={this.state.web3} />

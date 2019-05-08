@@ -72,17 +72,13 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                     </div>
                     <div className={style.menu}>
                         <Menu secondary inverted>
-                            <Menu.Item name='Home' active={true} onClick={() => {}} />
+                            {/* <Menu.Item name='Home' active={true} onClick={() => {}} /> */}
                             <Menu.Item
                             name='Create'
                             active={false}
                             onClick={() => {}}
                             />
                             <Menu.Menu position='right'>
-                            {
-                                console.log(this.props.membership)
-                            }
-                            
                             {
                                 (this.props.membership === Membership.NO_BODY) ? (
                                     <MembershipUpgrade web3={this.props.web3} />

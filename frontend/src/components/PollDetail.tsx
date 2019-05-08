@@ -77,10 +77,30 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
     }
 
     async componentDidUpdate(prevProps: IPollDetailProps) {
-        const votesByIndex = await this.fetchVotesByIndex();
-        this.setState({
-            votesByIndex
-        });
+        if (this.props !== prevProps) {
+            const votesByIndex = await this.fetchVotesByIndex();
+            this.setState({
+                votesByIndex
+            });
+
+            if (this.props.isVoted) {
+                console.log(this.props.isVoted);
+                try {
+                    console.log('account: ' + this.props.accountAddress);
+                    const selectedIndex = (await this.contract.methods.getMyOption(this.props.accountAddress).call()).toNumber();
+                    this.setState({
+                        votingMessage: {
+                            selectedIndex,
+                            selectedOption: this.props.options[selectedIndex]
+                        }
+                    })
+                } catch (error) {
+                    console.log('getMyOption failed');
+                    console.log(error);
+                }
+                
+            }
+        }
     }
 
     dynamicColors() {
@@ -325,7 +345,8 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
 
 const mapStateToProps = (state: StoreState, ownProps: IPollDetail.IInnerProps): IPollDetail.IStateFromProps => {
     return {
-        accountAddress: state.ethMisc.accountAddress
+        accountAddress: state.ethMisc.accountAddress,
+        blockHeight: state.ethMisc.blockHeight
     }
 }
 

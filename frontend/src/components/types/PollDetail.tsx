@@ -16,6 +16,7 @@ export namespace IPollDetail {
     
     export interface IStateFromProps {
         accountAddress: AddressType | null;
+        blockHeight: BlockHeightType;
     }
 }
 

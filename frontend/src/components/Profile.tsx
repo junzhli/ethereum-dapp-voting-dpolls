@@ -1,8 +1,10 @@
 import React from 'react';
 import { IProfileProps, IProfileStates, IProfile } from './types/Profile';
-import { Card, Icon, Image } from 'semantic-ui-react';
+import { Card, Icon, Image, Loader } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { StoreState } from '../store/types';
+import style from './Profile.module.css';
+import { Membership } from '../types';
 
 class Profile extends React.Component<IProfileProps, IProfileStates> {
     constructor (props: IProfileProps) {
@@ -10,28 +12,67 @@ class Profile extends React.Component<IProfileProps, IProfileStates> {
 
     }
 
+    getMembership() {
+        switch (this.props.membership) {
+            case Membership.NO_BODY:
+                return (
+                    <div className={[style['rcorner'], style['free']].join(' ')} >
+                        FREE
+                    </div>
+                );
+            case Membership.CITIZEN:
+                return (
+                    <div className={[style['rcorner'], style['citizen']].join(' ')} >
+                        CITIZEN
+                    </div>
+                );
+            case Membership.DIAMOND:
+            return (
+                    <div className={[style['rcorner'], style['diamond']].join(' ')} >
+                        DIAMOND
+                    </div>
+                );
+            default:
+                return null;
+        }
+    }
+
     render () {
         return (
             <Card>
                 {/* <Image src='https://react.semantic-ui.com/images/avatar/large/daniel.jpg' wrapped ui={false} /> */}
                 <Card.Content>
-                <Card.Header>InfoCard</Card.Header>
-                {/* <Card.Meta>Joined in 2016</Card.Meta> */}
-                <Card.Description>
-                    Daniel is a comedian living in Nashville.
-                </Card.Description>
-                <Card.Description>
-                    Daniel is a comedian living in Nashville.
-                </Card.Description>
-                <Card.Description>
-                    Daniel is a comedian living in Nashville.
-                </Card.Description>
+                    <Card.Header><Icon color='black' name='clock outline' /> Latest block</Card.Header>
+                    {/* <Card.Meta>Joined in 2016</Card.Meta> */}
+                    <Card.Description>
+                        <div>
+                             {
+                                 this.props.blockHeight !== -1 ? (
+                                     this.props.blockHeight + ' blocks'
+                                 ) : (
+                                    <Loader active inline='centered' />
+                                 )
+                             }
+                        </div>
+                    </Card.Description>
                 </Card.Content>
-                <Card.Content extra>
-                <a>
+                <Card.Content>
+                    <Card.Header><Icon color='red' name='user outline' />  Current User</Card.Header>
+                    <div className={style['address']}>
+                        {this.props.accountAddress}
+                    </div>
+                    {
+                        this.getMembership() !== null ? (
+                            this.getMembership()
+                        ) : (
+                            <Loader active inline='centered' />
+                        )
+                    }
+                    
+                {/* <a>
                     <Icon name='user' />
                     10 Friends
-                </a>
+                </a> */}
                 </Card.Content>
             </Card>
         )
@@ -40,7 +81,9 @@ class Profile extends React.Component<IProfileProps, IProfileStates> {
 
 const mapStateToProps = (state: StoreState, ownProps: IProfile.IInnerProps): IProfile.IStateFromProps => {
     return {
-        accountAddress: state.ethMisc.accountAddress
+        blockHeight: state.ethMisc.blockHeight,
+        accountAddress: state.ethMisc.accountAddress,
+        membership: state.ethMisc.membership
     }
 }
 

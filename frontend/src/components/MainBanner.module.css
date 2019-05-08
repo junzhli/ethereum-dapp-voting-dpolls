@@ -21,14 +21,13 @@
 
 .logo {
     padding: 5px;
-    width: 150px;
+    width: 140px;
     float:left; /* add this */
 }
 
 .menu {
     overflow: hidden; /* if you don't want #second to wrap below #first */
-    float: left;
-    padding-left: 40%;
+    float: right;
 }
 
 .center {

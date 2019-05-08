@@ -53,18 +53,20 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     }
 
     async componentDidUpdate(prevProps: IPollCardProps) {
-        const isExpired = this.checkIfExpired();
-        const isVoted = await this.checkIfVoted();
-        const votesAmount = (await this.contract.methods.votesAmount().call()).toNumber();
-        if (this.state.externalData) {
-            if (isExpired !== this.state.externalData.isExpired || votesAmount !== this.state.externalData.votesAmount) {
-                this.setState({
-                    externalData: Object.assign(this.state.externalData, {
-                        isExpired,
-                        isVoted,
-                        votesAmount
+        if (this.props !== prevProps) {
+            const isExpired = this.checkIfExpired();
+            const isVoted = await this.checkIfVoted();
+            const votesAmount = (await this.contract.methods.votesAmount().call()).toNumber();
+            if (this.state.externalData) {
+                if (isExpired !== this.state.externalData.isExpired || votesAmount !== this.state.externalData.votesAmount) {
+                    this.setState({
+                        externalData: Object.assign(this.state.externalData, {
+                            isExpired,
+                            isVoted,
+                            votesAmount
+                        })
                     })
-                })
+                }
             }
         }
     }
@@ -136,7 +138,6 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
                             <div className={style['top-bottom-border']}>
                                 <Icon size='huge' name='hand paper outline' />
                             </div>
-                            
                             <Item.Content className={style['top-bottom-border']}>
                                 <Header as='h2'>
                                     { this.state.externalData && this.state.externalData.title }
