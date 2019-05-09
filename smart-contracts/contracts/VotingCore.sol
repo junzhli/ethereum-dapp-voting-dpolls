@@ -10,6 +10,8 @@ contract VotingCore is Permissioned {
   address payable public depositAccount;
 
   event newVoting(address _voting);
+  event ejectVotingRegistry(address _votingRegistry);
+  event ejectVotingHostRegistry(address _votingHostRegistry);
 
   uint constant ONE_ETHER = 1e18;
   uint constant TEN_ETHERS = 10 * 1e18;
@@ -81,5 +83,14 @@ contract VotingCore is Permissioned {
 
   function withdrawEther() adminOnly public {
     depositAccount.transfer(address(this).balance);
+  }
+
+  function ejectRegistry() adminOnly public {
+    VotingHostRegistry hostRegistry = VotingHostRegistry(votingHostRegistry);
+    VotingRegistry registry = VotingRegistry(votingRegistry);
+    hostRegistry.setAdmin(admin);
+    emit ejectVotingHostRegistry(votingHostRegistry);
+    registry.setAdmin(admin);
+    emit ejectVotingRegistry(votingRegistry);
   }
 }

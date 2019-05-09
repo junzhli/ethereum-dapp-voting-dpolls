@@ -94,4 +94,12 @@ contract("VotingCore", function(accounts) {
         await VotingCoreInstance.withdrawEther({ from: testingAccountContractAdmin });
         assert.equal(await web3.eth.getBalance(testingDepositAccount) - balanceBeforeWithdraw, fee * (10 ** 18));
     });
+
+    it("eject all registries to let current admin take ownership of them", async () => {
+        assert.equal(await VotingRegistryInstance.admin(), VotingCoreInstance.address);
+        assert.equal(await VotingHostRegistryInstance.admin(), VotingCoreInstance.address);
+        await VotingCoreInstance.ejectRegistry({from: testingAccountContractAdmin});
+        assert.equal(await VotingRegistryInstance.admin(), testingAccountContractAdmin);
+        assert.equal(await VotingHostRegistryInstance.admin(), testingAccountContractAdmin);
+    });
 });
