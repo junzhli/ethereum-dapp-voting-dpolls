@@ -59,7 +59,9 @@ contract VotingCore is Permissioned {
     VotingRegistry registry = VotingRegistry(votingRegistry);
     registry.depositVoting(voting);
     emit newVoting(address(voting));
-    hostRegistry.setRecordForHost(msg.sender);
+    if (hostRegistry.getMembership(msg.sender) == VotingHostRegistry.Membership.CITIZEN) {
+      hostRegistry.setRecordForHost(msg.sender);
+    }
   }
 
   function applyAsHost() public payable {
