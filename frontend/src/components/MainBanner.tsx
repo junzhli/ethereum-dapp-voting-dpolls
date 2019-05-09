@@ -9,6 +9,7 @@ import { VOTING_CORE_ABI } from '../constants/contractABIs';
 import style from './MainBanner.module.css';
 import MembershipUpgrade from './MembershipUpgrade';
 import { Header, Icon, Menu, Input } from 'semantic-ui-react';
+import PollCreate from './PollCreate';
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
@@ -79,12 +80,13 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                     <div className={style.menu}>
                         <Menu secondary inverted>
                             {/* <Menu.Item name='Home' active={true} onClick={() => {}} /> */}
-                            <Menu.Item
+                            <PollCreate web3={this.props.web3} />
+                            {/* <Menu.Item
                             name='Create'
                             active={false}
                             onClick={() => {}}
-                            />
-                            <Menu.Menu position='right'>
+                            /> */}
+                            {/* <Menu.Menu position='right'> */}
                             {
                                 (this.props.membership === Membership.NO_BODY) ? (
                                     <MembershipUpgrade web3={this.props.web3} />
@@ -97,7 +99,7 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                                     />
                                 )
                             }
-                            </Menu.Menu>
+                            {/* </Menu.Menu> */}
                         </Menu>
                     </div>
                 </div>

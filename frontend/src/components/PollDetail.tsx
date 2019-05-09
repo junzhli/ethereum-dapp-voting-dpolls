@@ -322,7 +322,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                                                             value={index}
                                                             checked={this.state.votingMessage.selectedIndex === index}
                                                             onChange={this.handleOptionVoted.bind(this)}
-                                                            disabled={this.props.isVoted}
+                                                            disabled={this.props.isVoted || this.props.isExpired}
                                                         />
                                                     </Form.Field>
                                                 )

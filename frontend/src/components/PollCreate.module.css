@@ -1,0 +1,21 @@
+.button-outer {
+    margin-left: 5px;
+    float: left;
+}
+
+.option-outer {
+    float: left;
+    width: 45%;
+}
+
+.option-divider {
+    margin-top: 10px;
+}
+
+.options-wrapper {
+    overflow: hidden;
+}
+
+.form-ui {
+    max-width: 500px;
+}
