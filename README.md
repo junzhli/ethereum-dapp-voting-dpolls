@@ -19,6 +19,7 @@ A Dapp project proposed in NTU DApp development course
 * Contract administration
   * Set admin
   * Withdraw funds from smart contract
+  * Reclaim ownership of registries in case of new core contract replacement
 
 ### Table of Contents
 * [smart-contract](#smart-contracts)
