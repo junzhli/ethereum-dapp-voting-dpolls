@@ -7,6 +7,7 @@ import PollDetail from './PollDetail';
 import { Item, Placeholder, Icon, Segment, Header, Button } from 'semantic-ui-react';
 import commonStyle from '../commons/styles/index.module.css';
 import style from './PollCard.module.css';
+import { Address } from '../types';
 
 class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     private contract: any;
@@ -27,18 +28,18 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
         return isExpired;
     }
 
-    async checkIfVoted() {
-        if (this.props.accountAddress === null) {
+    async checkIfVoted(address: Address | null) {
+        if (address === null) {
             return null;
         }
 
-        const isExpired = await this.contract.methods.isVoted(this.props.accountAddress).call();
+        const isExpired = await this.contract.methods.isVoted(address).call();
         return isExpired;
     }
 
     async componentWillReceiveProps(nextProps: IPollCardProps) {
         if (this.props !== nextProps) {
-            const isVoted = await this.checkIfVoted();
+            const isVoted = await this.checkIfVoted(nextProps.accountAddress);
             if (this.state.externalData) {
                 if (isVoted !== this.state.externalData.isVoted) {
                     this.setState({
@@ -53,20 +54,18 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     }
 
     async componentDidUpdate(prevProps: IPollCardProps) {
-        if (this.props !== prevProps) {
-            const isExpired = this.checkIfExpired();
-            const isVoted = await this.checkIfVoted();
-            const votesAmount = (await this.contract.methods.votesAmount().call()).toNumber();
-            if (this.state.externalData) {
-                if (isExpired !== this.state.externalData.isExpired || votesAmount !== this.state.externalData.votesAmount) {
-                    this.setState({
-                        externalData: Object.assign(this.state.externalData, {
-                            isExpired,
-                            isVoted,
-                            votesAmount
-                        })
+        const isExpired = this.checkIfExpired();
+        const isVoted = await this.checkIfVoted(this.props.accountAddress);
+        const votesAmount = (await this.contract.methods.votesAmount().call()).toNumber();
+        if (this.state.externalData) {
+            if (isExpired !== this.state.externalData.isExpired || votesAmount !== this.state.externalData.votesAmount) {
+                this.setState({
+                    externalData: Object.assign(this.state.externalData, {
+                        isExpired,
+                        isVoted,
+                        votesAmount
                     })
-                }
+                })
             }
         }
     }
@@ -75,14 +74,13 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
         const expiryBlockNumber = Number(await this.contract.methods.expiryBlockNumber().call());
         const isExpired = this.checkIfExpired();
         const title = this.props.web3.utils.hexToUtf8(await this.contract.methods.title().call()) as string;
-        const isVoted = await this.checkIfVoted();
+        const isVoted = await this.checkIfVoted(this.props.accountAddress);
         const amountOptions = Number(await this.contract.methods.optionsAmount().call());
         const options = [];
         for (let i = 0; i < amountOptions; i++) {
             options.push(this.props.web3.utils.hexToUtf8(await this.contract.methods.getOptionTitleByIndex(i).call()) as string);
         }
         const votesAmount = (await this.contract.methods.votesAmount().call()).toNumber();
-
         this.setState({
             externalData: {
                 expiryBlockNumber,

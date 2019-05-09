@@ -40,6 +40,32 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
         };
     }
 
+    async componentWillReceiveProps(nextProps: IPollDetailProps) {
+        if (this.props !== nextProps) {
+            if (nextProps.isVoted) {
+                try {
+                    const selectedIndex = (await this.contract.methods.getMyOption(nextProps.accountAddress).call()).toNumber();
+                    this.setState({
+                        votingMessage: {
+                            selectedIndex,
+                            selectedOption: this.props.options[selectedIndex]
+                        }
+                    })
+                } catch (error) {
+                    console.log('getMyOption failed');
+                    console.log(error);
+                }
+            } else {
+                this.setState({
+                    votingMessage: {
+                        selectedIndex: null,
+                        selectedOption: null
+                    }
+                })
+            }
+        }
+    }
+
     async componentDidMount() {
         const votesByIndex = await this.fetchVotesByIndex();
         this.setState({
@@ -83,23 +109,12 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                 votesByIndex
             });
 
-            if (this.props.isVoted) {
-                console.log(this.props.isVoted);
-                try {
-                    console.log('account: ' + this.props.accountAddress);
-                    const selectedIndex = (await this.contract.methods.getMyOption(this.props.accountAddress).call()).toNumber();
-                    this.setState({
-                        votingMessage: {
-                            selectedIndex,
-                            selectedOption: this.props.options[selectedIndex]
-                        }
-                    })
-                } catch (error) {
-                    console.log('getMyOption failed');
-                    console.log(error);
+            const chartOptions = this.fetchChartOption();
+            this.setState({
+                chart: {
+                    option: chartOptions
                 }
-                
-            }
+            })
         }
     }
 

@@ -38,8 +38,14 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
             const accountAddress = await this.props.web3.eth.getAccounts();
             if (accountAddress[0] !== this.props.accountAddress) {
                 this.props.setAccountAddress(accountAddress[0]);
-                const membership = (await this.contract.methods.getMembership(accountAddress[0]).call()).toNumber();
-                this.props.setMembership(membership);
+                try {
+                    const membership = (await this.contract.methods.getMembership(accountAddress[0]).call()).toNumber();
+                    this.props.setMembership(membership);
+                } catch (error) {
+                    console.log('getMembership falied');
+                    console.log(error);
+                }
+                
             }
         }, 1000)
     }
