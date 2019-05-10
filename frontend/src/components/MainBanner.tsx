@@ -48,7 +48,7 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                 }
                 
             }
-        }, 1000)
+        }, 1000);
     }
 
     componentWillUnmount() {

@@ -1,4 +1,4 @@
-import { Address } from "../../types";
+import { Address, Membership } from "../../types";
 import { BlockHeightType, AddressType } from "../../actions/types/eth";
 
 export namespace IPollCreate {
@@ -9,10 +9,15 @@ export namespace IPollCreate {
     export interface IStateFromProps {
         accountAddress: AddressType | null;
         blockHeight: BlockHeightType;
+        membership: Membership | null;
+    }
+
+    export interface IPropsFromDispatch {
+        setMembership: (nextMembership: Membership) => void;
     }
 }
 
-export type IPollCreateProps = IPollCreate.IInnerProps & IPollCreate.IStateFromProps;
+export type IPollCreateProps = IPollCreate.IInnerProps & IPollCreate.IStateFromProps & IPollCreate.IPropsFromDispatch;
 
 export interface IPollCreateStates {
     waitingMessage: {
