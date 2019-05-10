@@ -234,6 +234,26 @@ export const VOTING_CORE_ABI = [
     "signature": "0x34c5a044"
   },
   {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "_address",
+        "type": "address"
+      }
+    ],
+    "name": "getQuota",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x43a2a302"
+  },
+  {
     "constant": false,
     "inputs": [
       {

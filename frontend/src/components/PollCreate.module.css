@@ -19,3 +19,16 @@
 .form-ui {
     max-width: 500px;
 }
+
+.quota {
+    font-style: italic;
+    margin-left: 5px;
+}
+
+.inline-container {
+    width: 100%;
+}
+
+.inline-component {
+    display: inline-block;
+}

@@ -42,8 +42,7 @@ class Profile extends React.Component<IProfileProps, IProfileStates> {
             <Card>
                 {/* <Image src='https://react.semantic-ui.com/images/avatar/large/daniel.jpg' wrapped ui={false} /> */}
                 <Card.Content>
-                    <Card.Header><Icon color='black' name='clock outline' /> Latest block</Card.Header>
-                    {/* <Card.Meta>Joined in 2016</Card.Meta> */}
+                    <Card.Header><Icon color='black' name='clock outline' />Latest block</Card.Header>
                     <Card.Description>
                         <div>
                              {
@@ -57,10 +56,19 @@ class Profile extends React.Component<IProfileProps, IProfileStates> {
                     </Card.Description>
                 </Card.Content>
                 <Card.Content>
-                    <Card.Header><Icon color='red' name='user outline' />  Current User</Card.Header>
+                    <Card.Header><Icon color='red' name='user outline' />Current User</Card.Header>
                     <div className={style['address']}>
-                        {this.props.accountAddress}
+                        {
+                            this.props.accountAddress ? (
+                                this.props.accountAddress
+                            ) : (
+                                <Loader active inline='centered' />
+                            )
+                        }
                     </div>
+                </Card.Content>
+                <Card.Content>
+                    <Card.Header><Icon color='grey' name='id badge' />Membership</Card.Header>
                     {
                         this.getMembership() !== null ? (
                             this.getMembership()
@@ -68,11 +76,6 @@ class Profile extends React.Component<IProfileProps, IProfileStates> {
                             <Loader active inline='centered' />
                         )
                     }
-                    
-                {/* <a>
-                    <Icon name='user' />
-                    10 Friends
-                </a> */}
                 </Card.Content>
             </Card>
         )

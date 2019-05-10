@@ -34,9 +34,32 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             successfulMessage: {
                 show: false
             },
+            quota: null,
             optionsAmount: 2
         };
         this.state = Object.assign({}, this.initialState);
+    }
+
+    async componentDidMount() {
+        if (this.props.accountAddress) {
+            if (this.props.membership === Membership.CITIZEN) {
+
+            } else if (this.props.accountAddress && this.props.membership === Membership.DIAMOND) {
+                await this.fetchQuota();
+            }
+        }
+    }
+
+    async componentDidUpdate() {
+        if (this.props.accountAddress) {
+            if (this.props.membership === Membership.CITIZEN) {
+                await this.fetchQuota();
+            } else if (this.props.accountAddress && this.props.membership === Membership.DIAMOND) {
+                this.setState({
+                    quota: 10
+                })
+            }
+        }
     }
 
     componentWillUnmount() {
@@ -47,6 +70,13 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         if (this.setTimeoutHolder) {
             clearTimeout(this.setTimeoutHolder);
         }
+    }
+
+    async fetchQuota() {
+        const quota = (await this.contract.methods.getQuota(this.props.accountAddress).call()).toNumber();
+        this.setState({
+            quota
+        })
     }
 
     addOption() {
@@ -165,6 +195,8 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                                 }
                             })
                         }, 5000);
+
+                        await this.refreshQuota();
                     }
                 } catch (error) {
                     // we skip any error
@@ -267,17 +299,20 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                         </div>
                         
                     </Form.Field>
-                    {/* <Form.Field>
-                        <Checkbox label='I agree to the Terms and Conditions' />
-                    </Form.Field> */}
-                    <Button type='submit'>Submit</Button>
+                    <div className={style['inline-container']}>
+                        <div className={style['inline-component']}>
+                            <Button type='submit'>Submit</Button>
+                        </div>
+                        <div className={[style['inline-component'], style['quota']].join(' ')}>
+                            {
+                                (this.state.quota && (
+                                    '(Remaining quota: ' + this.state.quota + ')'
+                                ))
+                            }
+                            
+                        </div>
+                    </div>
                 </Form>
-                {/* <Image wrapped size='medium' src='https://react.semantic-ui.com/images/avatar/large/rachel.png' />
-                <Modal.Description>
-                    <Header>Default Profile Image</Header>
-                    <p>We've found the following gravatar image associated with your e-mail address.</p>
-                    <p>Is it okay to use this photo?</p>
-                </Modal.Description> */}
             </div>
         )
     }
