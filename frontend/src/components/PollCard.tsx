@@ -71,6 +71,7 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     }
 
     async componentDidMount() {
+        const chairperson = await this.contract.methods.chairperson().call();
         const expiryBlockNumber = Number(await this.contract.methods.expiryBlockNumber().call());
         const isExpired = this.checkIfExpired();
         const title = this.props.web3.utils.hexToUtf8(await this.contract.methods.title().call()) as string;
@@ -83,6 +84,7 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
         const votesAmount = (await this.contract.methods.votesAmount().call()).toNumber();
         this.setState({
             externalData: {
+                chairperson,
                 expiryBlockNumber,
                 isExpired,
                 isVoted,
@@ -145,7 +147,10 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
                                     
                                 </Item.Header> */}
                                 <Item.Extra>
-                                    <Icon color='red' name='user outline' /> { this.props.address }
+                                    <Icon color='olive' name='archive' /> { this.props.address }
+                                </Item.Extra>
+                                <Item.Extra>
+                                    <Icon color='red' name='user outline' /> { this.state.externalData && this.state.externalData.chairperson }
                                 </Item.Extra>
                                 <Item.Extra>
                                     { (this.state.externalData && this.state.externalData.isExpired) ? <Icon color='red' name='close' /> : <Icon color='green' name='check' /> } Expired at { this.state.externalData && this.state.externalData.expiryBlockNumber }

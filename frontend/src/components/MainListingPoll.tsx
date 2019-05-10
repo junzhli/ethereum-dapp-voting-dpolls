@@ -76,7 +76,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                     return (
                         <Item.Group>
                             <div className={style.center}>
-                                <Icon name='bullhorn' size='massive' />
+                                <Icon name='archive' size='massive' />
                                 <Header>
                                     No poll for now...
                                 </Header>

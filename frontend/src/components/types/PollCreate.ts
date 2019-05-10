@@ -15,5 +15,16 @@ export namespace IPollCreate {
 export type IPollCreateProps = IPollCreate.IInnerProps & IPollCreate.IStateFromProps;
 
 export interface IPollCreateStates {
+    waitingMessage: {
+        show: boolean,
+        message: string | null
+    };
+    errorMessage: {
+        show: boolean,
+        message: string | string[] | null
+    };
+    successfulMessage: {
+        show: boolean
+    };
     optionsAmount: number;
 }

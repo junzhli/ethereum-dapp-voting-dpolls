@@ -17,6 +17,7 @@ export type IPollCardProps = IPollCard.IInnerProps & IPollCard.IStateFromProps;
 
 export interface IPollCardStates {
     externalData: {
+        chairperson: string | null,
         isExpired: boolean | null,
         isVoted: boolean | null,
         expiryBlockNumber: number,

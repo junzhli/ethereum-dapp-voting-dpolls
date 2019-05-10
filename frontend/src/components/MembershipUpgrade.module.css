@@ -16,11 +16,11 @@
 }
 
 .inline-container {
-    display: table;
+    width: 100%;
 }
 
 .inline-component {
-    display: table-cell;
+    display: inline-block;
 }
 
 .title-center {
@@ -28,12 +28,14 @@
 }
 
 .plan-citizen-title {
-    width: 1%;
+    width: 100%;
 }
 
 .plan-diamond-title {
-    text-align: left;
-    padding-left: 10%;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    left: -5px;
 }
 
 .price {

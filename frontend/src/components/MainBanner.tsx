@@ -73,7 +73,7 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                 <div className={[style.banner, style.center].join(' ')}>
                     <div className={style.logo}>
                         <Header inverted as='h2'>
-                            <Icon name='plug' />
+                            <Icon name='archive' />
                             <Header.Content>dPolls</Header.Content>
                         </Header>
                     </div>
