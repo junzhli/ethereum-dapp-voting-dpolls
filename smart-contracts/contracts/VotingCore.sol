@@ -55,6 +55,11 @@ contract VotingCore is Permissioned {
     return uint(hostRegistry.getMembership(_address));
   }
 
+  function getQuota(address _address) public view returns (uint) {
+    VotingHostRegistry hostRegistry = VotingHostRegistry(votingHostRegistry);
+    return hostRegistry.getQuota(_address);
+  }
+
   function createVoting(bytes32 title, bytes32[] memory optionTitles, uint expiryBlockNumber) hostOnly(msg.sender) public {
     Voting voting = new Voting(title, optionTitles, expiryBlockNumber, msg.sender);
     VotingHostRegistry hostRegistry = VotingHostRegistry(votingHostRegistry);

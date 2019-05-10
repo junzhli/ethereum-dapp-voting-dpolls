@@ -1,5 +1,5 @@
 const catchRevert = require('./helper/exception').catchRevert;
-const { Membership } = require('./constant');
+const { Membership, MembershipQuota } = require('./constant');
 const VotingHostRegistry = artifacts.require('./VotingHostRegistry');
 
 
@@ -42,13 +42,20 @@ contract("VotingHostRegistry", function(accounts) {
         await VotingHostRegistryInstance.depositHost(testingAccountWithCitizenMembership, Membership.CITIZEN, { from: testingAccountContractAdmin });
         assert.equal(await VotingHostRegistryInstance.isHost(testingAccountWithCitizenMembership), true);
         assert.equal(await VotingHostRegistryInstance.getMembership(testingAccountWithCitizenMembership), Membership.CITIZEN);
-        
-        // start setting 10 records
-        for (let i = 0; i < 10; i++) {
+        assert.equal(await VotingHostRegistryInstance.getQuota(testingAccountWithCitizenMembership), MembershipQuota.CITIZEN);
+
+        // check quota left while during the time of setting 10 records
+        const checkPoint = 4;
+        for (let i = 0; i < checkPoint; i++) {
+            await VotingHostRegistryInstance.setRecordForHost(testingAccountWithCitizenMembership);
+        }
+        assert.equal(await VotingHostRegistryInstance.getQuota(testingAccountWithCitizenMembership), MembershipQuota.CITIZEN - checkPoint);
+        for (let i = checkPoint; i < 10; i++) {
             await VotingHostRegistryInstance.setRecordForHost(testingAccountWithCitizenMembership);
         }
         
         assert.equal(await VotingHostRegistryInstance.getMembership(testingAccountWithCitizenMembership), Membership.NOBODY);
+        await catchRevert(VotingHostRegistryInstance.getQuota(testingAccountWithCitizenMembership));
     });
 
     it("deposit a host with 'DIAMOND' membership to the registry", async () => {
