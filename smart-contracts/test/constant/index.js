@@ -8,3 +8,7 @@ module.exports.MembershipPricing = {
     CITIZEN: 1,
     DIAMOND: 10
 }
+
+module.exports.MembershipQuota = {
+    CITIZEN: 10
+}

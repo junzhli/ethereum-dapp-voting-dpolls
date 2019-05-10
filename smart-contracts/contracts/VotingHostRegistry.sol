@@ -40,4 +40,9 @@ contract VotingHostRegistry is Permissioned {
   function getMembership(address _address) external view returns (Membership) {
       return hosts[_address];
   }
+
+  function getQuota(address _address) public view returns (uint) {
+    require(Membership.CITIZEN == hosts[_address]);
+    return (MAX_TIMES_PER_HOST - usedTimes[_address]);
+  }
 }
