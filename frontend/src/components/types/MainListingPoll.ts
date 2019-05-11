@@ -1,5 +1,5 @@
 import { Address } from "../../types";
-import { BlockHeightType } from "../../actions/types/eth";
+import { BlockHeightType, AddressType } from "../../actions/types/eth";
 
 
 export namespace IMainListingPoll {
@@ -8,7 +8,7 @@ export namespace IMainListingPoll {
     }
     
     export interface IStateFromProps {
-        blockHeight: BlockHeightType
+        blockHeight: BlockHeightType;
     }
     
     export interface IPropsFromDispatch {
@@ -17,7 +17,14 @@ export namespace IMainListingPoll {
 
 export type IMainListingPollProps = IMainListingPoll.IInnerProps & IMainListingPoll.IStateFromProps & IMainListingPoll.IPropsFromDispatch;
 
+export interface PollIntitalMetadata {
+    address: string;
+    isExpired: boolean;
+    expiryBlockNumber: number;
+    contract: any;
+}
 export interface IMainListingPollState {
     amountPolls: number | null;
-    polls: Address[] | null;
+    inactivePolls: PollIntitalMetadata[] | null;
+    activePolls: PollIntitalMetadata[] | null;
 }

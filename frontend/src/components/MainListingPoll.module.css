@@ -6,3 +6,15 @@
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
 }
+
+.active-list {
+    overflow: scroll;
+    height: 100%;
+    max-height: 550px;
+}
+
+.inactive-list {
+    overflow: scroll;
+    height: 100%;
+    max-height: 550px;
+}

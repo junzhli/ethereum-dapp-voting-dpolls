@@ -1,6 +1,6 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
-import { IPollCardProps, IPollCardStates, IPollCard } from './types/PollCard';
+import { IPollCardProps, IPollCardStates, IPollCard, IPollCardStatus } from './types/PollCard';
 import { VOTING_ABI } from '../constants/contractABIs';
 import { StoreState } from '../store/types';
 import PollDetail from './PollDetail';
@@ -11,21 +11,28 @@ import { Address } from '../types';
 
 class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     private contract: any;
+    private status: {
+        [key in IPollCardStatus]: {
+            border: "teal" | "grey" | "red" | "orange" | "yellow" | "olive" | "green" | "blue" | "violet" | "purple" | "pink" | "brown" | "black" | undefined,
+            icon: 'calendar' | 'calendar check'
+        }
+    };
     constructor(props: IPollCardProps) {
         super(props);
-        this.contract = new this.props.web3.eth.Contract(VOTING_ABI, this.props.address);
+        this.contract = this.props.contract;
+        this.status = {
+            active: {
+                border: 'teal',
+                icon: 'calendar'
+            },
+            inactive: {
+                border: 'grey',
+                icon: 'calendar check'
+            }
+        }
         this.state = {
             externalData: null
         }
-    }
-
-    checkIfExpired() {
-        if (this.props.blockHeight === null || this.state.externalData === null) {
-            return null;
-        }
-
-        const isExpired = (this.props.blockHeight > this.state.externalData.expiryBlockNumber) ? true : false;
-        return isExpired;
     }
 
     async checkIfVoted(address: Address | null) {
@@ -54,14 +61,12 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     }
 
     async componentDidUpdate(prevProps: IPollCardProps) {
-        const isExpired = this.checkIfExpired();
         const isVoted = await this.checkIfVoted(this.props.accountAddress);
         const votesAmount = (await this.contract.methods.votesAmount().call()).toNumber();
         if (this.state.externalData) {
-            if (isExpired !== this.state.externalData.isExpired || votesAmount !== this.state.externalData.votesAmount) {
+            if (votesAmount !== this.state.externalData.votesAmount) {
                 this.setState({
                     externalData: Object.assign(this.state.externalData, {
-                        isExpired,
                         isVoted,
                         votesAmount
                     })
@@ -72,8 +77,6 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
 
     async componentDidMount() {
         const chairperson = await this.contract.methods.chairperson().call();
-        const expiryBlockNumber = Number(await this.contract.methods.expiryBlockNumber().call());
-        const isExpired = this.checkIfExpired();
         const title = this.props.web3.utils.hexToUtf8(await this.contract.methods.title().call()) as string;
         const isVoted = await this.checkIfVoted(this.props.accountAddress);
         const amountOptions = Number(await this.contract.methods.optionsAmount().call());
@@ -85,8 +88,6 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
         this.setState({
             externalData: {
                 chairperson,
-                expiryBlockNumber,
-                isExpired,
                 isVoted,
                 options,
                 title,
@@ -98,23 +99,19 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     renderComponent() {
         let state: 'loading' | 'non-loaded-completely' | 'completed' | null = null;
 
-        if (this.state.externalData === null) {
+        if (this.state.externalData && (this.state.externalData.isVoted !== null)) {
+            state = 'completed';
+        } else if (this.state.externalData && (this.state.externalData.isVoted === null)) {
+            state = 'non-loaded-completely';
+        } else {
             state = 'loading';
-        }
-
-        if (this.state.externalData && this.state.externalData.expiryBlockNumber) {
-            if (this.state.externalData.isExpired !== null && this.state.externalData.isVoted !== null) {
-                state = 'completed';
-            } else {
-                state = 'non-loaded-completely';
-            }
         }
 
         switch (state) {
             case 'loading':
             case 'non-loaded-completely':
                 return (
-                    <Segment color='teal'>
+                    <Segment color={this.status.inactive.border}>
                         <Placeholder style={{ height: 56, width: 56 }}>
                             <Placeholder.Image />
                         </Placeholder>
@@ -132,45 +129,39 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
                 )
             case 'completed':
                 return (
-                    // <Item>
-                        <Segment color='teal'>
-                            {/* <Item.Image size='medium' src='/images/wireframe/image.png' /> */}
-                            <div className={style['top-bottom-border']}>
-                                <Icon size='huge' name='hand paper outline' />
-                            </div>
-                            <Item.Content className={style['top-bottom-border']}>
-                                <Header as='h2'>
-                                    { this.state.externalData && this.state.externalData.title }
-                                </Header>
-                                
-                                {/* <Item.Header>
-                                    
-                                </Item.Header> */}
-                                <Item.Extra>
-                                    <Icon color='olive' name='archive' /> { this.props.address }
-                                </Item.Extra>
-                                <Item.Extra>
-                                    <Icon color='red' name='user outline' /> { this.state.externalData && this.state.externalData.chairperson }
-                                </Item.Extra>
-                                <Item.Extra>
-                                    { (this.state.externalData && this.state.externalData.isExpired) ? <Icon color='red' name='close' /> : <Icon color='green' name='check' /> } Expired at { this.state.externalData && this.state.externalData.expiryBlockNumber }
-                                </Item.Extra>
-                                <Item.Extra>
-                                    <Icon color='brown' name='users' /> { this.state.externalData && this.state.externalData.votesAmount } votes
-                                </Item.Extra>
-                            </Item.Content>
-                            <PollDetail 
-                            web3={this.props.web3} 
-                            address={this.props.address} 
-                            title={(this.state.externalData && this.state.externalData.title) as string} 
-                            options={(this.state.externalData && this.state.externalData.options) as string[]} 
-                            votesAmount={(this.state.externalData && this.state.externalData.votesAmount) as number}
-                            expiryBlockHeight={(this.state.externalData && this.state.externalData.expiryBlockNumber) as number} 
-                            isExpired={(this.state.externalData && this.state.externalData.isExpired) as boolean} 
-                            isVoted={(this.state.externalData && this.state.externalData.isVoted) as boolean} 
-                            contract={this.contract} />
-                        </Segment>
-                    // </Item>
+                    <Segment color={this.status[this.props.status].border}>
+                        <div className={style['top-bottom-border']}>
+                            <Icon size='huge' name={this.status[this.props.status].icon} />
+                        </div>
+                        <Item.Content className={style['top-bottom-border']}>
+                            <Header as='h2'>
+                                { this.state.externalData && this.state.externalData.title }
+                            </Header>
+                            
+                            <Item.Extra>
+                                <Icon color='olive' name='archive' /> { this.props.address }
+                            </Item.Extra>
+                            <Item.Extra>
+                                <Icon color='red' name='user outline' /> { this.state.externalData && this.state.externalData.chairperson }
+                            </Item.Extra>
+                            <Item.Extra>
+                                { (this.props.isExpired) ? <Icon color='red' name='close' /> : <Icon color='green' name='check' /> } Expired at { this.props.expiryBlockNumber }
+                            </Item.Extra>
+                            <Item.Extra>
+                                <Icon color='brown' name='users' /> { this.state.externalData && this.state.externalData.votesAmount } votes
+                            </Item.Extra>
+                        </Item.Content>
+                        <PollDetail 
+                        web3={this.props.web3} 
+                        address={this.props.address} 
+                        title={(this.state.externalData && this.state.externalData.title) as string} 
+                        options={(this.state.externalData && this.state.externalData.options) as string[]} 
+                        votesAmount={(this.state.externalData && this.state.externalData.votesAmount) as number}
+                        expiryBlockHeight={this.props.expiryBlockNumber} 
+                        isExpired={this.props.isExpired} 
+                        isVoted={(this.state.externalData && this.state.externalData.isVoted) as boolean} 
+                        contract={this.contract} />
+                    </Segment>
                 )
         }
     }

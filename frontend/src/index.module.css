@@ -1,7 +1,7 @@
 .listing-outer {
     position: relative;
     float:left;
-    width: 60%;
+    width: 63%;
     height: 100%;
     padding-left: 18%;
     overflow: hidden;
@@ -9,7 +9,6 @@
 
 .listing-inner {
     position: absolute;
-    margin-left: 30%;
 	left: 0;
 	top: 0;
 	right: 0;
@@ -21,6 +20,11 @@
 /* for Chrome */
 .listing-inner::-webkit-scrollbar {
     display: none;
+}
+
+.listing-inner-content {
+    margin-left: 25%;
+    /* margin-right: 100px; */
 }
 
 .profile {

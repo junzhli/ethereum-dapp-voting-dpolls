@@ -109,7 +109,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         let block = (this.refs['block'] as any as HTMLInputElement).value;
         if (block === '') {
             errors.push('Expiry block height is empty');
-        } else if (Number(block) <= this.props.blockHeight) {
+        } else if (Number(block) <= this.props.blockHeight + 1) {
             errors.push('Block number is behind the latest block');
         }
         
