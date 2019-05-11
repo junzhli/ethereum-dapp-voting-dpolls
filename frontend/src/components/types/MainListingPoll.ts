@@ -12,6 +12,7 @@ export namespace IMainListingPoll {
     }
     
     export interface IPropsFromDispatch {
+        setPollStatistics: (amount: number, active: number) => void;
     }
 }
 

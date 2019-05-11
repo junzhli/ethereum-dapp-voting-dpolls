@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch } from 'react';
 import { IMainListingPollProps, IMainListingPollState, IMainListingPoll, PollIntitalMetadata } from './types/MainListingPoll';
 import { VOTING_CORE_ABI, VOTING_ABI } from '../constants/contractABIs';
 import { Address } from '../types';
@@ -10,6 +10,8 @@ import { connect } from 'react-redux';
 import style from './MainListingPoll.module.css';
 import { BlockHeightType } from '../actions/types/eth';
 import { pathToFileURL } from 'url';
+import { PollActionType } from '../actions/types/poll';
+import { setStatistics } from '../actions/poll';
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 
@@ -32,6 +34,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
             const { amountPolls, polls } = data;
             const { activePolls, inactivePolls } = this.filePolls(polls);
 
+            this.props.setPollStatistics(amountPolls, activePolls.length);
             this.setState({
                 amountPolls,
                 activePolls,
@@ -177,7 +180,13 @@ const mapStateToProps = (state: StoreState, ownProps: IMainListingPoll.IInnerPro
     }
 }
 
+const mapDispatchToProps = (dispatch: Dispatch<PollActionType>, ownProps: IMainListingPoll.IInnerProps): IMainListingPoll.IPropsFromDispatch => {
+    return {
+        setPollStatistics: (amount: number, active: number) => dispatch(setStatistics(amount, active))
+    }
+}
+
 export default connect(
     mapStateToProps,
-    null
+    mapDispatchToProps
 )(MainListingPoll);

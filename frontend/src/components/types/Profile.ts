@@ -10,6 +10,10 @@ export namespace IProfile {
         blockHeight: BlockHeightType,
         accountAddress: AddressType | null,
         membership: Membership | null,
+        poll: {
+            amount: number | null,
+            active: number | null
+        }
     }
 }
 

@@ -7,6 +7,12 @@ export interface IEthMisc {
     membership: Membership | null
 }
 
+export interface IPollMisc {
+    active: number | null,
+    amount: number | null
+}
+
 export interface StoreState {
-    ethMisc: IEthMisc
+    ethMisc: IEthMisc,
+    pollMisc: IPollMisc
 }
