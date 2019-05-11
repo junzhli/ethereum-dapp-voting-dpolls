@@ -1,5 +1,5 @@
 import React, { Dispatch } from 'react';
-import { Modal, Button, Image, Header, Menu, Form, Checkbox, Icon, Message } from 'semantic-ui-react';
+import { Modal, Button, Menu, Form, Icon, Message } from 'semantic-ui-react';
 import { IPollCreate, IPollCreateProps, IPollCreateStates } from './types/PollCreate';
 import { StoreState } from '../store/types';
 import { connect } from 'react-redux';
@@ -12,6 +12,7 @@ import { setMembership } from '../actions/eth';
 import MembershipUpgradePromotion from './MembershipUpgradePromotion';
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS as string;
+
 class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
     private contract: any;
     private checkConfirmedInterval: any;
@@ -42,23 +43,13 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
 
     async componentDidMount() {
         if (this.props.accountAddress) {
-            if (this.props.membership === Membership.CITIZEN) {
-
-            } else if (this.props.accountAddress && this.props.membership === Membership.DIAMOND) {
-                await this.fetchQuota();
-            }
+            await this.refreshQuota(this.props.membership);
         }
     }
 
-    async componentDidUpdate() {
-        if (this.props.accountAddress) {
-            if (this.props.membership === Membership.CITIZEN) {
-                await this.fetchQuota();
-            } else if (this.props.accountAddress && this.props.membership === Membership.DIAMOND) {
-                this.setState({
-                    quota: 10
-                })
-            }
+    async componentWillReceiveProps(nextProps: IPollCreateProps) {
+        if (nextProps.membership) {
+            await this.refreshQuota(nextProps.membership);
         }
     }
 
@@ -72,11 +63,22 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         }
     }
 
-    async fetchQuota() {
-        const quota = (await this.contract.methods.getQuota(this.props.accountAddress).call()).toNumber();
-        this.setState({
-            quota
-        })
+    async refreshQuota(membership: Membership | null) {
+        switch(membership) {
+            case Membership.CITIZEN:
+                const quota = (await this.contract.methods.getQuota(this.props.accountAddress).call()).toNumber();
+                return this.setState({
+                    quota
+                });
+            case Membership.DIAMOND:
+                return this.setState({
+                    quota: 'Unlimited'
+                });
+            default:
+                return this.setState({
+                    quota: null
+                });
+        }
     }
 
     addOption() {
@@ -196,13 +198,12 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                             })
                         }, 5000);
 
-                        await this.refreshQuota();
+                        await this.refreshQuota(this.props.membership);
                     }
                 } catch (error) {
                     // we skip any error
                     console.log('error occurred: ' + error);
                 }
-                
             }, 1000);
         } catch (error) {
             this.setState({

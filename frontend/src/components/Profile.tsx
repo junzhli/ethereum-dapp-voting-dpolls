@@ -9,7 +9,6 @@ import { Membership } from '../types';
 class Profile extends React.Component<IProfileProps, IProfileStates> {
     constructor (props: IProfileProps) {
         super(props);
-
     }
 
     getMembership() {

@@ -31,6 +31,6 @@ export interface IPollCreateStates {
     successfulMessage: {
         show: boolean
     };
-    quota: number | null;
+    quota: string | null;
     optionsAmount: number;
 }
