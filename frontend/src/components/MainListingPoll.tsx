@@ -152,7 +152,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                     <Item.Group divided>
                         <div className={style['inline-container']}>
                             <div className={style['inline-title']}>
-                                <Header size='large' content='Active' />
+                                <Header size='large' content='Active Polls' />
                             </div>
                             {
                                 (this.state.activePolls && this.state.activePolls.length !== 0) && (
@@ -202,7 +202,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                         <br />
                         <div className={style['inline-container']}>
                             <div className={style['inline-title']}>
-                                <Header size='large' content='Inactive' />
+                                <Header size='large' content='Expired Polls' />
                             </div>
                             {
                                 (this.state.inactivePolls && this.state.inactivePolls.length !== 0) && (

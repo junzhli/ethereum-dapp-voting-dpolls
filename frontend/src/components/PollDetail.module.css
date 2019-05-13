@@ -12,3 +12,30 @@
 .inline-right {
     float:right
 }
+
+.voting-box {
+    margin-top: 10px;
+}
+
+.stamp {
+    box-shadow: 0 0 0 3px blue, 0 0 0 2px blue inset;  
+    border: 2px solid transparent;
+    border-radius: 4px;
+    display: inline-block;
+    padding: 5px 2px;
+    line-height: 22px;
+    color: blue;
+    font-size: 24px;
+    font-family: 'Black Ops One', cursive;
+    text-transform: uppercase;
+    text-align: center;
+    opacity: 0.4;
+    width: 155px;
+    transform: rotate(-30deg);
+}
+
+.ended {
+    position: absolute;
+    left: 155px;
+    bottom: 95px;
+}

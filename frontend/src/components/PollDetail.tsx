@@ -1,5 +1,5 @@
 import React, { SyntheticEvent } from 'react';
-import { Modal, Button, Header, Image, Message, Icon, Form, Checkbox } from 'semantic-ui-react';
+import { Modal, Button, Header, Image, Message, Icon, Form, Checkbox, Item } from 'semantic-ui-react';
 import { IPollDetailProps, IPollDetailStates, IPollDetail } from './types/PollDetail';
 import { sendTransaction } from '../utils/web3';
 import { StoreState } from '../store/types';
@@ -72,12 +72,14 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             votesByIndex
         });
 
-        const chartOptions = this.fetchChartOption();
-        this.setState({
-            chart: {
-                option: chartOptions
-            }
-        })
+        if (this.props.votesAmount !== 0) {
+            const chartOptions = this.fetchChartOption();
+            this.setState({
+                chart: {
+                    option: chartOptions
+                }
+            })
+        }
     }
 
     async componentWillMount() {
@@ -109,12 +111,14 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                 votesByIndex
             });
 
-            const chartOptions = this.fetchChartOption();
-            this.setState({
-                chart: {
-                    option: chartOptions
-                }
-            })
+            if (this.props.votesAmount !== 0) {
+                const chartOptions = this.fetchChartOption();
+                this.setState({
+                    chart: {
+                        option: chartOptions
+                    }
+                })
+            }
         }
     }
 
@@ -262,7 +266,11 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                         <Icon name='arrow right' />
                     </Button.Content>
                 </Button>}>
-                    <Modal.Header>Poll detail</Modal.Header>
+                    <Modal.Header>
+                        {
+                            !this.props.isExpired ? 'Poll detail' : 'Poll result'
+                        }
+                    </Modal.Header>
                     <Modal.Content image>
                         {/* <Image
                             wrapped
@@ -270,6 +278,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                             src="https://react.semantic-ui.com/images/avatar/large/rachel.png"
                         /> */}
                         <Modal.Description>
+                            
                             {
                                 this.state.waitingMessage.show && (
                                     <Message icon>
@@ -300,13 +309,13 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                                     </Message>
                                 )
                             }
-                            <Header>{this.props.title}</Header>
+                            <Header size='huge'>{this.props.title}</Header>
                             <div>
                                 <div className={style['inline-left']}>
-                                    <div>
-                                        Expiry Block Height: {this.props.expiryBlockHeight}
-                                    </div>
-                                    <Form>
+                                    <Header size='small'>
+                                        Choose an option
+                                    </Header>
+                                    <Form className={style['voting-box']}>
                                         {
                                             this.props.options.map((option, index) => {
                                                 return (
@@ -342,14 +351,21 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                                         )
                                     }
                                 </div>
-                                <div className={style['inline-right']}>
-                                    {
-                                        (this.state.chart && (
+                                {
+                                    (this.state.chart && (
+                                        <div className={style['inline-right']}>
                                             <Pie data={this.state.chart.option as ChartData<Chart.ChartData>} options={{cutoutPercentage: 8, legend: {display: false}}} />
-                                        ))
-                                    }
-                                </div>
+                                        </div>
+                                    ))
+                                }
                             </div>
+                            {
+                                this.props.isExpired && (
+                                    <div className={[style['stamp'], style['ended']].join(' ')}>
+                                        Poll ended
+                                    </div>
+                                )
+                            }
                         </Modal.Description>
                     </Modal.Content>
                 </Modal>
