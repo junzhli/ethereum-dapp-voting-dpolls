@@ -37,6 +37,12 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
 
         this.checkAccountAddressInterval = setInterval(async () => {
             const accountAddress = await this.props.web3.eth.getAccounts();
+
+            if (accountAddress.length === 0) {
+                this.props.userWalletUnlockApproval();
+                return;
+            }
+
             if (accountAddress[0] !== this.props.accountAddress) {
                 this.props.setAccountAddress(accountAddress[0]);
                 try {
@@ -46,7 +52,6 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                     console.log('getMembership falied');
                     console.log(error);
                 }
-                
             }
         }, 1000);
     }

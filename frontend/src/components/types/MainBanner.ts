@@ -4,6 +4,7 @@ import { Membership } from "../../types";
 export namespace IMainBanner {
     export interface IInnerProps {
         web3: any;
+        userWalletUnlockApproval: any;
     }
     
     export interface IStateFromProps {

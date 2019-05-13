@@ -12,6 +12,8 @@ export enum Membership {
 export interface IIndexStates {
     web3: any;
     approved: boolean;
+    showUserPrivacyModeDeniedMessage: boolean;
+    showUserWalletLockedMessage: boolean;
     voting: {
         selector: AddressType | null
     }
