@@ -10,7 +10,7 @@ class MembershipUpgradePromotion extends React.Component<IMembershipUpgradePromo
                 <div className={style.center}>
                     <Icon name='info circle' size='massive' />
                     <Header>
-                        Membership only.
+                        Members only.
                     </Header>
                 </div>
             </Item.Group>
