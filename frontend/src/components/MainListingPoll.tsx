@@ -4,7 +4,7 @@ import { VOTING_CORE_ABI, VOTING_ABI } from '../constants/contractABIs';
 import { Address } from '../types';
 import { IPollCardStatus } from './types/PollCard';
 import PollCard from './PollCard';
-import { Item, Icon, Loader, Header, Segment } from 'semantic-ui-react';
+import { Item, Icon, Loader, Header, Segment, Button } from 'semantic-ui-react';
 import { StoreState } from '../store/types';
 import { connect } from 'react-redux';
 import style from './MainListingPoll.module.css';
@@ -23,7 +23,9 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         this.state = {
             amountPolls: null,
             inactivePolls: null,
-            activePolls: null
+            activePolls: null,
+            inactiveCollapse: true,
+            activeCollapse: true
         }
     }
 
@@ -94,6 +96,18 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         };
     }
 
+    inactiveCollapseToggle() {
+        this.setState({
+            inactiveCollapse: !this.state.inactiveCollapse
+        })
+    }
+
+    activeCollapseToggle() {
+        this.setState({
+            activeCollapse: !this.state.activeCollapse
+        })
+    }
+
     async componentDidMount() {
         await this.refreshPolls();
     }
@@ -136,33 +150,100 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
 
                 return (
                     <Item.Group divided>
-                        <Header size='large' content='Active' />
-                        <div className={style['active-list']}>
-                            <Segment>
-                                {
-                                    this.state.activePolls && this.state.activePolls.map(pollInitialMetadata => {
-                                        const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
-                                        return (
-                                            <PollCard status='active' web3={this.props.web3} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} key={address} />
-                                        )
-                                    })
-                                }
-                            </Segment>
+                        <div className={style['inline-container']}>
+                            <div className={style['inline-title']}>
+                                <Header size='large' content='Active' />
+                            </div>
+                            {
+                                (this.state.activePolls && this.state.activePolls.length !== 0) && (
+                                    <div className={style['inline-button']}>
+                                        {
+                                            (this.state.activeCollapse) ? (
+                                                <Button icon onClick={() => this.activeCollapseToggle()}><Icon name='chevron down' size='big' /></Button>
+                                            ) : (
+                                                <Button icon onClick={() => this.activeCollapseToggle()}><Icon name='chevron up' size='big' /></Button>
+                                            )
+                                        }
+                                        
+                                    </div>
+                                )
+                            }
                         </div>
+                        {
+                            (this.state.activePolls && this.state.activePolls.length !== 0) ? (
+                                <div className={
+                                    (this.state.activeCollapse) ? (
+                                        [style['collapse'], style['active-list']].join(' ')
+                                    ) : (
+                                        style['active-list']
+                                    )}>
+                                <Segment>
+                                    {
+                                        this.state.activePolls.map(pollInitialMetadata => {
+                                            const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
+                                            return (
+                                                <PollCard status='active' web3={this.props.web3} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} key={address} />
+                                            )
+                                        })
+                                    }
+                                </Segment>
+                            </div>
+                            ) : (
+                                <Segment>
+                                    <Header textAlign='center' size='small'>
+                                        <div>
+                                            No polls are available...
+                                        </div>  
+                                    </Header>
+                                </Segment>
+                            )
+                        }
                         
-                        <Header size='large' content='Inactive' />
-                        <div className={style['inactive-list']}>
-                            <Segment>
-                                {
-                                    this.state.inactivePolls && this.state.inactivePolls.map(pollInitialMetadata => {
-                                        const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
-                                        return (
-                                            <PollCard status='inactive' web3={this.props.web3} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} key={address} />
-                                        )
-                                    })
-                                }
-                            </Segment>
+                        <br />
+                        <div className={style['inline-container']}>
+                            <div className={style['inline-title']}>
+                                <Header size='large' content='Inactive' />
+                            </div>
+                            {
+                                (this.state.inactivePolls && this.state.inactivePolls.length !== 0) && (
+                                    <div className={style['inline-button']}>
+                                        {
+                                            (this.state.inactiveCollapse) ? (
+                                                <Button icon onClick={() => this.inactiveCollapseToggle()}><Icon name='chevron down' size='big' /></Button>
+                                            ) : (
+                                                <Button icon onClick={() => this.inactiveCollapseToggle()}><Icon name='chevron up' size='big' /></Button>
+                                            )
+                                        }
+                                        
+                                    </div>
+                                )
+                            }
                         </div>
+                        {
+                            (this.state.inactivePolls && this.state.inactivePolls.length !== 0) ? (
+                                <div className={style['inactive-list']}>
+                                    <Segment>
+                                        {
+                                            this.state.inactivePolls.map(pollInitialMetadata => {
+                                                const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
+                                                return (
+                                                    <PollCard status='inactive' web3={this.props.web3} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} key={address} />
+                                                )
+                                            })
+                                        }  
+                                    </Segment>
+                                </div>
+                            ) : (
+                                <Segment>
+                                    <Header textAlign='center' size='small'>
+                                        <div>
+                                            No polls are available...
+                                        </div>  
+                                    </Header>
+                                </Segment>
+                            )
+                        }
+                        
                     </Item.Group>
                     
                 )

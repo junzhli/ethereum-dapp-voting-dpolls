@@ -8,13 +8,30 @@
 }
 
 .active-list {
-    overflow: scroll;
     height: 100%;
-    max-height: 550px;
 }
 
 .inactive-list {
-    overflow: scroll;
     height: 100%;
+}
+
+.collapse {
+    overflow: scroll;
     max-height: 550px;
+}
+
+.inline-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.inline-title {
+    padding-top: 10px;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.inline-button {
+    display: inline-block;
 }

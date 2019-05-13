@@ -28,4 +28,6 @@ export interface IMainListingPollState {
     amountPolls: number | null;
     inactivePolls: PollIntitalMetadata[] | null;
     activePolls: PollIntitalMetadata[] | null;
+    inactiveCollapse: boolean;
+    activeCollapse: boolean;
 }

@@ -78,12 +78,14 @@ class App extends React.Component<{}, IIndexStates> {
     }
 
     async componentDidMount() {
-        if ((await this.state.web3.eth.getAccounts()).length === 0) {
-            await this.userWalletUnlockApproval();
-        } else {
-            this.setState({
-                approved: true
-            })
+        if (this.state.web3) {
+            if ((await this.state.web3.eth.getAccounts()).length === 0) {
+                await this.userWalletUnlockApproval();
+            } else {
+                this.setState({
+                    approved: true
+                })
+            }
         }
     }
 
