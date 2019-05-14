@@ -1,5 +1,5 @@
 import React, { SyntheticEvent } from 'react';
-import { Modal, Button, Header, Image, Message, Icon, Form, Checkbox, Item } from 'semantic-ui-react';
+import { Modal, Button, Header, Message, Icon, Form, Checkbox } from 'semantic-ui-react';
 import { IPollDetailProps, IPollDetailStates, IPollDetail } from './types/PollDetail';
 import { sendTransaction } from '../utils/web3';
 import { StoreState } from '../store/types';
@@ -272,11 +272,6 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                         }
                     </Modal.Header>
                     <Modal.Content image>
-                        {/* <Image
-                            wrapped
-                            size="medium"
-                            src="https://react.semantic-ui.com/images/avatar/large/rachel.png"
-                        /> */}
                         <Modal.Description>
                             
                             {

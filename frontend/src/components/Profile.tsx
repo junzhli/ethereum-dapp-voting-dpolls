@@ -1,6 +1,6 @@
 import React from 'react';
 import { IProfileProps, IProfileStates, IProfile } from './types/Profile';
-import { Card, Icon, Image, Loader, Statistic } from 'semantic-ui-react';
+import { Card, Icon, Loader, Statistic } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { StoreState } from '../store/types';
 import style from './Profile.module.css';
@@ -58,7 +58,6 @@ class Profile extends React.Component<IProfileProps, IProfileStates> {
     render () {
         return (
             <Card>
-                {/* <Image src='https://react.semantic-ui.com/images/avatar/large/daniel.jpg' wrapped ui={false} /> */}
                 <Card.Content>
                     <Card.Header><Icon color='black' name='clock outline' />Latest block</Card.Header>
                     <Card.Description>

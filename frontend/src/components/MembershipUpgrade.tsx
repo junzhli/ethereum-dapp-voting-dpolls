@@ -1,10 +1,8 @@
 import React, { Dispatch } from 'react';
 import { IMembershipUpgradeProps, IMembershipUpgradeStates, IMembershipUpgrade } from './types/MembershipUpgrade';
-import { Modal, Button, Header, Image, Segment, Grid, Form, Divider, Label, Dimmer, Message, Icon, Menu } from 'semantic-ui-react';
+import { Modal, Button, Segment, Grid, Label, Message, Icon, Menu } from 'semantic-ui-react';
 import { StoreState } from '../store/types';
 import { connect } from 'react-redux';
-import citizenImage from '../commons/statics/images/citizen.png';
-import diamondImage from '../commons/statics/images/diamond.png';
 import style from './MembershipUpgrade.module.css';
 import { ETHActionType } from '../actions/types/eth';
 import { Membership } from '../types';

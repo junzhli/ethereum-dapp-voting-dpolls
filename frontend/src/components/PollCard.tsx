@@ -1,11 +1,9 @@
-import React, { Dispatch } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { IPollCardProps, IPollCardStates, IPollCard, IPollCardStatus } from './types/PollCard';
-import { VOTING_ABI } from '../constants/contractABIs';
 import { StoreState } from '../store/types';
 import PollDetail from './PollDetail';
 import { Item, Placeholder, Icon, Segment, Header, Button } from 'semantic-ui-react';
-import commonStyle from '../commons/styles/index.module.css';
 import style from './PollCard.module.css';
 import { Address } from '../types';
 

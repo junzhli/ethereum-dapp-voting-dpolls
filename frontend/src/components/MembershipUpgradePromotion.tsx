@@ -1,4 +1,4 @@
-import React, { Dispatch } from 'react';
+import React from 'react';
 import { IMembershipUpgradePromotionProps, IMembershipUpgradePromotionStates } from './types/MembershipUpgradePromotion';
 import { Item, Icon, Header } from 'semantic-ui-react';
 import style from './MembershipUpgradePromotion.module.css';

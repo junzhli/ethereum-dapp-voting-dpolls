@@ -1,5 +1,5 @@
 import React, { Dispatch } from 'react';
-import { Modal, Button, Menu, Form, Icon, Message, Input, Label } from 'semantic-ui-react';
+import { Modal, Button, Menu, Form, Icon, Message, Label } from 'semantic-ui-react';
 import { IPollCreate, IPollCreateProps, IPollCreateStates } from './types/PollCreate';
 import { StoreState } from '../store/types';
 import { connect } from 'react-redux';

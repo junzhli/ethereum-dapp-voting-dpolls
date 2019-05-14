@@ -8,7 +8,7 @@ import { Membership } from '../types';
 import { VOTING_CORE_ABI } from '../constants/contractABIs';
 import style from './MainBanner.module.css';
 import MembershipUpgrade from './MembershipUpgrade';
-import { Header, Icon, Menu, Input } from 'semantic-ui-react';
+import { Header, Icon, Menu } from 'semantic-ui-react';
 import PollCreate from './PollCreate';
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
@@ -84,14 +84,7 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                     </div>
                     <div className={style.menu}>
                         <Menu secondary inverted>
-                            {/* <Menu.Item name='Home' active={true} onClick={() => {}} /> */}
                             <PollCreate web3={this.props.web3} />
-                            {/* <Menu.Item
-                            name='Create'
-                            active={false}
-                            onClick={() => {}}
-                            /> */}
-                            {/* <Menu.Menu position='right'> */}
                             {
                                 (this.props.membership === Membership.NO_BODY) ? (
                                     <MembershipUpgrade web3={this.props.web3} />
@@ -104,24 +97,9 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                                     />
                                 )
                             }
-                            {/* </Menu.Menu> */}
                         </Menu>
                     </div>
                 </div>
-                
-                
-                {/* <div id="block-height">
-                Block height: { this.props.blockHeight }
-                </div>
-                <div id="account-address">
-                    Account address: { this.props.accountAddress }
-                </div>
-                <div id="membership">
-                    Membership: { this.showMembership() }
-                </div>
-                <div id="upgrade">
-                    <MembershipUpgrade web3={this.props.web3} />
-                </div> */}
             </div>
         )
     }

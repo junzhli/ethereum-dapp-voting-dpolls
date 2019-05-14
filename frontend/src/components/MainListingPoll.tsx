@@ -1,15 +1,12 @@
 import React, { Dispatch } from 'react';
 import { IMainListingPollProps, IMainListingPollState, IMainListingPoll, PollIntitalMetadata } from './types/MainListingPoll';
 import { VOTING_CORE_ABI, VOTING_ABI } from '../constants/contractABIs';
-import { Address } from '../types';
-import { IPollCardStatus } from './types/PollCard';
 import PollCard from './PollCard';
 import { Item, Icon, Loader, Header, Segment, Button } from 'semantic-ui-react';
 import { StoreState } from '../store/types';
 import { connect } from 'react-redux';
 import style from './MainListingPoll.module.css';
 import { BlockHeightType } from '../actions/types/eth';
-import { pathToFileURL } from 'url';
 import { PollActionType } from '../actions/types/poll';
 import { setStatistics } from '../actions/poll';
 

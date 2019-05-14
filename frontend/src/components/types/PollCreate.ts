@@ -1,4 +1,4 @@
-import { Address, Membership } from "../../types";
+import { Membership } from "../../types";
 import { BlockHeightType, AddressType } from "../../actions/types/eth";
 
 export namespace IPollCreate {

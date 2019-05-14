@@ -10,7 +10,7 @@ import 'semantic-ui-css/semantic.min.css';
 import commonStyle from './commons/styles/index.module.css';
 import style from './index.module.css';
 import Profile from './components/Profile';
-import { Segment, Loader, Dimmer, Image } from 'semantic-ui-react';
+import { Loader, Dimmer } from 'semantic-ui-react';
 
 /**
  * global declaration
