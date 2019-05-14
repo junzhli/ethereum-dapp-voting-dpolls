@@ -16,7 +16,7 @@ A Dapp project proposed in NTU DApp development course
     * A max number of 10 times creating a poll
   * 10 ETH for DIAMOND
     * **Unlimited**
-* Contract administration
+* Contract administration *(smart contract only)*
   * Set admin
   * Withdraw funds from smart contract
   * Reclaim ownership of registries in case of new core contract replacement
@@ -24,9 +24,7 @@ A Dapp project proposed in NTU DApp development course
 ### Table of Contents
 * [smart-contract](#smart-contracts)
   * Smart contracts on Ethereum blockchain
-* web3
-  * test stuffs
-  * be removed in future version
+* [frontend](#frontend)
 
 
 Smart Contracts
@@ -45,3 +43,27 @@ Smart Contracts
 ```shell
 $ truffle test
 ```
+
+Frontend
+--------------------
+
+## Setup Guide
+#### Pre-configuration options
+To run the fronend, please specify all required values.
+Fill in all values in file ```.env``` as referenced file ```.env.template``` or set all of the following as environment variables
+
+* ```REACT_APP_VOTING_CORE_ADDRESS``` - Voting Core contract address
+
+#### Run dev server
+```shell
+$ npm start
+```
+
+#### Build for production environment
+```shell
+$ npm build
+$ ## dist folder: ./build
+$ cd build
+```
+
+Place files in ```build``` in static web server like **Nginx**
