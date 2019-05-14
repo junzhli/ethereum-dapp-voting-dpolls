@@ -46,8 +46,6 @@ $ truffle test
 
 Frontend
 --------------------
-
-## Setup Guide
 #### Pre-configuration options
 To run the fronend, please specify all required values.
 Fill in all values in file ```.env``` as referenced file ```.env.template``` or set all of the following as environment variables
@@ -66,4 +64,4 @@ $ ## dist folder: ./build
 $ cd build
 ```
 
-Place files in ```build``` in static web server like **Nginx**
+Place files in folder ```build``` in static web server (e.g. **Nginx**)
