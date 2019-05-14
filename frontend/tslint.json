@@ -7,7 +7,7 @@
     "rules": {
         "semicolon": [true, "always"],
         "member-access": [true, "no-public"],
-        "jsx-alignment": "true",
+        "jsx-alignment": "true"
     },
     "rulesDirectory": []
 }

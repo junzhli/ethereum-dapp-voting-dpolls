@@ -1,7 +1,5 @@
-import { IEthMisc, IPollMisc } from "../store/types";
-import { ETHActionType } from "../actions/types/eth";
-import { SET_BLOCK_HEIGHT, SET_ACCOUNT_ADDRESS, SET_MEMBERSHIP, SET_POLL_STATISTICS } from "../actions/constant";
-import { Action } from "redux";
+import { IPollMisc } from "../store/types";
+import { SET_POLL_STATISTICS } from "../actions/constant";
 import { PollActionType } from "../actions/types/poll";
 
 const initialState: IPollMisc = {
