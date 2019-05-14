@@ -5,15 +5,27 @@
     width: 100px;
 }
 
+.inline-container {
+    float: left;
+    width: 100%;
+}
+
 .inline-left {
-    float:left
+    display: inline-block;
+    
 }
 
 .inline-right {
-    float:right
+    display: inline-block;
+    vertical-align: top;
+    float: right;
 }
 
 .voting-box {
+    margin-top: 10px;
+}
+
+.voting-button {
     margin-top: 10px;
 }
 
@@ -36,6 +48,6 @@
 
 .ended {
     position: absolute;
-    left: 155px;
-    bottom: 95px;
+    left: 70px;
+    top: 120px;
 }

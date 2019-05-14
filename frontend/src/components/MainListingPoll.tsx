@@ -214,14 +214,18 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                                                 <Button icon onClick={() => this.inactiveCollapseToggle()}><Icon name='chevron up' size='big' /></Button>
                                             )
                                         }
-                                        
                                     </div>
                                 )
                             }
                         </div>
                         {
                             (this.state.inactivePolls && this.state.inactivePolls.length !== 0) ? (
-                                <div className={style['inactive-list']}>
+                                <div className={
+                                    (this.state.inactiveCollapse) ? (
+                                        [style['collapse'], style['inactive-list']].join(' ')
+                                    ) : (
+                                        style['inactive-list']
+                                    )}>
                                     <Segment>
                                         {
                                             this.state.inactivePolls.map(pollInitialMetadata => {
@@ -243,9 +247,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                                 </Segment>
                             )
                         }
-                        
-                    </Item.Group>
-                    
+                    </Item.Group> 
                 )
         }
     }

@@ -33,4 +33,7 @@ export interface IPollCreateStates {
     };
     quota: string | null;
     optionsAmount: number;
+    inputErrors: {
+        blockHeight: boolean
+    }
 }

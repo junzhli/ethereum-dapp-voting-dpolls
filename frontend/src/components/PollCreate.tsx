@@ -1,5 +1,5 @@
 import React, { Dispatch } from 'react';
-import { Modal, Button, Menu, Form, Icon, Message } from 'semantic-ui-react';
+import { Modal, Button, Menu, Form, Icon, Message, Input, Label } from 'semantic-ui-react';
 import { IPollCreate, IPollCreateProps, IPollCreateStates } from './types/PollCreate';
 import { StoreState } from '../store/types';
 import { connect } from 'react-redux';
@@ -36,7 +36,10 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                 show: false
             },
             quota: null,
-            optionsAmount: 2
+            optionsAmount: 2,
+            inputErrors: {
+                blockHeight: false
+            }
         };
         this.state = Object.assign({}, this.initialState);
     }
@@ -61,6 +64,26 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         if (this.setTimeoutHolder) {
             clearTimeout(this.setTimeoutHolder);
         }
+    }
+
+    blockHeightCheckHandler(event: React.KeyboardEvent<HTMLInputElement>) {
+        const charCode = event.charCode;
+        if (charCode >= 48 && charCode <= 57) {
+            this.setState({
+                inputErrors: {
+                    blockHeight: false
+                }
+            })
+            return true;
+        }
+
+        this.setState({
+            inputErrors: {
+                blockHeight: true
+            }
+        })
+        event.preventDefault();
+        return false;
     }
 
     async refreshQuota(membership: Membership | null) {
@@ -109,6 +132,8 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         let block = (this.refs['block'] as any as HTMLInputElement).value;
         if (block === '') {
             errors.push('Expiry block height is empty');
+        } else if (isNaN(Number(block))) {
+            errors.push('Block number is invalid');
         } else if (Number(block) <= this.props.blockHeight + 1) {
             errors.push('Block number is behind the latest block');
         }
@@ -266,7 +291,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                 <Form className={style['form-ui']} size='large' onSubmit={this.createPoll.bind(this)}>
                     <Form.Field>
                         <label>Title</label>
-                        <input placeholder='Title' ref='title' />
+                        <input placeholder='Enter a poll question' ref='title' />
                     </Form.Field>
                     <Form.Field>
                         <label>Host</label>
@@ -274,7 +299,14 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     </Form.Field>
                     <Form.Field>
                         <label>Expiry Block Height</label>
-                        <input placeholder='Block height' ref='block' />
+                        <input onKeyPress={this.blockHeightCheckHandler.bind(this)} placeholder='When will the poll expire?' ref='block' />
+                        {
+                            (this.state.inputErrors.blockHeight) && (
+                                <Label basic color='red' pointing>
+                                    Invalid input
+                                </Label>
+                            )
+                        }
                     </Form.Field>
                     <Form.Field>
                         <label>Options</label>

@@ -17,7 +17,7 @@
 
 .collapse {
     overflow: scroll;
-    max-height: 550px;
+    max-height: 400px;
 }
 
 .inline-container {

@@ -181,9 +181,12 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                                     <div className={style['price']}>
                                         1 ETH
                                     </div>
-                                    <div className={style.center}>
-                                        <Image src={citizenImage} verticalAlign='middle' />
+
+                                    <div>
+                                        <Segment size='big' textAlign='center' vertical>10 times of poll creations</Segment>
+                                        <Segment size='big' textAlign='center' vertical>24/7 Exclusive Customer Service</Segment>
                                     </div>
+
                                     <Button content='Upgrade now' primary onClick={() => this.upgradeMembership(Membership.CITIZEN, 10 ** 18)} disabled={this.props.membership !== Membership.NO_BODY} />
                                     {
                                         (this.props.membership === Membership.CITIZEN) && (
@@ -206,18 +209,17 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                                         <div className={[style['plan-name'], style['inline-component'], style['plan-diamond-title']].join(' ')}>
                                             <h3>Diamond</h3>
                                         </div>
-                                        {/* <Header className={[style['plan-name'], style['inline-component']].join(' ')}>
-                                            Diamond
-                                        </Header> */}
                                     </div>
                                     
                                     <div className={style['price']}>
                                         10 ETH
                                     </div>
-                                    
-                                    <div className={style.center}>
-                                        <Image src={diamondImage} verticalAlign='middle' />
+
+                                    <div>
+                                        <Segment size='big' textAlign='center' vertical>Unlimited times of poll creations</Segment>
+                                        <Segment size='big' textAlign='center' vertical>24/7 Exclusive Customer Service</Segment>
                                     </div>
+
                                     <Button content='Upgrade now' primary onClick={() => this.upgradeMembership(Membership.DIAMOND, 10 * (10 ** 18))} disabled={(this.props.membership !== Membership.CITIZEN) && (this.props.membership !== Membership.NO_BODY)} />
                                     {
                                         (this.props.membership === Membership.DIAMOND) && (

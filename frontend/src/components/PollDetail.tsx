@@ -310,12 +310,12 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                                 )
                             }
                             <Header size='huge'>{this.props.title}</Header>
-                            <div>
+                            <div className={style['inline-container']}>
                                 <div className={style['inline-left']}>
-                                    <Header size='small'>
+                                    <Header size='medium'>
                                         Choose an option
                                     </Header>
-                                    <Form className={style['voting-box']}>
+                                    <Form className={style['voting-box']} size='huge'>
                                         {
                                             this.props.options.map((option, index) => {
                                                 return (
@@ -347,7 +347,9 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                                     </Form>
                                     {
                                         (this.state.votingMessage.selectedIndex !== null && !this.props.isVoted) && (
-                                            <Button content='Vote!' onClick={() => this.vote(this.state.votingMessage.selectedIndex as number)}/>
+                                            <div className={style['voting-button']}>
+                                                <Button content='Vote!' onClick={() => this.vote(this.state.votingMessage.selectedIndex as number)}/>
+                                            </div>
                                         )
                                     }
                                 </div>
