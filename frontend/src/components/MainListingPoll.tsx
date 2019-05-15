@@ -24,6 +24,8 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
             inactiveCollapse: true,
             activeCollapse: true,
         };
+        this.inactiveCollapseToggle = this.inactiveCollapseToggle.bind(this);
+        this.activeCollapseToggle = this.activeCollapseToggle.bind(this);
     }
 
     async refreshPolls() {
