@@ -5,7 +5,7 @@ var VotingCore = artifacts.require('VotingCore');
 module.exports = function(deployer, network, accounts) {
     let votingHostRegistryAddress;
     let votingRegistryAddress;
-    const depositAccountAddress = accounts[5];
+    const depositAccountAddress = 'deposit_account';
 
     deployer.deploy(VotingHostRegistry)
         .then(() => {

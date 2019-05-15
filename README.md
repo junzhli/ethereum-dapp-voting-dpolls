@@ -29,6 +29,10 @@ A Dapp project proposed in NTU DApp development course
 
 Smart Contracts
 --------------------
+#### Build status
+##### Staging (Ropsten)
+* VotingCore - `0x55D7f084e97eD41811Ad03256348626053162AC8`
+
 #### Prerequisites
 * Truffle - blockchain development framework
 * Ganache - private blockchain network
@@ -46,6 +50,8 @@ $ truffle test
 
 Frontend
 --------------------
+#### Build status
+##### Staging
 [![Netlify Status](https://api.netlify.com/api/v1/badges/34104410-f4a4-48a3-8603-876aeef24cbf/deploy-status)](https://app.netlify.com/sites/dpolls-staging-jeremyli-f05e34/deploys)
 
 #### Pre-configuration options
