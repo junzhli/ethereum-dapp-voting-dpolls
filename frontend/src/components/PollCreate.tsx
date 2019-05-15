@@ -84,7 +84,6 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
     }
 
     blockHeightFocusInHandler(event: React.FocusEvent<HTMLInputElement>) {
-        console.log(event);
         this.setState({
             inputHints: {
                 blockHeight: true,
