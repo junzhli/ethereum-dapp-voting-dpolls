@@ -55,7 +55,7 @@ Frontend
 [![Netlify Status](https://api.netlify.com/api/v1/badges/34104410-f4a4-48a3-8603-876aeef24cbf/deploy-status)](https://app.netlify.com/sites/dpolls-staging-jeremyli-f05e34/deploys)
 
 #### Pre-configuration options
-To run the fronend, please specify all required values.
+To run the frontend, please specify all required values.
 Fill in all values in file ```.env``` as referenced file ```.env.template``` or set all of the following as environment variables
 
 * ```REACT_APP_VOTING_CORE_ADDRESS``` - Voting Core contract address
