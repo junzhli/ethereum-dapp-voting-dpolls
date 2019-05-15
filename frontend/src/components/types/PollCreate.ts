@@ -36,4 +36,7 @@ export interface IPollCreateStates {
     inputErrors: {
         blockHeight: boolean,
     };
+    inputHints: {
+        blockHeight: boolean,
+    };
 }

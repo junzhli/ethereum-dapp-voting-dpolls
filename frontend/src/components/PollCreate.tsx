@@ -41,11 +41,16 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             inputErrors: {
                 blockHeight: false,
             },
+            inputHints: {
+                blockHeight: false,
+            },
         };
         this.state = Object.assign({}, this.initialState);
         this.formOnSubmitHandler = this.createPoll.bind(this);
         this.blockHeightCheckHandler = this.blockHeightCheckHandler.bind(this);
         this.addOption = this.addOption.bind(this);
+        this.blockHeightFocusOutHandler = this.blockHeightFocusOutHandler.bind(this);
+        this.blockHeightFocusInHandler = this.blockHeightFocusInHandler.bind(this);
     }
 
     async componentDidMount() {
@@ -68,6 +73,23 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         if (this.setTimeoutHolder) {
             clearTimeout(this.setTimeoutHolder);
         }
+    }
+
+    blockHeightFocusOutHandler(event: React.FocusEvent<HTMLInputElement>) {
+        this.setState({
+            inputHints: {
+                blockHeight: false,
+            },
+        });
+    }
+
+    blockHeightFocusInHandler(event: React.FocusEvent<HTMLInputElement>) {
+        console.log(event);
+        this.setState({
+            inputHints: {
+                blockHeight: true,
+            },
+        });
     }
 
     blockHeightCheckHandler(event: React.KeyboardEvent<HTMLInputElement>) {
@@ -303,7 +325,14 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     </Form.Field>
                     <Form.Field>
                         <label>Expiry Block Height</label>
-                        <input onKeyPress={this.blockHeightCheckHandler} placeholder="When will the poll expire?" ref="block" />
+                        <input onFocus={this.blockHeightFocusInHandler} onBlur={this.blockHeightFocusOutHandler} onKeyPress={this.blockHeightCheckHandler} placeholder="When will the poll expire?" ref="block" />
+                        {
+                            (this.state.inputHints.blockHeight) && (
+                                <Label basic={true} color="teal" pointing={true}>
+                                    Specify block number with more than {this.props.blockHeight + 1}
+                                </Label>
+                            )
+                        }
                         {
                             (this.state.inputErrors.blockHeight) && (
                                 <Label basic={true} color="red" pointing={true}>
