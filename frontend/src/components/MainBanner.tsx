@@ -1,30 +1,30 @@
-import React, { Dispatch } from 'react';
-import { IMainBannerProps, IMainBannerStates, IMainBanner } from './types/MainBanner';
-import { StoreState } from '../store/types';
-import { ETHActionType, BlockHeightType, AddressType } from '../actions/types/eth';
-import { setBlockHeight, setAccountAddress, setMembership } from '../actions/eth';
-import { connect } from 'react-redux';
-import { Membership } from '../types';
-import { VOTING_CORE_ABI } from '../constants/contractABIs';
-import style from './MainBanner.module.css';
-import MembershipUpgrade from './MembershipUpgrade';
-import { Header, Icon, Menu } from 'semantic-ui-react';
-import PollCreate from './PollCreate';
+import React, { Dispatch } from "react";
+import { connect } from "react-redux";
+import { Header, Icon, Menu } from "semantic-ui-react";
+import { setAccountAddress, setBlockHeight, setMembership } from "../actions/eth";
+import { AddressType, BlockHeightType, ETHActionType } from "../actions/types/eth";
+import { VOTING_CORE_ABI } from "../constants/contractABIs";
+import { StoreState } from "../store/types";
+import { Membership } from "../types";
+import style from "./MainBanner.module.css";
+import MembershipUpgrade from "./MembershipUpgrade";
+import PollCreate from "./PollCreate";
+import { IMainBanner, IMainBannerProps, IMainBannerStates } from "./types/MainBanner";
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
     private contract: any;
     private checkBlockNumberInterval: any;
     private checkAccountAddressInterval: any;
-    
+
     constructor(props: IMainBannerProps) {
         super(props);
         this.contract = new this.props.web3.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
         this.checkBlockNumberInterval = null;
         this.checkAccountAddressInterval = null;
         this.state = {
-            isLoaded: false
-        }
+            isLoaded: false,
+        };
     }
 
     async componentDidMount() {
@@ -49,7 +49,7 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                     const membership = (await this.contract.methods.getMembership(accountAddress[0]).call()).toNumber();
                     this.props.setMembership(membership);
                 } catch (error) {
-                    console.log('getMembership falied');
+                    console.log("getMembership falied");
                     console.log(error);
                 }
             }
@@ -64,44 +64,37 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
     showMembership() {
         switch (this.props.membership) {
             case Membership.NO_BODY:
-                return 'FREE'
+                return "FREE";
             case Membership.CITIZEN:
-                return 'CITIZEN'
+                return "CITIZEN";
             case Membership.DIAMOND:
-                return 'DIAMOND'
+                return "DIAMOND";
         }
     }
 
     render() {
         return (
-            <div className={style['main-banner']}>
-                <div className={[style.banner, style.center].join(' ')}>
+            <div className={style["main-banner"]}>
+                <div className={[style.banner, style.center].join(" ")}>
                     <div className={style.logo}>
-                        <Header inverted as='h2'>
-                            <Icon name='archive' />
+                        <Header inverted={true} as="h2">
+                            <Icon name="archive" />
                             <Header.Content>dPolls</Header.Content>
                         </Header>
                     </div>
                     <div className={style.menu}>
-                        <Menu secondary inverted>
+                        <Menu secondary={true} inverted={true}>
                             <PollCreate web3={this.props.web3} />
                             {
-                                (this.props.membership === Membership.NO_BODY) ? (
+                                (this.props.membership === Membership.NO_BODY) && (
                                     <MembershipUpgrade web3={this.props.web3} />
-                                ) : (
-                                    <Menu.Item
-                                    name='       '
-                                    active={false}
-                                    onClick={() => {}}
-                                    disabled
-                                    />
                                 )
                             }
                         </Menu>
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 }
 
@@ -109,19 +102,19 @@ const mapStateToProps = (state: StoreState, ownProps: IMainBanner.IInnerProps): 
     return {
         blockHeight: state.ethMisc.blockHeight,
         accountAddress: state.ethMisc.accountAddress,
-        membership: state.ethMisc.membership
-    }
-}
+        membership: state.ethMisc.membership,
+    };
+};
 
 const mapDispatchToProps = (dispatch: Dispatch<ETHActionType>, ownProps: IMainBanner.IInnerProps): IMainBanner.IPropsFromDispatch => {
     return {
         setBlockHeight: (blockHeight: BlockHeightType) => dispatch(setBlockHeight(blockHeight)),
         setAccountAddress: (accountAddress: AddressType) => dispatch(setAccountAddress(accountAddress)),
-        setMembership: (nextMembership: Membership) => dispatch(setMembership(nextMembership))
-    }
-}
+        setMembership: (nextMembership: Membership) => dispatch(setMembership(nextMembership)),
+    };
+};
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
 )(MainBanner);

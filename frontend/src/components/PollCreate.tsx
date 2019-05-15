@@ -1,15 +1,15 @@
-import React, { Dispatch } from 'react';
-import { Modal, Button, Menu, Form, Icon, Message, Label } from 'semantic-ui-react';
-import { IPollCreate, IPollCreateProps, IPollCreateStates } from './types/PollCreate';
-import { StoreState } from '../store/types';
-import { connect } from 'react-redux';
-import style from './PollCreate.module.css';
-import { VOTING_CORE_ABI } from '../constants/contractABIs';
-import { sendTransaction } from '../utils/web3';
-import { ETHActionType } from '../actions/types/eth';
-import { Membership } from '../types';
-import { setMembership } from '../actions/eth';
-import MembershipUpgradePromotion from './MembershipUpgradePromotion';
+import React, { Dispatch } from "react";
+import { connect } from "react-redux";
+import { Button, Form, Icon, Label, Menu, Message, Modal } from "semantic-ui-react";
+import { setMembership } from "../actions/eth";
+import { ETHActionType } from "../actions/types/eth";
+import { VOTING_CORE_ABI } from "../constants/contractABIs";
+import { StoreState } from "../store/types";
+import { Membership } from "../types";
+import { sendTransaction } from "../utils/web3";
+import MembershipUpgradePromotion from "./MembershipUpgradePromotion";
+import style from "./PollCreate.module.css";
+import { IPollCreate, IPollCreateProps, IPollCreateStates } from "./types/PollCreate";
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS as string;
 
@@ -18,6 +18,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
     private checkConfirmedInterval: any;
     private setTimeoutHolder: any;
     private initialState: IPollCreateStates;
+    private formOnSubmitHandler: any;
     constructor(props: IPollCreateProps) {
         super(props);
         this.contract = new this.props.web3.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
@@ -26,22 +27,25 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         this.initialState = {
             waitingMessage: {
                 show: false,
-                message: null
+                message: null,
             },
             errorMessage: {
                 show: false,
-                message: null
+                message: null,
             },
             successfulMessage: {
-                show: false
+                show: false,
             },
             quota: null,
             optionsAmount: 2,
             inputErrors: {
-                blockHeight: false
-            }
+                blockHeight: false,
+            },
         };
         this.state = Object.assign({}, this.initialState);
+        this.formOnSubmitHandler = this.createPoll.bind(this);
+        this.blockHeightCheckHandler = this.blockHeightCheckHandler.bind(this);
+        this.addOption = this.addOption.bind(this);
     }
 
     async componentDidMount() {
@@ -71,82 +75,82 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         if (charCode >= 48 && charCode <= 57) {
             this.setState({
                 inputErrors: {
-                    blockHeight: false
-                }
-            })
+                    blockHeight: false,
+                },
+            });
             return true;
         }
 
         this.setState({
             inputErrors: {
-                blockHeight: true
-            }
-        })
+                blockHeight: true,
+            },
+        });
         event.preventDefault();
         return false;
     }
 
     async refreshQuota(membership: Membership | null) {
-        switch(membership) {
+        switch (membership) {
             case Membership.CITIZEN:
                 const quota = (await this.contract.methods.getQuota(this.props.accountAddress).call()).toNumber();
                 return this.setState({
-                    quota
+                    quota,
                 });
             case Membership.DIAMOND:
                 return this.setState({
-                    quota: 'Unlimited'
+                    quota: "Unlimited",
                 });
             default:
                 return this.setState({
-                    quota: null
+                    quota: null,
                 });
         }
     }
 
     addOption() {
         this.setState({
-            optionsAmount: this.state.optionsAmount + 1
-        })
+            optionsAmount: this.state.optionsAmount + 1,
+        });
     }
 
     async createPoll(event: React.FormEvent) {
         this.setState({
             waitingMessage: {
                 show: false,
-                message: null
+                message: null,
             },
             errorMessage: {
                 show: false,
-                message: null
-            }
-        })
+                message: null,
+            },
+        });
 
         const errors: string[] = [];
-        let title = (this.refs['title'] as any as HTMLInputElement).value;
-        if (title === '') {
-            errors.push('Title is empty');
+        let title = (this.refs.title as any as HTMLInputElement).value;
+        if (title === "") {
+            errors.push("Title is empty");
         }
         title = this.props.web3.utils.padRight(this.props.web3.utils.utf8ToHex(title), 64);
 
-        let block = (this.refs['block'] as any as HTMLInputElement).value;
-        if (block === '') {
-            errors.push('Expiry block height is empty');
+        const block = (this.refs.block as any as HTMLInputElement).value;
+        if (block === "") {
+            errors.push("Expiry block height is empty");
         } else if (isNaN(Number(block))) {
-            errors.push('Block number is invalid');
+            errors.push("Block number is invalid");
         } else if (Number(block) <= this.props.blockHeight + 1) {
-            errors.push('Block number is behind the latest block');
+            errors.push("Block number is behind the latest block");
         }
-        
+
         const options = Array.from(Array(this.state.optionsAmount), (entity, index) => {
-                const option = (this.refs['option' + index] as any as HTMLInputElement).value;
-                if (option === '') {
-                    errors.push('Option ' + index + ' is empty');
+                const option = (this.refs["option" + index] as any as HTMLInputElement).value;
+                if (option === "") {
+                    errors.push("Option " + index + " is empty");
                     return null;
                 }
 
                 if (option.length > 20) {
-                    errors.push('Option' + index + ' exceeds 20 chars');
+                    errors.push("Option" + index + " exceeds 20 chars");
                     return null;
                 }
                 const hex = this.props.web3.utils.padRight(this.props.web3.utils.utf8ToHex(option), 64);
@@ -158,25 +162,25 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             return this.setState({
                 errorMessage: {
                     show: true,
-                    message: errors
+                    message: errors,
                 },
                 waitingMessage: {
                     show: false,
-                    message: null
-                }
+                    message: null,
+                },
             });
         }
 
         this.setState({
             errorMessage: {
                 show: false,
-                message: null
+                message: null,
             },
             waitingMessage: {
                 show: true,
-                message: 'Waiting for user prompt...'
-            }
-        })
+                message: "Waiting for user prompt...",
+            },
+        });
 
         const web3 = this.props.web3;
         const from = this.props.accountAddress as string;
@@ -187,18 +191,18 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                 web3,
                 from,
                 to,
-                data
-            )
+                data,
+            );
             this.setState({
                 errorMessage: {
                     show: false,
-                    message: null
+                    message: null,
                 },
                 waitingMessage: {
                     show: true,
-                    message: 'Waiting for a few blocks being confirmed'
-                }
-            })
+                    message: "Waiting for a few blocks being confirmed",
+                },
+            });
             this.checkConfirmedInterval = setInterval(async () => {
                 try {
                     const receipt = await this.props.web3.eth.getTransactionReceipt(txid);
@@ -206,11 +210,11 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                         this.setState({
                             waitingMessage: {
                                 show: false,
-                                message: null
+                                message: null,
                             },
                             successfulMessage: {
-                                show: true
-                            }
+                                show: true,
+                            },
                         });
                         clearInterval(this.checkConfirmedInterval);
                         this.setTimeoutHolder = setTimeout(async () => {
@@ -218,39 +222,39 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                             this.props.setMembership(membership);
                             this.setState({
                                 successfulMessage: {
-                                    show: false
-                                }
-                            })
+                                    show: false,
+                                },
+                            });
                         }, 5000);
 
                         await this.refreshQuota(this.props.membership);
                     }
                 } catch (error) {
                     // we skip any error
-                    console.log('error occurred: ' + error);
+                    console.log("error occurred: " + error);
                 }
             }, 1000);
         } catch (error) {
             this.setState({
                 waitingMessage: {
                     show: false,
-                    message: null
+                    message: null,
                 },
                 errorMessage: {
                     show: true,
                     message: [
-                        error.message
-                    ]
-                }
-            })
+                        error.message,
+                    ],
+                },
+            });
 
             this.setTimeoutHolder = setTimeout(() => {
                 this.setState({
                     errorMessage: {
                         show: false,
-                        message: null
-                    }
-                })
+                        message: null,
+                    },
+                });
             }, 5000);
         }
     }
@@ -260,8 +264,8 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             <div>
                 {
                     this.state.waitingMessage.show && (
-                        <Message icon>
-                            <Icon name='circle notched' loading />
+                        <Message icon={true}>
+                            <Icon name="circle notched" loading={true} />
                             <Message.Content>
                             <Message.Header>Just a few seconds</Message.Header>
                             {this.state.waitingMessage.message}
@@ -272,8 +276,8 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                 {
                     this.state.errorMessage.show && (
                         <Message
-                            error
-                            header='There was some errors with your submission'
+                            error={true}
+                            header="There was some errors with your submission"
                             list={
                                 this.state.errorMessage.message as string[]
                             }
@@ -282,27 +286,27 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                 }
                 {
                     this.state.successfulMessage.show && (
-                        <Message positive>
+                        <Message positive={true}>
                             <Message.Header>Your creation has been performed successfully!</Message.Header>
                             <p>Your transaction has been confirmed.</p>
                         </Message>
                     )
                 }
-                <Form className={style['form-ui']} size='large' onSubmit={this.createPoll.bind(this)}>
+                <Form className={style["form-ui"]} size="large" onSubmit={this.formOnSubmitHandler}>
                     <Form.Field>
                         <label>Title</label>
-                        <input placeholder='Enter a poll question' ref='title' />
+                        <input placeholder="Enter a poll question" ref="title" />
                     </Form.Field>
                     <Form.Field>
                         <label>Host</label>
-                        <input placeholder={(this.props.accountAddress) ? this.props.accountAddress : 'Host'} disabled/>
+                        <input placeholder={(this.props.accountAddress) ? this.props.accountAddress : "Host"} disabled={true}/>
                     </Form.Field>
                     <Form.Field>
                         <label>Expiry Block Height</label>
-                        <input onKeyPress={this.blockHeightCheckHandler.bind(this)} placeholder='When will the poll expire?' ref='block' />
+                        <input onKeyPress={this.blockHeightCheckHandler} placeholder="When will the poll expire?" ref="block" />
                         {
                             (this.state.inputErrors.blockHeight) && (
-                                <Label basic color='red' pointing>
+                                <Label basic={true} color="red" pointing={true}>
                                     Invalid input
                                 </Label>
                             )
@@ -310,51 +314,51 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     </Form.Field>
                     <Form.Field>
                         <label>Options</label>
-                        <div className={style['options-wrapper']}>
-                            <div className={style['option-outer']}>
-                                <input placeholder='Option 0' ref='option0' /> 
+                        <div className={style["options-wrapper"]}>
+                            <div className={style["option-outer"]}>
+                                <input placeholder="Option 0" ref="option0" />
                                 {
                                     Array.from(Array(this.state.optionsAmount), (entity, index) => {
                                         if (index !== 0) {
                                             return (
-                                                <div className={style['option-divider']}>
-                                                    <input placeholder={'Option ' + index} ref={'option' + index} />
+                                                <div key={index} className={style["option-divider"]}>
+                                                    <input placeholder={"Option " + index} ref={"option" + index} />
                                                 </div>
-                                            )
+                                            );
                                         }
                                     })
                                 }
                             </div>
-                            
-                            <div className={style['button-outer']}>
-                                <Button circular icon='plus' onClick={() => this.addOption()} type='button' />
+
+                            <div className={style["button-outer"]}>
+                                <Button circular={true} icon="plus" onClick={this.addOption} type="button" />
                             </div>
                         </div>
-                        
+
                     </Form.Field>
-                    <div className={style['inline-container']}>
-                        <div className={style['inline-component']}>
-                            <Button type='submit'>Submit</Button>
+                    <div className={style["inline-container"]}>
+                        <div className={style["inline-component"]}>
+                            <Button type="submit">Submit</Button>
                         </div>
-                        <div className={[style['inline-component'], style['quota']].join(' ')}>
+                        <div className={[style["inline-component"], style.quota].join(" ")}>
                             {
                                 (this.state.quota && (
-                                    '(Remaining quota: ' + this.state.quota + ')'
+                                    "(Remaining quota: " + this.state.quota + ")"
                                 ))
                             }
-                            
+
                         </div>
                     </div>
                 </Form>
             </div>
-        )
+        );
     }
 
     render() {
         return (
             <Modal trigger={
                 <Menu.Item
-                    name='Create'
+                    name="Create"
                     active={false}
                 />
             }>
@@ -365,7 +369,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     }
                 </Modal.Content>
             </Modal>
-        )
+        );
     }
 }
 
@@ -373,17 +377,17 @@ const mapStateToProps = (state: StoreState, ownProps: IPollCreate.IInnerProps): 
     return {
         accountAddress: state.ethMisc.accountAddress,
         blockHeight: state.ethMisc.blockHeight,
-        membership: state.ethMisc.membership
-    }
-}
+        membership: state.ethMisc.membership,
+    };
+};
 
 const mapDispatchToProps = (dispatch: Dispatch<ETHActionType>, ownProps: IPollCreate.IInnerProps): IPollCreate.IPropsFromDispatch => {
     return {
-        setMembership: (nextMembership: Membership) => dispatch(setMembership(nextMembership))
-    }
-}
+        setMembership: (nextMembership: Membership) => dispatch(setMembership(nextMembership)),
+    };
+};
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
 )(PollCreate);

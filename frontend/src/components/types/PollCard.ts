@@ -1,7 +1,7 @@
+import { AddressType, BlockHeightType } from "../../actions/types/eth";
 import { Address } from "../../types";
-import { BlockHeightType, AddressType } from "../../actions/types/eth";
 
-export type IPollCardStatus = 'active' | 'inactive';
+export type IPollCardStatus = "active" | "inactive";
 
 export namespace IPollCard {
     export interface IInnerProps {
@@ -12,7 +12,7 @@ export namespace IPollCard {
         expiryBlockNumber: number;
         status: IPollCardStatus;
     }
-    
+
     export interface IStateFromProps {
         accountAddress: AddressType | null;
         blockHeight: BlockHeightType;
@@ -27,6 +27,6 @@ export interface IPollCardStates {
         isVoted: boolean | null,
         title: string,
         options: string[],
-        votesAmount: number
+        votesAmount: number,
     } | null;
 }

@@ -1,5 +1,5 @@
-import { BlockHeightType, AddressType } from "../../actions/types/eth";
 import { ChartData } from "react-chartjs-2";
+import { AddressType, BlockHeightType } from "../../actions/types/eth";
 
 export namespace IPollDetail {
     export interface IInnerProps {
@@ -13,7 +13,7 @@ export namespace IPollDetail {
         isVoted: boolean;
         votesAmount: number;
     }
-    
+
     export interface IStateFromProps {
         accountAddress: AddressType | null;
         blockHeight: BlockHeightType;
@@ -25,18 +25,18 @@ export type IPollDetailProps = IPollDetail.IInnerProps & IPollDetail.IStateFromP
 export interface IPollDetailStates {
     waitingMessage: {
         show: boolean,
-        message: string | null
+        message: string | null,
     };
     errorMessage: {
         show: boolean,
-        message: string | null
+        message: string | null,
     };
     votingMessage: {
         selectedIndex: number | null,
-        selectedOption: string | null
+        selectedOption: string | null,
     };
     successfulMessage: {
-        show: boolean
+        show: boolean,
     };
     votedOption: number | null;
     votesByIndex: number[] | null;

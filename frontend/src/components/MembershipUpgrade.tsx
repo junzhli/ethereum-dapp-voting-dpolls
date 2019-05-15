@@ -1,36 +1,38 @@
-import React, { Dispatch } from 'react';
-import { IMembershipUpgradeProps, IMembershipUpgradeStates, IMembershipUpgrade } from './types/MembershipUpgrade';
-import { Modal, Button, Segment, Grid, Label, Message, Icon, Menu } from 'semantic-ui-react';
-import { StoreState } from '../store/types';
-import { connect } from 'react-redux';
-import style from './MembershipUpgrade.module.css';
-import { ETHActionType } from '../actions/types/eth';
-import { Membership } from '../types';
-import { setMembership } from '../actions/eth';
-import { VOTING_CORE_ABI } from '../constants/contractABIs';
-import { sendTransaction } from '../utils/web3';
+import React, { Dispatch, SyntheticEvent } from "react";
+import { connect } from "react-redux";
+import { Button, Grid, Icon, Label, Menu, Message, Modal, Segment } from "semantic-ui-react";
+import { setMembership } from "../actions/eth";
+import { ETHActionType } from "../actions/types/eth";
+import { VOTING_CORE_ABI } from "../constants/contractABIs";
+import { StoreState } from "../store/types";
+import { Membership } from "../types";
+import { sendTransaction } from "../utils/web3";
+import style from "./MembershipUpgrade.module.css";
+import { IMembershipUpgrade, IMembershipUpgradeProps, IMembershipUpgradeStates } from "./types/MembershipUpgrade";
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMembershipUpgradeStates> {
     private contract: any;
     private checkConfirmedInterval: any;
     private setTimeoutHolder: any;
+    private upgradeButtonOnClick: any;
     constructor(props: IMembershipUpgradeProps) {
         super(props);
         this.contract = new this.props.web3.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
         this.state = {
             waitingMessage: {
                 show: false,
-                message: null
+                message: null,
             },
             errorMessage: {
                 show: false,
-                message: null
+                message: null,
             },
             successfulMessage: {
-                show: false
-            }
-        }
+                show: false,
+            },
+        };
+        this.upgradeButtonOnClick = this.upgradeHandler.bind(this);
     }
 
     componentWillUnmount() {
@@ -43,16 +45,29 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
         }
     }
 
-    async upgradeMembership(membership: Membership ,value: number) {
+    async upgradeHandler(event: SyntheticEvent, data: any) {
+        switch (data.value) {
+            case Membership.CITIZEN:
+                await this.upgradeMembership(Membership.CITIZEN, 10 ** 18);
+                break;
+            case Membership.DIAMOND:
+                await this.upgradeMembership(Membership.DIAMOND, 10 * (10 ** 18));
+                break;
+            default:
+                return null;
+        }
+    }
+
+    async upgradeMembership(membership: Membership , value: number) {
         this.setState({
             errorMessage: {
                 show: false,
-                message: null
+                message: null,
             },
             waitingMessage: {
                 show: true,
-                message: 'Waiting for user prompt...'
-            }
+                message: "Waiting for user prompt...",
+            },
         });
 
         const web3 = this.props.web3;
@@ -65,18 +80,18 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                 from,
                 to,
                 data,
-                value
-            )
+                value,
+            );
             this.setState({
                 errorMessage: {
                     show: false,
-                    message: null
+                    message: null,
                 },
                 waitingMessage: {
                     show: true,
-                    message: 'Waiting for a few blocks being confirmed'
-                }
-            })
+                    message: "Waiting for a few blocks being confirmed",
+                },
+            });
             this.checkConfirmedInterval = setInterval(async () => {
                 try {
                     const receipt = await this.props.web3.eth.getTransactionReceipt(txid);
@@ -84,47 +99,47 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                         this.setState({
                             waitingMessage: {
                                 show: false,
-                                message: null
+                                message: null,
                             },
                             successfulMessage: {
-                                show: true
-                            }
+                                show: true,
+                            },
                         });
                         this.props.setMembership(membership);
                         clearInterval(this.checkConfirmedInterval);
                         this.setTimeoutHolder = setTimeout(() => {
                             this.setState({
                                 successfulMessage: {
-                                    show: false
-                                }
-                            })
+                                    show: false,
+                                },
+                            });
                         }, 5000);
                     }
                 } catch (error) {
                     // we skip any error
-                    console.log('error occurred: ' + error);
+                    console.log("error occurred: " + error);
                 }
-                
+
             }, 1000);
         } catch (error) {
             this.setState({
                 waitingMessage: {
                     show: false,
-                    message: null
+                    message: null,
                 },
                 errorMessage: {
                     show: true,
-                    message: error.message
-                }
-            })
+                    message: error.message,
+                },
+            });
 
             this.setTimeoutHolder = setTimeout(() => {
                 this.setState({
                     errorMessage: {
                         show: false,
-                        message: null
-                    }
-                })
+                        message: null,
+                    },
+                });
             }, 5000);
         }
     }
@@ -132,15 +147,15 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
     render() {
         return (
             <Modal trigger={<Menu.Item
-                name='Upgrade'
+                name="Upgrade"
                 active={false}
             />}>
                 <Modal.Header>Select a plan</Modal.Header>
                 <Modal.Content>
                     {
                         this.state.waitingMessage.show && (
-                            <Message icon>
-                                <Icon name='circle notched' loading />
+                            <Message icon={true}>
+                                <Icon name="circle notched" loading={true} />
                                 <Message.Content>
                                 <Message.Header>Still processing your membership status</Message.Header>
                                 {this.state.waitingMessage.message}
@@ -151,8 +166,8 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                     {
                         this.state.errorMessage.show && (
                             <Message
-                                error
-                                header='There was some errors with your submission'
+                                error={true}
+                                header="There was some errors with your submission"
                                 list={[
                                     this.state.errorMessage.message,
                                 ]}
@@ -161,67 +176,67 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                     }
                     {
                         this.state.successfulMessage.show && (
-                            <Message positive>
+                            <Message positive={true}>
                                 <Message.Header>Congratulations!</Message.Header>
                                 <p>Your transaction has been confirmed.</p>
                             </Message>
                         )
                     }
-                    
-                    <Segment placeholder>
-                        <Grid columns={2} padded='vertically' stackable>
+
+                    <Segment placeholder={true}>
+                        <Grid columns={2} padded="vertically" stackable={true}>
                         <Grid.Column>
-                            <Segment raised>
-                                <div className={style['plan-square']}>
-                                    <div className={[style['plan-name'], style['inline-component'], style['plan-citizen-title'], style['title-center']].join(' ')}>
+                            <Segment raised={true}>
+                                <div className={style["plan-square"]}>
+                                    <div className={[style["plan-name"], style["inline-component"], style["plan-citizen-title"], style["title-center"]].join(" ")}>
                                             <h3>Citizen</h3>
                                     </div>
-                                    <div className={style['price']}>
+                                    <div className={style.price}>
                                         1 ETH
                                     </div>
 
                                     <div>
-                                        <Segment size='big' textAlign='center' vertical>10 times of poll creations</Segment>
-                                        <Segment size='big' textAlign='center' vertical>24/7 Exclusive Customer Service</Segment>
+                                        <Segment size="big" textAlign="center" vertical={true}>10 times of poll creations</Segment>
+                                        <Segment size="big" textAlign="center" vertical={true}>24/7 Exclusive Customer Service</Segment>
                                     </div>
 
-                                    <Button content='Upgrade now' primary onClick={() => this.upgradeMembership(Membership.CITIZEN, 10 ** 18)} disabled={this.props.membership !== Membership.NO_BODY} />
+                                    <Button value={Membership.CITIZEN} content="Upgrade now" primary={true} onClick={this.upgradeButtonOnClick} disabled={this.props.membership !== Membership.NO_BODY} />
                                     {
                                         (this.props.membership === Membership.CITIZEN) && (
-                                            <div className={style['note-below']}>(Already)</div>
+                                            <div className={style["note-below"]}>(Already)</div>
                                         )
                                     }
-                                    
+
                                 </div>
                             </Segment>
-                            
+
                         </Grid.Column>
 
                         <Grid.Column>
-                            <Segment raised>
-                                <div className={style['plan-square']}>
-                                    <div className={style['inline-container']}>
-                                        <Label as='a' color='red' ribbon className={style['inline-component']}>
+                            <Segment raised={true}>
+                                <div className={style["plan-square"]}>
+                                    <div className={style["inline-container"]}>
+                                        <Label as="a" color="red" ribbon={true} className={style["inline-component"]}>
                                             Best value
                                         </Label>
-                                        <div className={[style['plan-name'], style['inline-component'], style['plan-diamond-title']].join(' ')}>
+                                        <div className={[style["plan-name"], style["inline-component"], style["plan-diamond-title"]].join(" ")}>
                                             <h3>Diamond</h3>
                                         </div>
                                     </div>
-                                    
-                                    <div className={style['price']}>
+
+                                    <div className={style.price}>
                                         10 ETH
                                     </div>
 
                                     <div>
-                                        <Segment size='big' textAlign='center' vertical>Unlimited times of poll creations</Segment>
-                                        <Segment size='big' textAlign='center' vertical>24/7 Exclusive Customer Service</Segment>
+                                        <Segment size="big" textAlign="center" vertical={true}>Unlimited times of poll creations</Segment>
+                                        <Segment size="big" textAlign="center" vertical={true}>24/7 Exclusive Customer Service</Segment>
                                     </div>
 
-                                    <Button content='Upgrade now' primary onClick={() => this.upgradeMembership(Membership.DIAMOND, 10 * (10 ** 18))} disabled={(this.props.membership !== Membership.CITIZEN) && (this.props.membership !== Membership.NO_BODY)} />
+                                    <Button value={Membership.DIAMOND} content="Upgrade now" primary={true} onClick={this.upgradeButtonOnClick} disabled={(this.props.membership !== Membership.CITIZEN) && (this.props.membership !== Membership.NO_BODY)} />
                                     {
                                         (this.props.membership === Membership.DIAMOND) && (
-                                            <div className={style['note-below']}>(Already)</div>
+                                            <div className={style["note-below"]}>(Already)</div>
                                         )
                                     }
                                 </div>
@@ -239,17 +254,17 @@ const mapStateToProps = (state: StoreState, ownProps: IMembershipUpgrade.IInnerP
     return {
         accountAddress: state.ethMisc.accountAddress,
         blockHeight: state.ethMisc.blockHeight,
-        membership: state.ethMisc.membership
-    }
-}
+        membership: state.ethMisc.membership,
+    };
+};
 
 const mapDispatchToProps = (dispatch: Dispatch<ETHActionType>, ownProps: IMembershipUpgrade.IInnerProps): IMembershipUpgrade.IPropsFromDispatch => {
     return {
-        setMembership: (nextMembership: Membership) => dispatch(setMembership(nextMembership))
-    }
-}
+        setMembership: (nextMembership: Membership) => dispatch(setMembership(nextMembership)),
+    };
+};
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
 )(MembershipUpgrade);

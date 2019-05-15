@@ -1,12 +1,12 @@
-import React, { SyntheticEvent } from 'react';
-import { Modal, Button, Header, Message, Icon, Form, Checkbox } from 'semantic-ui-react';
-import { IPollDetailProps, IPollDetailStates, IPollDetail } from './types/PollDetail';
-import { sendTransaction } from '../utils/web3';
-import { StoreState } from '../store/types';
-import { connect } from 'react-redux';
-import { VOTING_ABI } from '../constants/contractABIs';
-import { Pie, ChartData } from 'react-chartjs-2';
-import style from './PollDetail.module.css';
+import React, { SyntheticEvent } from "react";
+import { ChartData, Pie } from "react-chartjs-2";
+import { connect } from "react-redux";
+import { Button, Checkbox, Form, Header, Icon, Message, Modal, ButtonProps } from "semantic-ui-react";
+import { VOTING_ABI } from "../constants/contractABIs";
+import { StoreState } from "../store/types";
+import { sendTransaction } from "../utils/web3";
+import style from "./PollDetail.module.css";
+import { IPollDetail, IPollDetailProps, IPollDetailStates } from "./types/PollDetail";
 
 class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
     private checkConfirmedInterval: any;
@@ -21,23 +21,25 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
         this.state = {
             waitingMessage: {
                 show: false,
-                message: null
+                message: null,
             },
             errorMessage: {
                 show: false,
-                message: null
+                message: null,
             },
             votingMessage: {
                 selectedIndex: null,
-                selectedOption: null
+                selectedOption: null,
             },
             successfulMessage: {
-                show: false
+                show: false,
             },
             votedOption: null,
             chart: null,
-            votesByIndex: null
+            votesByIndex: null,
         };
+        this.handleOptionVoted = this.handleOptionVoted.bind(this);
+        this.voteOnSubmitHandler = this.voteOnSubmitHandler.bind(this);
     }
 
     async componentWillReceiveProps(nextProps: IPollDetailProps) {
@@ -48,20 +50,20 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                     this.setState({
                         votingMessage: {
                             selectedIndex,
-                            selectedOption: this.props.options[selectedIndex]
-                        }
-                    })
+                            selectedOption: this.props.options[selectedIndex],
+                        },
+                    });
                 } catch (error) {
-                    console.log('getMyOption failed');
+                    console.log("getMyOption failed");
                     console.log(error);
                 }
             } else {
                 this.setState({
                     votingMessage: {
                         selectedIndex: null,
-                        selectedOption: null
-                    }
-                })
+                        selectedOption: null,
+                    },
+                });
             }
         }
     }
@@ -69,16 +71,16 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
     async componentDidMount() {
         const votesByIndex = await this.fetchVotesByIndex();
         this.setState({
-            votesByIndex
+            votesByIndex,
         });
 
         if (this.props.votesAmount !== 0) {
             const chartOptions = this.fetchChartOption();
             this.setState({
                 chart: {
-                    option: chartOptions
-                }
-            })
+                    option: chartOptions,
+                },
+            });
         }
     }
 
@@ -88,9 +90,9 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             this.setState({
                 votingMessage: {
                     selectedIndex,
-                    selectedOption: this.props.options[selectedIndex]
-                }
-            })
+                    selectedOption: this.props.options[selectedIndex],
+                },
+            });
         }
     }
 
@@ -108,38 +110,42 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
         if (this.props !== prevProps) {
             const votesByIndex = await this.fetchVotesByIndex();
             this.setState({
-                votesByIndex
+                votesByIndex,
             });
 
             if (this.props.votesAmount !== 0) {
                 const chartOptions = this.fetchChartOption();
                 this.setState({
                     chart: {
-                        option: chartOptions
-                    }
-                })
+                        option: chartOptions,
+                    },
+                });
             }
         }
     }
 
     dynamicColors() {
-        var r = Math.floor(Math.random() * 255);
-        var g = Math.floor(Math.random() * 255);
-        var b = Math.floor(Math.random() * 255);
+        const r = Math.floor(Math.random() * 255);
+        const g = Math.floor(Math.random() * 255);
+        const b = Math.floor(Math.random() * 255);
         return "rgb(" + r + "," + g + "," + b + ")";
-     };
+    }
+
+    async voteOnSubmitHandler(event: React.MouseEvent<HTMLButtonElement, MouseEvent>, data: ButtonProps) {
+        await this.vote(data.value);
+    }
 
     async vote(option: number) {
         this.setState({
             errorMessage: {
                 show: false,
-                message: null
+                message: null,
             },
             waitingMessage: {
                 show: true,
-                message: 'Waiting for user prompt...'
-            }
-        })
+                message: "Waiting for user prompt...",
+            },
+        });
 
         const web3 = this.props.web3;
         const from = this.props.accountAddress as string;
@@ -150,18 +156,18 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                 web3,
                 from,
                 to,
-                data
-            )
+                data,
+            );
             this.setState({
                 errorMessage: {
                     show: false,
-                    message: null
+                    message: null,
                 },
                 waitingMessage: {
                     show: true,
-                    message: 'Waiting for a few blocks being confirmed'
-                }
-            })
+                    message: "Waiting for a few blocks being confirmed",
+                },
+            });
             this.checkConfirmedInterval = setInterval(async () => {
                 try {
                     const receipt = await this.props.web3.eth.getTransactionReceipt(txid);
@@ -170,49 +176,49 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                         this.setState({
                             waitingMessage: {
                                 show: false,
-                                message: null
+                                message: null,
                             },
                             successfulMessage: {
-                                show: true
+                                show: true,
                             },
                             chart: {
-                                option: chartOptions
-                            }
+                                option: chartOptions,
+                            },
                         });
                         clearInterval(this.checkConfirmedInterval);
                         this.setTimeoutHolder = setTimeout(() => {
                             this.setState({
                                 successfulMessage: {
-                                    show: false
-                                }
-                            })
+                                    show: false,
+                                },
+                            });
                         }, 5000);
                     }
                 } catch (error) {
                     // we skip any error
-                    console.log('error occurred: ' + error);
+                    console.log("error occurred: " + error);
                 }
-                
+
             }, 1000);
         } catch (error) {
             this.setState({
                 waitingMessage: {
                     show: false,
-                    message: null
+                    message: null,
                 },
                 errorMessage: {
                     show: true,
-                    message: error.message
-                }
-            })
+                    message: error.message,
+                },
+            });
 
             this.setTimeoutHolder = setTimeout(() => {
                 this.setState({
                     errorMessage: {
                         show: false,
-                        message: null
-                    }
-                })
+                        message: null,
+                    },
+                });
             }, 5000);
         }
     }
@@ -221,9 +227,9 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
         this.setState({
             votingMessage: {
                 selectedIndex: object.value,
-                selectedOption: object.name
-            }
-        })
+                selectedOption: object.name,
+            },
+        });
     }
 
     async fetchVotesByIndex() {
@@ -251,33 +257,33 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             datasets: [{
                 data: votesByIndex,
                 backgroundColor: randomBackgroundsByIndex,
-                hoverBackgroundColor: randomBackgroundsByIndex
-            }]
-        }
+                hoverBackgroundColor: randomBackgroundsByIndex,
+            }],
+        };
     }
 
     render() {
         return (
-            <div className={style['align-right']}>
+            <div className={style["align-right"]}>
                 <Modal dimmer={true} trigger={
-                <Button animated>
-                    <Button.Content visible>Detail</Button.Content>
-                    <Button.Content hidden>
-                        <Icon name='arrow right' />
+                <Button animated={true}>
+                    <Button.Content visible={true}>Detail</Button.Content>
+                    <Button.Content hidden={true}>
+                        <Icon name="arrow right" />
                     </Button.Content>
                 </Button>}>
                     <Modal.Header>
                         {
-                            !this.props.isExpired ? 'Poll detail' : 'Poll result'
+                            !this.props.isExpired ? "Poll detail" : "Poll result"
                         }
                     </Modal.Header>
-                    <Modal.Content image>
+                    <Modal.Content image={true}>
                         <Modal.Description>
-                            
+
                             {
                                 this.state.waitingMessage.show && (
-                                    <Message icon>
-                                        <Icon name='circle notched' loading />
+                                    <Message icon={true}>
+                                        <Icon name="circle notched" loading={true} />
                                         <Message.Content>
                                         <Message.Header>Just a few seconds</Message.Header>
                                         {this.state.waitingMessage.message}
@@ -288,8 +294,8 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                             {
                                 this.state.errorMessage.show && (
                                     <Message
-                                        error
-                                        header='There was some errors with your submission'
+                                        error={true}
+                                        header="There was some errors with your submission"
                                         list={[
                                             this.state.errorMessage.message,
                                         ]}
@@ -298,59 +304,59 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                             }
                             {
                                 this.state.successfulMessage.show && (
-                                    <Message positive>
+                                    <Message positive={true}>
                                         <Message.Header>You vote successfully!</Message.Header>
                                         <p>Your transaction has been confirmed.</p>
                                     </Message>
                                 )
                             }
-                            <Header size='huge'>{this.props.title}</Header>
-                            <div className={style['inline-container']}>
-                                <div className={style['inline-left']}>
-                                    <Header size='medium'>
+                            <Header size="huge">{this.props.title}</Header>
+                            <div className={style["inline-container"]}>
+                                <div className={style["inline-left"]}>
+                                    <Header size="medium">
                                         Choose an option
                                     </Header>
-                                    <Form className={style['voting-box']} size='huge'>
+                                    <Form className={style["voting-box"]} size="huge">
                                         {
                                             this.props.options.map((option, index) => {
                                                 return (
-                                                    <Form.Field>
+                                                    <Form.Field key={this.props.address + " " + index}>
                                                         <Checkbox
-                                                            radio
+                                                            radio={true}
                                                             label={
                                                                 (this.state.votesByIndex && this.props.votesAmount > 0) ? (
-                                                                    option + ' (' + Math.floor((this.state.votesByIndex[index] / this.props.votesAmount) * 100) + '%)'
+                                                                    option + " (" + Math.floor((this.state.votesByIndex[index] / this.props.votesAmount) * 100) + "%)"
                                                                 ) : option
                                                             }
                                                             name={option}
                                                             value={index}
                                                             checked={this.state.votingMessage.selectedIndex === index}
-                                                            onChange={this.handleOptionVoted.bind(this)}
+                                                            onChange={this.handleOptionVoted}
                                                             disabled={this.props.isVoted || this.props.isExpired}
                                                         />
                                                     </Form.Field>
-                                                )
+                                                );
                                             })
                                         }
                                         {
                                             this.state.votingMessage.selectedOption && (
                                                 <Form.Field>
-                                                    { this.props.isVoted ? ('You haved voted for') : ('You are voting for')} <b>{ this.state.votingMessage.selectedOption }</b>
+                                                    {this.props.isVoted ? ("You haved voted for") : ("You are voting for")} <b>{this.state.votingMessage.selectedOption}</b>
                                                 </Form.Field>
                                             )
                                         }
                                     </Form>
                                     {
                                         (this.state.votingMessage.selectedIndex !== null && !this.props.isVoted) && (
-                                            <div className={style['voting-button']}>
-                                                <Button content='Vote!' onClick={() => this.vote(this.state.votingMessage.selectedIndex as number)}/>
+                                            <div className={style["voting-button"]}>
+                                                <Button value={this.state.votingMessage.selectedIndex} content="Vote!" onClick={this.voteOnSubmitHandler}/>
                                             </div>
                                         )
                                     }
                                 </div>
                                 {
                                     (this.state.chart && (
-                                        <div className={style['inline-right']}>
+                                        <div className={style["inline-right"]}>
                                             <Pie data={this.state.chart.option as ChartData<Chart.ChartData>} options={{cutoutPercentage: 8, legend: {display: false}}} />
                                         </div>
                                     ))
@@ -358,7 +364,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                             </div>
                             {
                                 this.props.isExpired && (
-                                    <div className={[style['stamp'], style['ended']].join(' ')}>
+                                    <div className={[style.stamp, style.ended].join(" ")}>
                                         Poll ended
                                     </div>
                                 )
@@ -367,19 +373,18 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                     </Modal.Content>
                 </Modal>
             </div>
-        )
+        );
     }
 }
 
 const mapStateToProps = (state: StoreState, ownProps: IPollDetail.IInnerProps): IPollDetail.IStateFromProps => {
     return {
         accountAddress: state.ethMisc.accountAddress,
-        blockHeight: state.ethMisc.blockHeight
-    }
-}
+        blockHeight: state.ethMisc.blockHeight,
+    };
+};
 
 export default connect(
     mapStateToProps,
-    null
+    null,
 )(PollDetail);
-

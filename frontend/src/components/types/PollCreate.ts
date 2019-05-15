@@ -1,11 +1,11 @@
+import { AddressType, BlockHeightType } from "../../actions/types/eth";
 import { Membership } from "../../types";
-import { BlockHeightType, AddressType } from "../../actions/types/eth";
 
 export namespace IPollCreate {
     export interface IInnerProps {
         web3: any;
     }
-    
+
     export interface IStateFromProps {
         accountAddress: AddressType | null;
         blockHeight: BlockHeightType;
@@ -22,18 +22,18 @@ export type IPollCreateProps = IPollCreate.IInnerProps & IPollCreate.IStateFromP
 export interface IPollCreateStates {
     waitingMessage: {
         show: boolean,
-        message: string | null
+        message: string | null,
     };
     errorMessage: {
         show: boolean,
-        message: string | string[] | null
+        message: string | string[] | null,
     };
     successfulMessage: {
-        show: boolean
+        show: boolean,
     };
     quota: string | null;
     optionsAmount: number;
     inputErrors: {
-        blockHeight: boolean
-    }
+        blockHeight: boolean,
+    };
 }

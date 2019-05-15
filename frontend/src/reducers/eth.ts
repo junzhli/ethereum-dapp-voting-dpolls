@@ -1,13 +1,12 @@
-import { IEthMisc } from "../store/types";
+import { SET_ACCOUNT_ADDRESS, SET_BLOCK_HEIGHT, SET_MEMBERSHIP } from "../actions/constant";
 import { ETHActionType } from "../actions/types/eth";
-import { SET_BLOCK_HEIGHT, SET_ACCOUNT_ADDRESS, SET_MEMBERSHIP } from "../actions/constant";
-import { Action } from "redux";
+import { IEthMisc } from "../store/types";
 
 const initialState: IEthMisc = {
     blockHeight: -1,
     accountAddress: null,
-    membership: null
-}
+    membership: null,
+};
 
 const eth = (state: IEthMisc = initialState, action: ETHActionType): IEthMisc => {
     switch (action.type) {
@@ -15,26 +14,26 @@ const eth = (state: IEthMisc = initialState, action: ETHActionType): IEthMisc =>
             const blockHeight = action.payload;
             return {
                 ...state,
-                blockHeight
-            }
+                blockHeight,
+            };
         }
         case SET_ACCOUNT_ADDRESS: {
             const accountAddress = action.payload;
             return {
                 ...state,
-                accountAddress
-            }
+                accountAddress,
+            };
         }
         case SET_MEMBERSHIP: {
             const membership = action.payload;
             return {
                 ...state,
-                membership
-            }
+                membership,
+            };
         }
     }
 
     return state;
-}
+};
 
 export default eth;

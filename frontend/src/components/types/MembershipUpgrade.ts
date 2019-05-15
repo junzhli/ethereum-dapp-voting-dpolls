@@ -1,11 +1,11 @@
-import { BlockHeightType, AddressType } from "../../actions/types/eth";
+import { AddressType, BlockHeightType } from "../../actions/types/eth";
 import { Membership } from "../../types";
 
 export namespace IMembershipUpgrade {
     export interface IInnerProps {
         web3: any;
     }
-    
+
     export interface IStateFromProps {
         accountAddress: AddressType | null;
         blockHeight: BlockHeightType;
@@ -22,13 +22,13 @@ export type IMembershipUpgradeProps = IMembershipUpgrade.IInnerProps & IMembersh
 export interface IMembershipUpgradeStates {
     waitingMessage: {
         show: boolean,
-        message: string | null
+        message: string | null,
     };
     errorMessage: {
         show: boolean,
-        message: string | null
+        message: string | null,
     };
     successfulMessage: {
-        show: boolean
+        show: boolean,
     };
 }

@@ -6,7 +6,7 @@ export type Address = string;
 export enum Membership {
     NO_BODY = 0,
     CITIZEN = 1,
-    DIAMOND = 2
+    DIAMOND = 2,
 }
 
 export interface IIndexStates {
@@ -15,6 +15,6 @@ export interface IIndexStates {
     showUserPrivacyModeDeniedMessage: boolean;
     showUserWalletLockedMessage: boolean;
     voting: {
-        selector: AddressType | null
-    }
+        selector: AddressType | null,
+    };
 }

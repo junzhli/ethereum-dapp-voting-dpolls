@@ -1,11 +1,11 @@
-import rootReducer from '../reducers';
-import { createStore } from 'redux';
+import { createStore } from "redux";
+import rootReducer from "../reducers";
 
 export type AppState = ReturnType<typeof rootReducer>;
 
 const configureStore = () => {
     const store = createStore(
-        rootReducer
+        rootReducer,
     );
 
     return store;
