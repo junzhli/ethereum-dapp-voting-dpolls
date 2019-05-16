@@ -36,7 +36,7 @@ const useTypeScript = fs.existsSync(paths.appTsConfig);
 
 // style files regexes
 const cssRegex = /\.css$/;
-const cssModuleRegex = /\.module\.css$/;
+const cssModuleRegex = [/\.module\.css$/, /node_modules/]; // node_modules: external libraries (e.g. semantic ui)
 const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
 
@@ -388,10 +388,9 @@ module.exports = function(webpackEnv) {
             // to a file, but in development "style" loader enables hot editing
             // of CSS.
             // By default we support CSS Modules with the extension .module.css
-            // we excludes external libraries by filter: node_modules
             {
               test: cssRegex,
-              exclude: [cssModuleRegex, /node_modules/],
+              exclude: cssModuleRegex,
               use: getStyleLoaders({
                 importLoaders: 1,
                 localIdentName: "[sha1:hash:hex:4]",
