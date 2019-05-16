@@ -49,10 +49,10 @@ $ truffle test
 ```
 
 #### Deployment
-Fill in all parameters in file `.env`
-* `MNEMONIC` - Mnemonic seed for use of contract deployment
-* `INFURA_KEY` - Infura Secret Token to get access to network
-* `DEPOSIT_ACCOUNT` - Deposit account for ethers withdrawals from core contract
+Set all parameters in file ```.env``` (referenced from ```.env.template```) or as environment variables
+* ```MNEMONIC``` - Mnemonic seed for use of contract deployment
+* ```INFURA_KEY``` - Infura Secret Token to get access to network
+* ```DEPOSIT_ACCOUNT``` - Deposit account for ethers withdrawals from core contract
 
 ```shell
 $ npm install
@@ -64,7 +64,7 @@ Frontend
 --------------------
 #### Pre-configuration options
 To run the frontend, please specify all required values.
-Fill in all values in file ```.env``` as referenced file ```.env.template``` or set all of the following as environment variables
+Set all parameters in file ```.env``` (referenced from ```.env.template```) or as environment variables
 
 * ```REACT_APP_VOTING_CORE_ADDRESS``` - Voting Core contract address
 * ```REACT_APP_NETWORK_ID``` - Restrict user running only on Network ID (1: Mainnet, 3: Ropsten..., etc) where the Voting Core deployed *(optional - defaults to all network)*
