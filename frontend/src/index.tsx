@@ -107,6 +107,7 @@ class App extends React.Component<{}, IIndexStates> {
                 } else {
                     if (NETWORK_ID in NETWORK_NAME) {
                         this.networkName = NETWORK_NAME[NETWORK_ID];
+                        this.forceUpdate();
                     }
                 }
             } else {
@@ -135,13 +136,13 @@ class App extends React.Component<{}, IIndexStates> {
         } else if (!this.state.networkChecked) {
             return (
                 <div>
-                    This website is available on {
+                    This website is only available on {
                         (this.networkName) ? (
                             this.networkName
                         ) : (
-                            "Unknown (Network ID: " + NETWORK_ID + ")"
+                            "unknown network (Network ID: " + NETWORK_ID + ")"
                         )
-                    } only
+                    }
                 </div>
             );
         } else if (!this.state.approved) {
