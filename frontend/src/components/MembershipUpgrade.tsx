@@ -7,7 +7,7 @@ import { VOTING_CORE_ABI } from "../constants/contractABIs";
 import { StoreState } from "../store/types";
 import { Membership } from "../types";
 import { sendTransaction } from "../utils/web3";
-import style from "./MembershipUpgrade.css";
+import style from "./MembershipUpgrade.module.css";
 import { IMembershipUpgrade, IMembershipUpgradeProps, IMembershipUpgradeStates } from "./types/MembershipUpgrade";
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;

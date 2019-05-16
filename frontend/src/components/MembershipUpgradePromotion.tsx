@@ -1,6 +1,6 @@
 import React from "react";
 import { Header, Icon, Item } from "semantic-ui-react";
-import style from "./MembershipUpgradePromotion.css";
+import style from "./MembershipUpgradePromotion.module.css";
 import { IMembershipUpgradePromotionProps, IMembershipUpgradePromotionStates } from "./types/MembershipUpgradePromotion";
 
 class MembershipUpgradePromotion extends React.Component<IMembershipUpgradePromotionProps, IMembershipUpgradePromotionStates> {

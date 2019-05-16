@@ -36,7 +36,7 @@ const useTypeScript = fs.existsSync(paths.appTsConfig);
 
 // style files regexes
 const cssRegex = /\.css$/;
-const cssModuleRegex = [/\.module\.css$/, /node_modules/]; // node_modules: external libraries (e.g. semantic ui)
+const cssModuleRegex = /\.module\.css$/;
 const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
 
@@ -393,8 +393,6 @@ module.exports = function(webpackEnv) {
               exclude: cssModuleRegex,
               use: getStyleLoaders({
                 importLoaders: 1,
-                localIdentName: "[sha1:hash:hex:4]",
-                modules: true,
                 sourceMap: isEnvProduction && shouldUseSourceMap,
               }),
               // Don't consider CSS imports dead code even if the

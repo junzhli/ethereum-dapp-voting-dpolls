@@ -6,7 +6,7 @@ import { BlockHeightType } from "../actions/types/eth";
 import { PollActionType } from "../actions/types/poll";
 import { VOTING_ABI, VOTING_CORE_ABI } from "../constants/contractABIs";
 import { StoreState } from "../store/types";
-import style from "./MainListingPoll.css";
+import style from "./MainListingPoll.module.css";
 import PollCard from "./PollCard";
 import { IMainListingPoll, IMainListingPollProps, IMainListingPollState, PollInitialMetadata } from "./types/MainListingPoll";
 
