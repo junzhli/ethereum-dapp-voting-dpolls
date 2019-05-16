@@ -1,4 +1,22 @@
 /**
+ * Env checks
+ */
+require('dotenv').config();
+
+[
+  'MNEMONIC',
+  'INFURA_KEY',
+  'DEPOSIT_ACCOUNT'
+].forEach(envParameter => {
+  console.log(typeof process.env[envParameter])
+  console.log(process.env[envParameter]);
+  if (!process.env[envParameter] | process.env[envParameter] === '') {
+    console.log(typeof process.env[envParameter])
+    throw new Error('env: ' + envParameter + ' not set properly!');
+  }
+})
+
+/**
  * Use this file to configure your truffle project. It's seeded with some
  * common settings for different networks and features like migrations,
  * compilation and testing. Uncomment the ones you need or modify
@@ -17,12 +35,11 @@
  * phrase from a file you've .gitignored so it doesn't accidentally become public.
  *
  */
-
 const HDWalletProvider = require('truffle-hdwallet-provider');
-const infuraKey = "infura_token_secret";
+const infuraKey = process.env.INFURA_KEY;
 
 const fs = require('fs');
-const mnemonic = fs.readFileSync(".secret").toString().trim();
+const mnemonic = process.env.MNEMONIC.trim();
 
 module.exports = {
   /**
