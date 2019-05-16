@@ -31,7 +31,7 @@ Smart Contracts
 --------------------
 #### Build status
 ##### Staging (Ropsten)
-* VotingCore - `0x55D7f084e97eD41811Ad03256348626053162AC8`
+* VotingCore - `0x55D7f084e97eD41811Ad03256348626053162AC8` - [Etherscan](https://ropsten.etherscan.io/address/0x55d7f084e97ed41811ad03256348626053162ac8)
 
 #### Prerequisites
 * Truffle - blockchain development framework
@@ -48,11 +48,23 @@ Smart Contracts
 $ truffle test
 ```
 
+#### Deployment
+Fill in all parameters in file `.env`
+* `MNEMONIC` - Mnemonic seed for use of contract deployment
+* `INFURA_KEY` - Infura Secret Token to get access to network
+* `DEPOSIT_ACCOUNT` - Deposit account for ethers withdrawals from core contract
+
+```shell
+$ npm install
+$ # All required environment parameters in file .env are ready at this point.
+$ truffle deploy --network <NETWORK>
+```
+
 Frontend
 --------------------
 #### Build status
-##### Staging
-[![Netlify Status](https://api.netlify.com/api/v1/badges/34104410-f4a4-48a3-8603-876aeef24cbf/deploy-status)](https://app.netlify.com/sites/dpolls-staging-jeremyli-f05e34/deploys)
+##### Staging (Ropsten)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/34104410-f4a4-48a3-8603-876aeef24cbf/deploy-status)](https://app.netlify.com/sites/dpolls-staging-jeremyli-f05e34/deploys) - [https://dpolls-staging-jeremyli-f05e34.netlify.com/](https://dpolls-staging-jeremyli-f05e34.netlify.com/)
 
 #### Pre-configuration options
 To run the frontend, please specify all required values.
