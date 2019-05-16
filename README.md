@@ -59,7 +59,7 @@ To run the frontend, please specify all required values.
 Fill in all values in file ```.env``` as referenced file ```.env.template``` or set all of the following as environment variables
 
 * ```REACT_APP_VOTING_CORE_ADDRESS``` - Voting Core contract address
-* ```REACT_APP_NETWORK_ID``` - Network ID where the Voting Core deployed *(optional - defaults to all network)*
+* ```REACT_APP_NETWORK_ID``` - Restrict user running only on Network ID (1: Mainnet, 3: Ropsten..., etc) where the Voting Core deployed *(optional - defaults to all network)*
 
 #### Run dev server
 ```shell
