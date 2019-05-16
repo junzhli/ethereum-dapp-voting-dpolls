@@ -1,8 +1,11 @@
-# ethereum-dapps-final-project
-A Dapp project proposed in NTU DApp development course
-
-----
 # Voting system
+A decentralized voting system proposed in NTU DApp course
+
+### Build status
+* Staging (Ropsten)
+  * VotingCore -`0x55D7f084e97eD41811Ad03256348626053162AC8` - [Etherscan](https://ropsten.etherscan.io/address/0x55d7f084e97ed41811ad03256348626053162ac8)
+  * [![Netlify Status](https://api.netlify.com/api/v1/badges/34104410-f4a4-48a3-8603-876aeef24cbf/deploy-status)](https://app.netlify.com/sites/dpolls-staging-jeremyli-f05e34/deploys) - [https://dpolls-staging-jeremyli-f05e34.netlify.com/](https://dpolls-staging-jeremyli-f05e34.netlify.com/)
+
 ### Feature
 * Decentralized voting system on top of Ethereum
   * Anyone can host their own polls
@@ -20,11 +23,6 @@ A Dapp project proposed in NTU DApp development course
   * Set admin
   * Withdraw funds from smart contract
   * Reclaim ownership of registries in case of new core contract replacement
-
-### Build status
-* Staging (Ropsten)
-  * VotingCore -`0x55D7f084e97eD41811Ad03256348626053162AC8` - [Etherscan](https://ropsten.etherscan.io/address/0x55d7f084e97ed41811ad03256348626053162ac8)
-  * [![Netlify Status](https://api.netlify.com/api/v1/badges/34104410-f4a4-48a3-8603-876aeef24cbf/deploy-status)](https://app.netlify.com/sites/dpolls-staging-jeremyli-f05e34/deploys) - [https://dpolls-staging-jeremyli-f05e34.netlify.com/](https://dpolls-staging-jeremyli-f05e34.netlify.com/)
 
 ### Table of Contents
 * [smart-contract](#smart-contracts)
