@@ -80,6 +80,9 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             inputHints: {
                 blockHeight: false,
             },
+            inputErrors: {
+                blockHeight: false,
+            },
         });
     }
 
@@ -88,23 +91,35 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             inputHints: {
                 blockHeight: true,
             },
+            inputErrors: {
+                blockHeight: false,
+            },
         });
     }
 
     blockHeightCheckHandler(event: React.KeyboardEvent<HTMLInputElement>) {
         const charCode = event.charCode;
         if (charCode >= 48 && charCode <= 57) {
-            this.setState({
-                inputErrors: {
-                    blockHeight: false,
-                },
-            });
+            if (this.state.inputErrors.blockHeight) {
+                this.setState({
+                    inputErrors: {
+                        blockHeight: false,
+                    },
+                    inputHints: {
+                        blockHeight: true,
+                    },
+                });
+            }
+
             return true;
         }
 
         this.setState({
             inputErrors: {
                 blockHeight: true,
+            },
+            inputHints: {
+                blockHeight: false,
             },
         });
         event.preventDefault();
@@ -384,12 +399,15 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
 
     render() {
         return (
-            <Modal trigger={
-                <Menu.Item
-                    name="Create"
-                    active={false}
-                />
-            }>
+            <Modal
+                trigger={
+                    <Menu.Item
+                        name="Create"
+                        active={false}
+                    />}
+                closeIcon={true}
+                closeOnDimmerClick={false}
+                >
                 <Modal.Header>Create a poll</Modal.Header>
                 <Modal.Content>
                     {

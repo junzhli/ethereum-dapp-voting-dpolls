@@ -265,13 +265,18 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
     render() {
         return (
             <div className={style["align-right"]}>
-                <Modal dimmer={true} trigger={
-                <Button animated={true}>
-                    <Button.Content visible={true}>Detail</Button.Content>
-                    <Button.Content hidden={true}>
-                        <Icon name="arrow right" />
-                    </Button.Content>
-                </Button>}>
+                <Modal
+                    dimmer={true}
+                    trigger={
+                    <Button animated={true}>
+                        <Button.Content visible={true}>Detail</Button.Content>
+                        <Button.Content hidden={true}>
+                            <Icon name="arrow right" />
+                        </Button.Content>
+                    </Button>}
+                    closeIcon={true}
+                    closeOnDimmerClick={false}
+                >
                     <Modal.Header>
                         {
                             !this.props.isExpired ? "Poll detail" : "Poll result"
