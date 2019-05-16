@@ -39,4 +39,5 @@ export interface IPollCreateStates {
     inputHints: {
         blockHeight: boolean,
     };
+    opened: boolean;
 }

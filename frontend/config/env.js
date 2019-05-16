@@ -108,4 +108,12 @@ ENV_VARS.forEach(value => {
 
 // =======================
 
+// =======================
+/**
+ * Environment variable checks (optional)
+ */
+const OPTIONAL_ENV_VARS = [
+  'NETWORK_ID'
+];
+
 module.exports = getClientEnvironment;

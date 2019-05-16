@@ -1,6 +1,6 @@
 import React, { Dispatch } from "react";
 import { connect } from "react-redux";
-import { Button, Form, Icon, Label, Menu, Message, Modal } from "semantic-ui-react";
+import { Button, Form, Icon, Label, Menu, Message, Modal, ModalProps } from "semantic-ui-react";
 import { setMembership } from "../actions/eth";
 import { ETHActionType } from "../actions/types/eth";
 import { VOTING_CORE_ABI } from "../constants/contractABIs";
@@ -44,6 +44,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             inputHints: {
                 blockHeight: false,
             },
+            opened: false,
         };
         this.state = Object.assign({}, this.initialState);
         this.formOnSubmitHandler = this.createPoll.bind(this);
@@ -51,6 +52,8 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         this.addOption = this.addOption.bind(this);
         this.blockHeightFocusOutHandler = this.blockHeightFocusOutHandler.bind(this);
         this.blockHeightFocusInHandler = this.blockHeightFocusInHandler.bind(this);
+        this.onOpenHandler = this.onOpenHandler.bind(this);
+        this.onCloseHandler = this.onCloseHandler.bind(this);
     }
 
     async componentDidMount() {
@@ -72,6 +75,22 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
 
         if (this.setTimeoutHolder) {
             clearTimeout(this.setTimeoutHolder);
+        }
+    }
+
+    onOpenHandler(event: React.MouseEvent<HTMLElement, MouseEvent>, data: ModalProps) {
+        if (data.open === false) {
+            this.setState({
+                opened: true,
+            });
+        }
+    }
+
+    onCloseHandler(event: React.MouseEvent<HTMLElement, MouseEvent>, data: ModalProps) {
+        if (data.open === true) {
+            this.setState({
+                opened: false,
+            });
         }
     }
 
@@ -260,6 +279,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                                 successfulMessage: {
                                     show: false,
                                 },
+                                opened: false,
                             });
                         }, 5000);
 
@@ -407,6 +427,9 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     />}
                 closeIcon={true}
                 closeOnDimmerClick={false}
+                open={this.state.opened}
+                onOpen={this.onOpenHandler}
+                onClose={this.onCloseHandler}
                 >
                 <Modal.Header>Create a poll</Modal.Header>
                 <Modal.Content>

@@ -16,7 +16,8 @@
         "no-empty-interface": false,
         "no-console": false,
         "jsx-no-string-ref": false,
-        "prefer-for-of": false
+        "prefer-for-of": false,
+        "ordered-imports": false
     },
     "rulesDirectory": []
 }

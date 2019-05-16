@@ -30,24 +30,24 @@
 }
 
 .stamp {
-    box-shadow: 0 0 0 3px blue, 0 0 0 2px blue inset;  
+    box-shadow: 0 0 0 3px rgb(105, 195, 255), 0 0 0 2px rgb(105, 195, 255) inset;  
     border: 2px solid transparent;
     border-radius: 4px;
     display: inline-block;
     padding: 5px 2px;
     line-height: 22px;
-    color: blue;
+    color: rgb(105, 195, 255);
     font-size: 24px;
     font-family: 'Black Ops One', cursive;
     text-transform: uppercase;
     text-align: center;
     opacity: 0.4;
     width: 155px;
-    transform: rotate(-30deg);
+    transform: rotate(-20deg);
 }
 
 .ended {
     position: absolute;
     left: 70px;
-    top: 120px;
+    top: 150px;
 }

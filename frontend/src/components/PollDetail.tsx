@@ -268,7 +268,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                 <Modal
                     dimmer={true}
                     trigger={
-                    <Button animated={true}>
+                    <Button animated={"fade"}>
                         <Button.Content visible={true}>Detail</Button.Content>
                         <Button.Content hidden={true}>
                             <Icon name="arrow right" />
@@ -360,11 +360,17 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                                     }
                                 </div>
                                 {
-                                    (this.state.chart && (
+                                    (this.state.chart) ?  (
                                         <div className={style["inline-right"]}>
                                             <Pie data={this.state.chart.option as ChartData<Chart.ChartData>} options={{cutoutPercentage: 8, legend: {display: false}}} />
                                         </div>
-                                    ))
+                                    ) : (
+                                        <div className={style["inline-right"]}>
+                                            <Header size="medium" color="grey">
+                                                (No enough data available in the poll)
+                                            </Header>
+                                        </div>
+                                    )
                                 }
                             </div>
                             {

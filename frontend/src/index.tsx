@@ -11,6 +11,9 @@ import Profile from "./components/Profile";
 import style from "./index.module.css";
 import store from "./store";
 import { IIndexStates } from "./types";
+import { NETWORK_NAME } from "./constants/networkID";
+
+const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 
 /**
  * global declaration
@@ -23,22 +26,23 @@ declare global {
 }
 
 class App extends React.Component<{}, IIndexStates> {
+    private networkName: string | null;
     constructor(props: {}) {
         super(props);
         let web3 = null;
         const approved = false;
+        const networkChecked = false;
         const showUserPrivacyModeDeniedMessage = false;
         const showUserWalletLockedMessage = false;
 
         // Checking if Web3 has been injected by the browser (Mist/MetaMask)
         if (typeof window.web3 !== "undefined") {
             web3 = new Web3(window.web3.currentProvider);
-        } else {
-            console.log("No web3? You should consider trying MetaMask!");
         }
 
         this.state = {
             web3,
+            networkChecked,
             approved,
             showUserPrivacyModeDeniedMessage,
             showUserWalletLockedMessage,
@@ -46,39 +50,71 @@ class App extends React.Component<{}, IIndexStates> {
                 selector: null,
             },
         };
+        this.networkName = null;
     }
 
     async userWalletUnlockApproval() {
-        this.setState({
-            approved: false,
-        });
-
         if (typeof window.ethereum !== "undefined") {
             try {
-                await window.ethereum.enable();
-                this.setState({
-                    approved: true,
-                });
+                const value = await window.ethereum.enable();
+                if (value) {
+                    this.setState({
+                        approved: true,
+                        showUserPrivacyModeDeniedMessage: false,
+                    });
+                } else {
+                    return this.setState({
+                        approved: false,
+                        showUserPrivacyModeDeniedMessage: true,
+                    });
+                }
             } catch (error) {
                 console.log("user rejected the approval");
                 console.log(error);
 
                 if (error.code === 4001) { // User denied account authorization
-                    console.log("code 4001");
-                    this.setState({
+                    return this.setState({
+                        approved: false,
                         showUserPrivacyModeDeniedMessage: true,
                     });
                 }
             }
-        } else {
-            this.setState({
+        }
+
+        const accounts = await this.state.web3.eth.getAccounts();
+        if (accounts.length === 0) {
+            return this.setState({
+                approved: false,
                 showUserWalletLockedMessage: true,
             });
         }
+
+        this.setState({
+            approved: true,
+            showUserPrivacyModeDeniedMessage: false,
+            showUserWalletLockedMessage: false,
+        });
     }
 
     async componentDidMount() {
         if (this.state.web3) {
+            if (typeof NETWORK_ID !== "undefined") {
+                const networkId: string = (await this.state.web3.eth.net.getId() as number).toString();
+                if (NETWORK_ID === networkId) {
+                    this.setState({
+                        networkChecked: true,
+                    });
+                } else {
+                    if (NETWORK_ID in NETWORK_NAME) {
+                        this.networkName = NETWORK_NAME[NETWORK_ID];
+                    }
+                }
+            } else {
+                this.setState({
+                    networkChecked: true,
+                });
+            }
+
             if ((await this.state.web3.eth.getAccounts()).length === 0) {
                 await this.userWalletUnlockApproval();
             } else {
@@ -96,21 +132,34 @@ class App extends React.Component<{}, IIndexStates> {
                     Please install Metamask/Mist at first!
                 </div>
             );
+        } else if (!this.state.networkChecked) {
+            return (
+                <div>
+                    This website is available on {
+                        (this.networkName) ? (
+                            this.networkName
+                        ) : (
+                            "Unknown (Network ID: " + NETWORK_ID + ")"
+                        )
+                    } only
+                </div>
+            );
         } else if (!this.state.approved) {
             if (this.state.showUserPrivacyModeDeniedMessage) {
                 return (
                     <div className={style["info-segment"]}>
-                            <Dimmer active={true}>
-                                <Loader size="massive">Please approve privacy data gathering, and reload the page</Loader>
-                            </Dimmer>
+                        <Dimmer active={true}>
+                            <Loader size="massive">Please approve privacy data gathering, and reload the page</Loader>
+                        </Dimmer>
                     </div>
                 );
-            } if (this.state.showUserWalletLockedMessage) {
+            }
+            if (this.state.showUserWalletLockedMessage) {
                 return (
                     <div className={style["info-segment"]}>
-                            <Dimmer active={true}>
-                                <Loader size="massive">Please unlock wallet at first, and reload the page</Loader>
-                            </Dimmer>
+                        <Dimmer active={true}>
+                            <Loader size="massive">Please unlock wallet at first, and reload the page</Loader>
+                        </Dimmer>
                     </div>
                 );
             } else {

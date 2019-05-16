@@ -143,7 +143,7 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
                                 <Icon color="red" name="user outline" /> {this.state.externalData && this.state.externalData.chairperson}
                             </Item.Extra>
                             <Item.Extra>
-                                {(this.props.isExpired) ? <Icon color="red" name="close" /> : <Icon color="green" name="check" />} Expired at {this.props.expiryBlockNumber}
+                                {(this.props.isExpired) ? <Icon color="red" name="close" /> : <Icon color="green" name="check" />} Expired at {this.props.expiryBlockNumber} blocks
                             </Item.Extra>
                             <Item.Extra>
                                 <Icon color="brown" name="users" /> {this.state.externalData && this.state.externalData.votesAmount} votes
