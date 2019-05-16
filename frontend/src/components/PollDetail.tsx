@@ -5,7 +5,7 @@ import { Button, Checkbox, Form, Header, Icon, Message, Modal, ButtonProps } fro
 import { VOTING_ABI } from "../constants/contractABIs";
 import { StoreState } from "../store/types";
 import { sendTransaction } from "../utils/web3";
-import style from "./PollDetail.module.css";
+import style from "./PollDetail.css";
 import { IPollDetail, IPollDetailProps, IPollDetailStates } from "./types/PollDetail";
 
 class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {

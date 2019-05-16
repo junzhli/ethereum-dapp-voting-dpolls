@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { Card, Icon, Loader, Statistic } from "semantic-ui-react";
 import { StoreState } from "../store/types";
 import { Membership } from "../types";
-import style from "./Profile.module.css";
+import style from "./Profile.css";
 import { IProfile, IProfileProps, IProfileStates } from "./types/Profile";
 
 class Profile extends React.Component<IProfileProps, IProfileStates> {

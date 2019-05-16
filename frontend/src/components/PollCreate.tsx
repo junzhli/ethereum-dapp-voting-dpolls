@@ -8,7 +8,7 @@ import { StoreState } from "../store/types";
 import { Membership } from "../types";
 import { sendTransaction } from "../utils/web3";
 import MembershipUpgradePromotion from "./MembershipUpgradePromotion";
-import style from "./PollCreate.module.css";
+import style from "./PollCreate.css";
 import { IPollCreate, IPollCreateProps, IPollCreateStates } from "./types/PollCreate";
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS as string;

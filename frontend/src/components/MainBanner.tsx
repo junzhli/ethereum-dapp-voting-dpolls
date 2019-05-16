@@ -6,7 +6,7 @@ import { AddressType, BlockHeightType, ETHActionType } from "../actions/types/et
 import { VOTING_CORE_ABI } from "../constants/contractABIs";
 import { StoreState } from "../store/types";
 import { Membership } from "../types";
-import style from "./MainBanner.module.css";
+import style from "./MainBanner.css";
 import MembershipUpgrade from "./MembershipUpgrade";
 import PollCreate from "./PollCreate";
 import { IMainBanner, IMainBannerProps, IMainBannerStates } from "./types/MainBanner";

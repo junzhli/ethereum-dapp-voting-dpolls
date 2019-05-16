@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { Header, Icon, Item, Placeholder, Segment } from "semantic-ui-react";
 import { StoreState } from "../store/types";
 import { Address } from "../types";
-import style from "./PollCard.module.css";
+import style from "./PollCard.css";
 import PollDetail from "./PollDetail";
 import { IPollCard, IPollCardProps, IPollCardStates, IPollCardStatus } from "./types/PollCard";
 
