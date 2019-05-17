@@ -1,0 +1,62 @@
+.center {
+    margin: auto;
+    width: 80%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.plan-square {
+    height: inherit;
+    width: inherit;
+}
+
+.plan-name {
+    width: 120px;
+    text-align: center;
+}
+
+.inline-container {
+    width: 100%;
+}
+
+.inline-component {
+    display: inline-block;
+}
+
+.title-center {
+    text-align: center;
+}
+
+.plan-citizen-title {
+    width: 100%;
+}
+
+.plan-diamond-title {
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    left: -5px;
+}
+
+.price {
+    text-align: center;
+    font-size: 40px;
+    color: grey;
+}
+
+.darker-span {
+    filter: brightness(50%);
+    z-index: 9999;
+}
+
+.note-below {
+    text-align: center;
+    color: darkgrey;
+    font-style: italic
+}
+
+@media (max-width: 768px) {
+    .plan-diamond-title {
+        padding-left: 0%;
+    }
+}

@@ -1,0 +1,53 @@
+.align-right {
+    margin-left:auto;
+    float: right;
+    margin-top: -40px;
+    width: 100px;
+}
+
+.inline-container {
+    float: left;
+    width: 100%;
+}
+
+.inline-left {
+    display: inline-block;
+    
+}
+
+.inline-right {
+    display: inline-block;
+    vertical-align: top;
+    float: right;
+}
+
+.voting-box {
+    margin-top: 10px;
+}
+
+.voting-button {
+    margin-top: 10px;
+}
+
+.stamp {
+    box-shadow: 0 0 0 3px rgb(105, 195, 255), 0 0 0 2px rgb(105, 195, 255) inset;  
+    border: 2px solid transparent;
+    border-radius: 4px;
+    display: inline-block;
+    padding: 5px 2px;
+    line-height: 22px;
+    color: rgb(105, 195, 255);
+    font-size: 24px;
+    font-family: 'Black Ops One', cursive;
+    text-transform: uppercase;
+    text-align: center;
+    opacity: 0.4;
+    width: 155px;
+    transform: rotate(-20deg);
+}
+
+.ended {
+    position: absolute;
+    left: 70px;
+    top: 150px;
+}

@@ -3,7 +3,23 @@ build/
 
 # Intermediates
 node_modules/
+## reactjs
+/.pnp
+.pnp.js
 
 # OS files
 .DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env files
+.env
+.secret
 

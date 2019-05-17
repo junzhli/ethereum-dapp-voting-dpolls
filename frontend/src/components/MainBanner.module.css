@@ -1,0 +1,36 @@
+.main-banner {
+    font-family: 'Open Sans', 'PingFang TC', sans-serif;
+    z-index: 999;
+    position: sticky;
+    top: 0;
+    background-color: teal;
+    color: white;
+    transition-property: background, padding, z-index;
+    transition-duration: 300ms;
+    transition-timing-function: ease;
+    transition-delay: 0ms;
+    -webkit-box-shadow: 1px 8px 11px 1px rgba(201,199,201,1);
+    -moz-box-shadow: 1px 8px 11px 1px rgba(201,199,201,1);
+    box-shadow: 1px 8px 11px 1px rgba(201,199,201,1);
+}
+
+.banner {
+    width: 1000px;
+    overflow: hidden; /* will contain if #first is longer than #second */
+}
+
+.logo {
+    padding: 5px;
+    width: 140px;
+    float:left; /* add this */
+}
+
+.menu {
+    overflow: hidden; /* if you don't want #second to wrap below #first */
+    float: right;
+}
+
+.center {
+    margin: auto;
+    width: 75%;
+}

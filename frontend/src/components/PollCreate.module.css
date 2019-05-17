@@ -1,0 +1,34 @@
+.button-outer {
+    margin-left: 5px;
+    float: left;
+}
+
+.option-outer {
+    float: left;
+    width: 45%;
+}
+
+.option-divider {
+    margin-top: 10px;
+}
+
+.options-wrapper {
+    overflow: hidden;
+}
+
+.form-ui {
+    max-width: 500px;
+}
+
+.quota {
+    font-style: italic;
+    margin-left: 5px;
+}
+
+.inline-container {
+    width: 100%;
+}
+
+.inline-component {
+    display: inline-block;
+}

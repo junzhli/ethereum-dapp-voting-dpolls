@@ -1,0 +1,48 @@
+.card {
+    width: 400px;
+}
+
+.address {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 10.5px;
+    text-align: left;
+    width: 100%;
+    margin-top: 5px;
+}
+
+.rcorner {
+    margin-top: 5px;
+    margin-bottom: 1px;
+    border-radius: 25px;
+}
+
+.free {
+    text-align: center;
+    background: rgb(207, 194, 14);
+    width: 50px;
+    height: 19px;
+    font-size: 12px;
+}
+
+.citizen {
+    text-align: center;
+    background: rgb(59, 212, 192);
+    width: 60px;
+    height: 19px;
+    font-size: 12px;
+}
+
+.diamond {
+    text-align: center;
+    color: #ffffff;
+    background: rgb(140, 33, 173);
+    width: 75px;
+    height: 19px;
+    font-size: 12px;
+}
+
+.statistics {
+    margin-top: 5px;
+}

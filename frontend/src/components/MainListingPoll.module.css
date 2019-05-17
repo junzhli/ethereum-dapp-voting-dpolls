@@ -1,0 +1,39 @@
+.center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+.active-list {
+    height: 100%;
+    border: 5px solid #0073801a;
+}
+
+.inactive-list {
+    height: 100%;
+    border: 5px solid #0073801a;
+}
+
+.collapse {
+    overflow-y: scroll;
+    max-height: 400px;
+}
+
+.inline-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.inline-title {
+    padding-top: 10px;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.inline-button {
+    display: inline-block;
+}
