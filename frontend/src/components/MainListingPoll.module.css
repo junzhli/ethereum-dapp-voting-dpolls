@@ -23,7 +23,7 @@
 .inline-container {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 5px;
+    margin-bottom: 15px;
 }
 
 .inline-title {
