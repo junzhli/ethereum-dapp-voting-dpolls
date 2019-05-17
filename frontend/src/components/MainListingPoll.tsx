@@ -137,7 +137,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                 if (this.state.amountPolls === 0) {
                     return (
                         <Item.Group>
-                            <div className={style.center}>
+                            <div className={style["no-poll"]}>
                                 <Icon name="archive" size="massive" />
                                 <Header>
                                     No poll for now...
