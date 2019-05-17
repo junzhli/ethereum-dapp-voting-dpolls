@@ -8,10 +8,7 @@ require('dotenv').config();
   'INFURA_KEY',
   'DEPOSIT_ACCOUNT'
 ].forEach(envParameter => {
-  console.log(typeof process.env[envParameter])
-  console.log(process.env[envParameter]);
   if (!process.env[envParameter] | process.env[envParameter] === '') {
-    console.log(typeof process.env[envParameter])
     throw new Error('env: ' + envParameter + ' not set properly!');
   }
 })
