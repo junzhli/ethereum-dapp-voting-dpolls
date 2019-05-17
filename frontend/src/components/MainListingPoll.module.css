@@ -9,10 +9,12 @@
 
 .active-list {
     height: 100%;
+    border: 5px solid #0073801a;
 }
 
 .inactive-list {
     height: 100%;
+    border: 5px solid #0073801a;
 }
 
 .collapse {
