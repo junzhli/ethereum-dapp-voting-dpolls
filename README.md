@@ -1,5 +1,6 @@
 # Voting system
 [![Netlify Status](https://api.netlify.com/api/v1/badges/34104410-f4a4-48a3-8603-876aeef24cbf/deploy-status)](https://app.netlify.com/sites/dpolls/deploys)
+
 A decentralized voting system proposed in NTU DApp course - [https://dpolls.netlify.com](https://dpolls.netlify.com)
 
 ### Feature
