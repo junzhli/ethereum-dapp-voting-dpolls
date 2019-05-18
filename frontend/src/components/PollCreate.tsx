@@ -287,7 +287,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     }
                 } catch (error) {
                     // we skip any error
-                    console.log("error occurred: " + error);
+                    console.log("checkConfirmedInterval error occurred: " + error);
                 }
             }, 1000);
         } catch (error) {
