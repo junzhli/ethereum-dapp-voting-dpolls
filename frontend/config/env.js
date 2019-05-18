@@ -113,7 +113,8 @@ ENV_VARS.forEach(value => {
  * Environment variable checks (optional)
  */
 const OPTIONAL_ENV_VARS = [
-  'NETWORK_ID'
+  'NETWORK_ID',
+  'GOOGLE_ANALYTICS_TRACKING_CODE'
 ];
 
 module.exports = getClientEnvironment;

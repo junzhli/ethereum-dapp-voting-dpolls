@@ -27,6 +27,7 @@ ID = "dpolls"
 
 [context.production.environment]
   REACT_APP_VOTING_CORE_ADDRESS = "0xb2e05B3531d0338a25202c2E5b565CB24f32e91e"
+  REACT_APP_GOOGLE_ANALYTICS_TRACKING_CODE = "UA-140414954-1"
 
 # Deploy Preview context: all deploys resulting from a pull/merge request will 
 # inherit these settings.

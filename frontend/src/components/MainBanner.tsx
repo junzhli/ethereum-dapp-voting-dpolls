@@ -49,7 +49,7 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                     const membership = (await this.contract.methods.getMembership(accountAddress[0]).call()).toNumber();
                     this.props.setMembership(membership);
                 } catch (error) {
-                    console.log("getMembership falied");
+                    console.log("getMembership failed");
                     console.log(error);
                 }
             }

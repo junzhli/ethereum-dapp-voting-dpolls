@@ -12,6 +12,12 @@ import style from "./index.module.css";
 import store from "./store";
 import { IIndexStates } from "./types";
 import { NETWORK_NAME } from "./constants/networkID";
+import ReactGA from "react-ga";
+
+const GOOGLE_ANALYTICS_TRACKING_ID = process.env.REACT_APP_GOOGLE_ANALYTICS_TRACKING_CODE;
+if (GOOGLE_ANALYTICS_TRACKING_ID) {
+    ReactGA.initialize(GOOGLE_ANALYTICS_TRACKING_ID);
+}
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 
@@ -97,6 +103,10 @@ class App extends React.Component<{}, IIndexStates> {
     }
 
     async componentDidMount() {
+        if (GOOGLE_ANALYTICS_TRACKING_ID) {
+            ReactGA.pageview("/");
+        }
+
         if (this.state.web3) {
             if (typeof NETWORK_ID !== "undefined") {
                 const networkId: string = (await this.state.web3.eth.net.getId() as number).toString();

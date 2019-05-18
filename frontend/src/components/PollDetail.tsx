@@ -196,7 +196,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                     }
                 } catch (error) {
                     // we skip any error
-                    console.log("error occurred: " + error);
+                    console.log("checkConfirmedInterval error occurred: " + error);
                 }
 
             }, 1000);
