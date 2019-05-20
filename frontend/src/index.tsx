@@ -13,6 +13,7 @@ import store from "./store";
 import { IIndexStates } from "./types";
 import { NETWORK_NAME } from "./constants/networkID";
 import ReactGA from "react-ga";
+import MainFooter from "./components/MainFooter";
 
 const GOOGLE_ANALYTICS_TRACKING_ID = process.env.REACT_APP_GOOGLE_ANALYTICS_TRACKING_CODE;
 if (GOOGLE_ANALYTICS_TRACKING_ID) {
@@ -57,6 +58,7 @@ class App extends React.Component<{}, IIndexStates> {
             },
         };
         this.networkName = null;
+        this.userWalletUnlockApproval = this.userWalletUnlockApproval.bind(this);
     }
 
     async userWalletUnlockApproval() {
@@ -184,22 +186,28 @@ class App extends React.Component<{}, IIndexStates> {
             }
         } else {
             return (
-                <div>
+                <div className={style["page-container"]}>
                     <div>
-                        <MainBanner web3={this.state.web3} userWalletUnlockApproval={() => this.userWalletUnlockApproval()} />
+                        <MainBanner web3={this.state.web3} userWalletUnlockApproval={this.userWalletUnlockApproval} />
                     </div>
 
-                    <div className={style["content-part"]}>
-                        <div className={[commonStyle.border, style["listing-outer"]].join(" ")}>
-                            <div className={style["listing-inner"]}>
-                                <div className={style["listing-inner-content"]}>
-                                    <MainListingPoll web3={this.state.web3} />
+                    <div className={style["content-wrap"]}>
+                        <div className={style["content-part"]}>
+                            <div className={[commonStyle.border, style["listing-outer"]].join(" ")}>
+                                <div className={style["listing-inner"]}>
+                                    <div className={style["listing-inner-content"]}>
+                                        <MainListingPoll web3={this.state.web3} />
+                                    </div>
                                 </div>
                             </div>
+                            <div className={style.profile}>
+                                <Profile web3={this.state.web3} />
+                            </div>
                         </div>
-                        <div className={style.profile}>
-                            <Profile web3={this.state.web3} />
-                        </div>
+                    </div>
+
+                    <div className={style.footer}>
+                        <MainFooter />
                     </div>
                 </div>
             );
