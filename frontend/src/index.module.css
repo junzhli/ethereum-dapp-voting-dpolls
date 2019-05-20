@@ -64,15 +64,15 @@
 
 .content-wrap {
     position: relative;
-    padding-bottom: 2.5rem;    /* Footer height */
+    padding-bottom: 2rem;    /* Footer height */
 }
 
 .footer {
     position: absolute;
     bottom: 0;
     width: 100%;
-    height: 2.5rem;            /* Footer height */
-    background-color: rgb(124, 162, 168);
+    height: 2rem;            /* Footer height */
+    background-color: #697c80;
     color: white;
     text-align: center;
     margin: 0 auto;
