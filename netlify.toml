@@ -35,12 +35,14 @@ ID = "dpolls"
 
 # Here is another way to define context specific environment variables.
 [context.deploy-preview.environment]
+  REACT_APP_HOST_ENV = "branch-deploy"
 
 # Branch Deploy context: all deploys that are not from a pull/merge request or 
 # from the Production branch will inherit these settings.
 [context.branch-deploy]
 
 [context.branch-deploy.environment]
+  REACT_APP_HOST_ENV = "branch-deploy"
 
 # Specific branch context: all deploys from this specific branch will inherit
 # these settings.
