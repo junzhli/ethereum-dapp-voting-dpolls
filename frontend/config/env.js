@@ -114,7 +114,13 @@ ENV_VARS.forEach(value => {
  */
 const OPTIONAL_ENV_VARS = [
   'NETWORK_ID',
-  'GOOGLE_ANALYTICS_TRACKING_CODE'
+  'GOOGLE_ANALYTICS_TRACKING_CODE',
+  'HOST_ENV'
 ];
+
+// HOST_ENV defaults to 'production'
+if (!process.env[ENV_PREFIX + 'HOST_ENV'] || (process.env[ENV_PREFIX + 'HOST_ENV'] === '')) {
+  process.env[ENV_PREFIX + 'HOST_ENV'] = 'production';
+}
 
 module.exports = getClientEnvironment;

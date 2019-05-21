@@ -66,6 +66,8 @@ Set all parameters in file ```.env``` (referenced from ```.env.template```) or a
 * ```REACT_APP_VOTING_CORE_ADDRESS``` - Voting Core contract address
 * ```REACT_APP_NETWORK_ID``` - Restrict access to a specific Network ID (1: Mainnet, 3: Ropsten..., etc) where the Voting Core deployed *(optional - defaults to all network)*
 * ```REACT_APP_GOOGLE_ANALYTICS_TRACKING_CODE``` - Set tracking code for page views *(optional - disabled by default)*
+* ```REACT_APP_HOST_ENV``` - Host environment to build conditional static content *(optional - defaults to 'production')*
+  * except for ```production``` - Tell search engine not to index
 
 #### Run dev server
 ```shell
