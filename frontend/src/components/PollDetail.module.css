@@ -1,7 +1,7 @@
 .align-right {
     margin-left:auto;
     float: right;
-    margin-top: -70px;
+    margin-top: -40px;
 }
 
 .inline-container {
@@ -59,4 +59,8 @@
     margin-bottom: 10px;
     font-style: italic;
     color: brown;
+}
+
+.show-voted-hint {
+    margin-top: -70px !important;
 }
