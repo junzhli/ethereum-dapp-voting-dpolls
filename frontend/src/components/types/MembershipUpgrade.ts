@@ -22,7 +22,7 @@ export type IMembershipUpgradeProps = IMembershipUpgrade.IInnerProps & IMembersh
 export interface IMembershipUpgradeStates {
     waitingMessage: {
         show: boolean,
-        message: string | null,
+        message: JSX.Element | null,
     };
     errorMessage: {
         show: boolean,
@@ -30,5 +30,6 @@ export interface IMembershipUpgradeStates {
     };
     successfulMessage: {
         show: boolean,
+        message: JSX.Element | null,
     };
 }

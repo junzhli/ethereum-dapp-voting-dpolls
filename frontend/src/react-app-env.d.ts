@@ -9,6 +9,9 @@ declare namespace NodeJS {
     NODE_ENV: "development" | "production" | "test";
     PUBLIC_URL: string;
     REACT_APP_VOTING_CORE_ADDRESS: Address;
+    REACT_APP_NETWORK_ID: string | undefined;
+    REACT_APP_GOOGLE_ANALYTICS_TRACKING_CODE: string | undefined;
+    REACT_APP_HOST_ENV: string | undefined;
   }
 }
 
