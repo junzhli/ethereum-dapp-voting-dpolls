@@ -291,10 +291,17 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
     render() {
         return (
             <div className={style["align-right"]}>
+                {
+                    (this.props.isVoted) && (
+                        <div className={style["voted-hint"]}>
+                            (Voted)
+                        </div>
+                    )
+                }
                 <Modal
                     dimmer={true}
                     trigger={
-                        <Button basic={true} color="vk" size="medium">See more details</Button>
+                        <Button basic={true} color="vk" size="medium">View details</Button>
                     }
                     closeIcon={true}
                     closeOnDimmerClick={false}
