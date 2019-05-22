@@ -25,7 +25,7 @@ export type IPollDetailProps = IPollDetail.IInnerProps & IPollDetail.IStateFromP
 export interface IPollDetailStates {
     waitingMessage: {
         show: boolean,
-        message: string | null,
+        message: JSX.Element | null,
     };
     errorMessage: {
         show: boolean,
@@ -37,6 +37,7 @@ export interface IPollDetailStates {
     };
     successfulMessage: {
         show: boolean,
+        message: JSX.Element | null,
     };
     votedOption: number | null;
     votesByIndex: number[] | null;

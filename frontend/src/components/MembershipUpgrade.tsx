@@ -9,7 +9,9 @@ import { Membership } from "../types";
 import { sendTransaction } from "../utils/web3";
 import style from "./MembershipUpgrade.module.css";
 import { IMembershipUpgrade, IMembershipUpgradeProps, IMembershipUpgradeStates } from "./types/MembershipUpgrade";
+import { getEtherscanTxURL } from "../utils/etherscan";
 
+const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMembershipUpgradeStates> {
     private contract: any;
@@ -30,6 +32,7 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
             },
             successfulMessage: {
                 show: false,
+                message: null,
             },
         };
         this.upgradeButtonOnClick = this.upgradeHandler.bind(this);
@@ -66,7 +69,11 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
             },
             waitingMessage: {
                 show: true,
-                message: "Waiting for user prompt...",
+                message: (
+                    <div>
+                        Waiting for user prompt...
+                    </div>
+                ),
             },
         });
 
@@ -89,13 +96,24 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                 },
                 waitingMessage: {
                     show: true,
-                    message: "Waiting for a few blocks being confirmed",
+                    message: (
+                        <div>
+                            Waiting for the transaction being confirmed. {
+                                (getEtherscanTxURL(NETWORK_ID, txid)) && (
+                                    <a target="_blank" rel="noopener noreferrer" href={getEtherscanTxURL(NETWORK_ID, txid) as string}>View on Etherscan</a>
+                                )
+                            }
+                        </div>
+                    ),
                 },
             });
+
+            const lastBlockNumber = this.props.blockHeight;
             this.checkConfirmedInterval = setInterval(async () => {
                 try {
+                    const blockNumber = await this.props.web3.eth.getBlockNumber();
                     const receipt = await this.props.web3.eth.getTransactionReceipt(txid);
-                    if (receipt) {
+                    if (receipt && (lastBlockNumber !== blockNumber)) {
                         this.setState({
                             waitingMessage: {
                                 show: false,
@@ -103,6 +121,15 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                             },
                             successfulMessage: {
                                 show: true,
+                                message: (
+                                    <div>
+                                        <p>Your transaction has been confirmed. {
+                                            (getEtherscanTxURL(NETWORK_ID, txid)) && (
+                                                <a target="_blank" rel="noopener noreferrer" href={getEtherscanTxURL(NETWORK_ID, txid) as string}>View on Etherscan</a>
+                                            )
+                                        }</p>
+                                    </div>
+                                ),
                             },
                         });
                         this.props.setMembership(membership);
@@ -111,6 +138,7 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                             this.setState({
                                 successfulMessage: {
                                     show: false,
+                                    message: null,
                                 },
                             });
                         }, 5000);
@@ -178,7 +206,7 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                         this.state.successfulMessage.show && (
                             <Message positive={true}>
                                 <Message.Header>Congratulations!</Message.Header>
-                                <p>Your transaction has been confirmed.</p>
+                                {this.state.successfulMessage.message}
                             </Message>
                         )
                     }

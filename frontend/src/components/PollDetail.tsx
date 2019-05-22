@@ -7,7 +7,9 @@ import { StoreState } from "../store/types";
 import { sendTransaction } from "../utils/web3";
 import style from "./PollDetail.module.css";
 import { IPollDetail, IPollDetailProps, IPollDetailStates } from "./types/PollDetail";
+import { getEtherscanTxURL } from "../utils/etherscan";
 
+const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
     private checkConfirmedInterval: any;
     private setTimeoutHolder: any;
@@ -33,6 +35,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             },
             successfulMessage: {
                 show: false,
+                message: null,
             },
             votedOption: null,
             chart: null,
@@ -143,7 +146,9 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             },
             waitingMessage: {
                 show: true,
-                message: "Waiting for user prompt...",
+                message: (
+                    <div>Waiting for user prompt...</div>
+                ),
             },
         });
 
@@ -165,13 +170,24 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                 },
                 waitingMessage: {
                     show: true,
-                    message: "Waiting for a few blocks being confirmed",
+                    message: (
+                        <div>
+                            Waiting for the transaction being confirmed. {
+                                (getEtherscanTxURL(NETWORK_ID, txid)) && (
+                                    <a target="_blank" rel="noopener noreferrer" href={getEtherscanTxURL(NETWORK_ID, txid) as string}>View on Etherscan</a>
+                                )
+                            }
+                        </div>
+                    ),
                 },
             });
+
+            const lastBlockNumber = this.props.blockHeight;
             this.checkConfirmedInterval = setInterval(async () => {
                 try {
+                    const blockNumber = await this.props.web3.eth.getBlockNumber();
                     const receipt = await this.props.web3.eth.getTransactionReceipt(txid);
-                    if (receipt) {
+                    if (receipt && (lastBlockNumber !== blockNumber)) {
                         const chartOptions = await this.fetchChartOption();
                         this.setState({
                             waitingMessage: {
@@ -180,6 +196,15 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                             },
                             successfulMessage: {
                                 show: true,
+                                message: (
+                                    <div>
+                                        <p>Your transaction has been confirmed. {
+                                            (getEtherscanTxURL(NETWORK_ID, txid)) && (
+                                                <a target="_blank" rel="noopener noreferrer" href={getEtherscanTxURL(NETWORK_ID, txid) as string}>View on Etherscan</a>
+                                            )
+                                        }</p>
+                                    </div>
+                                ),
                             },
                             chart: {
                                 option: chartOptions,
@@ -190,6 +215,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                             this.setState({
                                 successfulMessage: {
                                     show: false,
+                                    message: null,
                                 },
                             });
                         }, 5000);
@@ -268,19 +294,13 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                 <Modal
                     dimmer={true}
                     trigger={
-                    <Button animated={"fade"}>
-                        <Button.Content visible={true}>Detail</Button.Content>
-                        <Button.Content hidden={true}>
-                            <Icon name="arrow right" />
-                        </Button.Content>
-                    </Button>}
+                        <Button basic={true} color="vk" size="medium">See more details</Button>
+                    }
                     closeIcon={true}
                     closeOnDimmerClick={false}
                 >
                     <Modal.Header>
-                        {
-                            !this.props.isExpired ? "Poll detail" : "Poll result"
-                        }
+                        {this.props.title}
                     </Modal.Header>
                     <Modal.Content image={true}>
                         <Modal.Description>
@@ -311,16 +331,12 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                                 this.state.successfulMessage.show && (
                                     <Message positive={true}>
                                         <Message.Header>You vote successfully!</Message.Header>
-                                        <p>Your transaction has been confirmed.</p>
+                                        {this.state.successfulMessage.message}
                                     </Message>
                                 )
                             }
-                            <Header size="huge">{this.props.title}</Header>
                             <div className={style["inline-container"]}>
                                 <div className={style["inline-left"]}>
-                                    <Header size="medium">
-                                        Choose an option
-                                    </Header>
                                     <Form className={style["voting-box"]} size="huge">
                                         {
                                             this.props.options.map((option, index) => {
@@ -362,7 +378,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                                 {
                                     (this.state.chart) ?  (
                                         <div className={style["inline-right"]}>
-                                            <Pie data={this.state.chart.option as ChartData<Chart.ChartData>} options={{cutoutPercentage: 8, legend: {display: false}}} />
+                                            <Pie height={180} width={180} data={this.state.chart.option as ChartData<Chart.ChartData>} options={{cutoutPercentage: 8, legend: {display: false}}} />
                                         </div>
                                     ) : (
                                         <div className={style["inline-right"]}>

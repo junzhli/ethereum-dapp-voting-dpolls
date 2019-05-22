@@ -22,7 +22,7 @@ export type IPollCreateProps = IPollCreate.IInnerProps & IPollCreate.IStateFromP
 export interface IPollCreateStates {
     waitingMessage: {
         show: boolean,
-        message: string | null,
+        message: JSX.Element | null,
     };
     errorMessage: {
         show: boolean,
@@ -30,6 +30,7 @@ export interface IPollCreateStates {
     };
     successfulMessage: {
         show: boolean,
+        message: JSX.Element | null,
     };
     quota: string | null;
     optionsAmount: number;

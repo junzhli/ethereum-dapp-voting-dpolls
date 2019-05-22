@@ -10,7 +10,9 @@ import { sendTransaction } from "../utils/web3";
 import MembershipUpgradePromotion from "./MembershipUpgradePromotion";
 import style from "./PollCreate.module.css";
 import { IPollCreate, IPollCreateProps, IPollCreateStates } from "./types/PollCreate";
+import { getEtherscanTxURL } from "../utils/etherscan";
 
+const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS as string;
 
 class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
@@ -35,6 +37,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             },
             successfulMessage: {
                 show: false,
+                message: null,
             },
             quota: null,
             optionsAmount: 2,
@@ -233,7 +236,11 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             },
             waitingMessage: {
                 show: true,
-                message: "Waiting for user prompt...",
+                message: (
+                    <div>
+                        Waiting for user prompt...
+                    </div>
+                ),
             },
         });
 
@@ -255,13 +262,24 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                 },
                 waitingMessage: {
                     show: true,
-                    message: "Waiting for a few blocks being confirmed",
+                    message: (
+                        <div>
+                            Waiting for the transaction being confirmed. {
+                                (getEtherscanTxURL(NETWORK_ID, txid)) && (
+                                    <a target="_blank" rel="noopener noreferrer" href={getEtherscanTxURL(NETWORK_ID, txid) as string}>View on Etherscan</a>
+                                )
+                            }
+                        </div>
+                    ),
                 },
             });
+
+            const lastBlockNumber = this.props.blockHeight;
             this.checkConfirmedInterval = setInterval(async () => {
                 try {
+                    const blockNumber = await this.props.web3.eth.getBlockNumber();
                     const receipt = await this.props.web3.eth.getTransactionReceipt(txid);
-                    if (receipt) {
+                    if (receipt && (lastBlockNumber !== blockNumber)) {
                         this.setState({
                             waitingMessage: {
                                 show: false,
@@ -269,6 +287,15 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                             },
                             successfulMessage: {
                                 show: true,
+                                message: (
+                                    <div>
+                                        <p>Your transaction has been confirmed. {
+                                            (getEtherscanTxURL(NETWORK_ID, txid)) && (
+                                                <a target="_blank" rel="noopener noreferrer" href={getEtherscanTxURL(NETWORK_ID, txid) as string}>View on Etherscan</a>
+                                            )
+                                        }</p>
+                                    </div>
+                                ),
                             },
                         });
                         clearInterval(this.checkConfirmedInterval);
@@ -278,12 +305,12 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                             this.setState({
                                 successfulMessage: {
                                     show: false,
+                                    message: null,
                                 },
                                 opened: false,
                             });
+                            await this.refreshQuota(this.props.membership);
                         }, 5000);
-
-                        await this.refreshQuota(this.props.membership);
                     }
                 } catch (error) {
                     // we skip any error
@@ -344,7 +371,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     this.state.successfulMessage.show && (
                         <Message positive={true}>
                             <Message.Header>Your creation has been performed successfully!</Message.Header>
-                            <p>Your transaction has been confirmed.</p>
+                            {this.state.successfulMessage.message}
                         </Message>
                     )
                 }
