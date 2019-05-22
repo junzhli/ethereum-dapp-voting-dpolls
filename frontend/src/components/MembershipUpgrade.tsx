@@ -174,10 +174,11 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
 
     render() {
         return (
-            <Modal trigger={<Menu.Item
-                name="Upgrade"
-                active={false}
-            />}>
+            <Modal trigger={
+                <div className={style["upgrade-button-outer"]}>
+                    <Button color="orange" size="small" className={style["upgrade-button-inner"]}>Upgrade</Button>
+                </div>
+            }>
                 <Modal.Header>Select a plan</Modal.Header>
                 <Modal.Content>
                     {
