@@ -55,6 +55,14 @@
     font-style: italic
 }
 
+.upgrade-button-outer {
+    margin: 5px;
+}
+
+.upgrade-button-inner {
+    padding: .61571000em 1.5em 0.685600em !important;
+}
+
 @media (max-width: 768px) {
     .plan-diamond-title {
         padding-left: 0%;

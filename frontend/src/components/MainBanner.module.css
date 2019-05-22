@@ -20,7 +20,7 @@
 }
 
 .logo {
-    padding: 5px;
+    margin-top: 5px;
     width: 140px;
     float:left; /* add this */
 }
