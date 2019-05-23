@@ -11,6 +11,8 @@ import MembershipUpgradePromotion from "./MembershipUpgradePromotion";
 import style from "./PollCreate.module.css";
 import { IPollCreate, IPollCreateProps, IPollCreateStates } from "./types/PollCreate";
 import { getEtherscanTxURL } from "../utils/etherscan";
+import { withRouter } from "react-router-dom";
+import Routes from "../constants/routes";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS as string;
@@ -47,7 +49,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             inputHints: {
                 blockHeight: false,
             },
-            opened: false,
+            opened: (this.props.location.pathname === Routes.CREATE) ? true : false,
         };
         this.state = Object.assign({}, this.initialState);
         this.formOnSubmitHandler = this.createPoll.bind(this);
@@ -66,6 +68,18 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
     }
 
     async componentWillReceiveProps(nextProps: IPollCreateProps) {
+        if (nextProps.location.pathname !== this.props.location.pathname) {
+            if (nextProps.location.pathname === Routes.CREATE) {
+                this.setState({
+                    opened: true,
+                });
+            } else {
+                this.setState({
+                    opened: false,
+                });
+            }
+        }
+
         if (nextProps.membership) {
             await this.refreshQuota(nextProps.membership);
         }
@@ -86,6 +100,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             this.setState({
                 opened: true,
             });
+            this.props.history.push(Routes.CREATE);
         }
     }
 
@@ -94,6 +109,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             this.setState({
                 opened: false,
             });
+            this.props.history.push(Routes.ROOT);
         }
     }
 
@@ -483,7 +499,7 @@ const mapDispatchToProps = (dispatch: Dispatch<ETHActionType>, ownProps: IPollCr
     };
 };
 
-export default connect(
+export default withRouter(connect(
     mapStateToProps,
     mapDispatchToProps,
-)(PollCreate);
+)(PollCreate));

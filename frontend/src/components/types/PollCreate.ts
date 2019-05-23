@@ -1,5 +1,6 @@
 import { AddressType, BlockHeightType } from "../../actions/types/eth";
 import { Membership } from "../../types";
+import { RouteComponentProps } from "react-router-dom";
 
 export namespace IPollCreate {
     export interface IInnerProps {
@@ -17,7 +18,7 @@ export namespace IPollCreate {
     }
 }
 
-export type IPollCreateProps = IPollCreate.IInnerProps & IPollCreate.IStateFromProps & IPollCreate.IPropsFromDispatch;
+export type IPollCreateProps = RouteComponentProps<{}> & IPollCreate.IInnerProps & IPollCreate.IStateFromProps & IPollCreate.IPropsFromDispatch;
 
 export interface IPollCreateStates {
     waitingMessage: {

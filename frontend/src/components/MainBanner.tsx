@@ -10,6 +10,7 @@ import style from "./MainBanner.module.css";
 import MembershipUpgrade from "./MembershipUpgrade";
 import PollCreate from "./PollCreate";
 import { IMainBanner, IMainBannerProps, IMainBannerStates } from "./types/MainBanner";
+import { withRouter } from "react-router-dom";
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
@@ -114,7 +115,7 @@ const mapDispatchToProps = (dispatch: Dispatch<ETHActionType>, ownProps: IMainBa
     };
 };
 
-export default connect(
+export default withRouter(connect(
     mapStateToProps,
     mapDispatchToProps,
-)(MainBanner);
+)(MainBanner));

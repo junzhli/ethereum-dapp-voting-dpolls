@@ -12,6 +12,7 @@ import style from "./index.module.css";
 import store from "./store";
 import { IIndexStates } from "./types";
 import { NETWORK_NAME } from "./constants/networkID";
+import { BrowserRouter as Router, Link } from "react-router-dom";
 import ReactGA from "react-ga";
 import MainFooter from "./components/MainFooter";
 
@@ -186,30 +187,32 @@ class App extends React.Component<{}, IIndexStates> {
             }
         } else {
             return (
-                <div className={style["page-container"]}>
-                    <div>
-                        <MainBanner web3={this.state.web3} userWalletUnlockApproval={this.userWalletUnlockApproval} />
-                    </div>
+                <Router>
+                    <div className={style["page-container"]}>
+                        <div>
+                            <MainBanner web3={this.state.web3} userWalletUnlockApproval={this.userWalletUnlockApproval} />
+                        </div>
 
-                    <div className={style["content-wrap"]}>
-                        <div className={style["content-part"]}>
-                            <div className={[commonStyle.border, style["listing-outer"]].join(" ")}>
-                                <div className={style["listing-inner"]}>
-                                    <div className={style["listing-inner-content"]}>
-                                        <MainListingPoll web3={this.state.web3} />
+                        <div className={style["content-wrap"]}>
+                            <div className={style["content-part"]}>
+                                <div className={[commonStyle.border, style["listing-outer"]].join(" ")}>
+                                    <div className={style["listing-inner"]}>
+                                        <div className={style["listing-inner-content"]}>
+                                            <MainListingPoll web3={this.state.web3} />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className={style.profile}>
-                                <Profile web3={this.state.web3} />
+                                <div className={style.profile}>
+                                    <Profile web3={this.state.web3} />
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div className={style.footer}>
-                        <MainFooter />
+                        <div className={style.footer}>
+                            <MainFooter />
+                        </div>
                     </div>
-                </div>
+                </Router>
             );
         }
     }

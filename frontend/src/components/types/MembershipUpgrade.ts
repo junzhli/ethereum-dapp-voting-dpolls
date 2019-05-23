@@ -1,5 +1,6 @@
 import { AddressType, BlockHeightType } from "../../actions/types/eth";
 import { Membership } from "../../types";
+import { RouteComponentProps } from "react-router-dom";
 
 export namespace IMembershipUpgrade {
     export interface IInnerProps {
@@ -17,7 +18,7 @@ export namespace IMembershipUpgrade {
     }
 }
 
-export type IMembershipUpgradeProps = IMembershipUpgrade.IInnerProps & IMembershipUpgrade.IStateFromProps & IMembershipUpgrade.IPropsFromDispatch;
+export type IMembershipUpgradeProps = RouteComponentProps<{}> & IMembershipUpgrade.IInnerProps & IMembershipUpgrade.IStateFromProps & IMembershipUpgrade.IPropsFromDispatch;
 
 export interface IMembershipUpgradeStates {
     waitingMessage: {
@@ -32,4 +33,5 @@ export interface IMembershipUpgradeStates {
         show: boolean,
         message: JSX.Element | null,
     };
+    opened: boolean;
 }

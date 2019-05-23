@@ -1,6 +1,6 @@
 import React, { Dispatch, SyntheticEvent } from "react";
 import { connect } from "react-redux";
-import { Button, Grid, Icon, Label, Menu, Message, Modal, Segment } from "semantic-ui-react";
+import { Button, Grid, Icon, Label, Message, Modal, Segment, ModalProps } from "semantic-ui-react";
 import { setMembership } from "../actions/eth";
 import { ETHActionType } from "../actions/types/eth";
 import { VOTING_CORE_ABI } from "../constants/contractABIs";
@@ -10,6 +10,8 @@ import { sendTransaction } from "../utils/web3";
 import style from "./MembershipUpgrade.module.css";
 import { IMembershipUpgrade, IMembershipUpgradeProps, IMembershipUpgradeStates } from "./types/MembershipUpgrade";
 import { getEtherscanTxURL } from "../utils/etherscan";
+import { withRouter } from "react-router-dom";
+import Routes from "../constants/routes";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
@@ -34,8 +36,25 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                 show: false,
                 message: null,
             },
+            opened: (this.props.location.pathname === Routes.UPGRADE) ? true : false,
         };
         this.upgradeButtonOnClick = this.upgradeHandler.bind(this);
+        this.onOpenHandler = this.onOpenHandler.bind(this);
+        this.onCloseHandler = this.onCloseHandler.bind(this);
+    }
+
+    async componentWillReceiveProps(nextProps: IMembershipUpgradeProps) {
+        if (nextProps.location.pathname !== this.props.location.pathname) {
+            if (nextProps.location.pathname === Routes.UPGRADE) {
+                this.setState({
+                    opened: true,
+                });
+            } else {
+                this.setState({
+                    opened: false,
+                });
+            }
+        }
     }
 
     componentWillUnmount() {
@@ -45,6 +64,24 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
 
         if (this.setTimeoutHolder) {
             clearTimeout(this.setTimeoutHolder);
+        }
+    }
+
+    onOpenHandler(event: React.MouseEvent<HTMLElement, MouseEvent>, data: ModalProps) {
+        if (data.open === false) {
+            this.setState({
+                opened: true,
+            });
+            this.props.history.push(Routes.UPGRADE);
+        }
+    }
+
+    onCloseHandler(event: React.MouseEvent<HTMLElement, MouseEvent>, data: ModalProps) {
+        if (data.open === true) {
+            this.setState({
+                opened: false,
+            });
+            this.props.history.push(Routes.ROOT);
         }
     }
 
@@ -178,7 +215,10 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                 <div className={style["upgrade-button-outer"]}>
                     <Button color="orange" size="small" className={style["upgrade-button-inner"]}>Upgrade</Button>
                 </div>
-            }>
+            }
+            open={this.state.opened}
+            onOpen={this.onOpenHandler}
+            onClose={this.onCloseHandler}>
                 <Modal.Header>Select a plan</Modal.Header>
                 <Modal.Content>
                     {
@@ -293,7 +333,7 @@ const mapDispatchToProps = (dispatch: Dispatch<ETHActionType>, ownProps: IMember
     };
 };
 
-export default connect(
+export default withRouter(connect(
     mapStateToProps,
     mapDispatchToProps,
-)(MembershipUpgrade);
+)(MembershipUpgrade));
