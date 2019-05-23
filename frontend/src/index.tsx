@@ -12,7 +12,7 @@ import style from "./index.module.css";
 import store from "./store";
 import { IIndexStates } from "./types";
 import { NETWORK_NAME } from "./constants/networkID";
-import { BrowserRouter as Router, Link } from "react-router-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 import ReactGA from "react-ga";
 import MainFooter from "./components/MainFooter";
 
@@ -35,6 +35,7 @@ declare global {
 
 class App extends React.Component<{}, IIndexStates> {
     private networkName: string | null;
+    private notificationEnabled: boolean | null;
     constructor(props: {}) {
         super(props);
         let web3 = null;
@@ -59,7 +60,69 @@ class App extends React.Component<{}, IIndexStates> {
             },
         };
         this.networkName = null;
+        this.notificationEnabled = null;
         this.userWalletUnlockApproval = this.userWalletUnlockApproval.bind(this);
+    }
+
+    async componentDidMount() {
+        this.initialDesktopNotification();
+
+        if (GOOGLE_ANALYTICS_TRACKING_ID) {
+            ReactGA.pageview("/");
+        }
+
+        if (this.state.web3) {
+            if (typeof NETWORK_ID !== "undefined") {
+                const networkId: string = (await this.state.web3.eth.net.getId() as number).toString();
+                if (NETWORK_ID === networkId) {
+                    this.setState({
+                        networkChecked: true,
+                    });
+                } else {
+                    if (NETWORK_ID in NETWORK_NAME) {
+                        this.networkName = NETWORK_NAME[NETWORK_ID];
+                        this.forceUpdate();
+                    }
+                }
+            } else {
+                this.setState({
+                    networkChecked: true,
+                });
+            }
+
+            if ((await this.state.web3.eth.getAccounts()).length === 0) {
+                await this.userWalletUnlockApproval();
+            } else {
+                this.setState({
+                    approved: true,
+                });
+            }
+        }
+    }
+
+    initialDesktopNotification() {
+        if ("Notification" in window) {
+            switch (Notification.permission) {
+                case "denied":
+                    this.notificationEnabled = false;
+                    break;
+                case "granted":
+                    this.notificationEnabled = true;
+                    break;
+                case "default":
+                    Notification.requestPermission().then(permission => {
+                        if (permission === "granted") {
+                            const notification = new Notification("dPolls", {
+                                body: "Welcome! You'll be notified of any important message here :)",
+                            });
+                        }
+                    }).catch(error => {
+                        console.log("requestNotificationApproval failed");
+                        console.log(error);
+                    });
+                    break;
+            }
+        }
     }
 
     async userWalletUnlockApproval() {
@@ -103,40 +166,6 @@ class App extends React.Component<{}, IIndexStates> {
             showUserPrivacyModeDeniedMessage: false,
             showUserWalletLockedMessage: false,
         });
-    }
-
-    async componentDidMount() {
-        if (GOOGLE_ANALYTICS_TRACKING_ID) {
-            ReactGA.pageview("/");
-        }
-
-        if (this.state.web3) {
-            if (typeof NETWORK_ID !== "undefined") {
-                const networkId: string = (await this.state.web3.eth.net.getId() as number).toString();
-                if (NETWORK_ID === networkId) {
-                    this.setState({
-                        networkChecked: true,
-                    });
-                } else {
-                    if (NETWORK_ID in NETWORK_NAME) {
-                        this.networkName = NETWORK_NAME[NETWORK_ID];
-                        this.forceUpdate();
-                    }
-                }
-            } else {
-                this.setState({
-                    networkChecked: true,
-                });
-            }
-
-            if ((await this.state.web3.eth.getAccounts()).length === 0) {
-                await this.userWalletUnlockApproval();
-            } else {
-                this.setState({
-                    approved: true,
-                });
-            }
-        }
     }
 
     renderComponent() {

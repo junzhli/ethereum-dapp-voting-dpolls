@@ -12,7 +12,12 @@ export interface IPollMisc {
     amount: number | null;
 }
 
+export interface IUserMisc {
+    notificationStatus: boolean | null;
+}
+
 export interface StoreState {
     ethMisc: IEthMisc;
     pollMisc: IPollMisc;
+    userMisc: IUserMisc;
 }

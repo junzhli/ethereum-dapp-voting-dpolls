@@ -13,3 +13,9 @@
  */
 
  export const SET_POLL_STATISTICS = "SET-POLL-STATISTICS";
+
+/**
+ * User runtime configurations
+ */
+
+ export const SET_NOTIFICATION_STATUS = "SET-NOTIFICATION-STATUS";

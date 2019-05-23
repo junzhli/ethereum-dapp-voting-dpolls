@@ -1,4 +1,4 @@
-import React, { Dispatch } from "react";
+import React, { Dispatch, useContext } from "react";
 import { connect } from "react-redux";
 import { Button, Header, Icon, Item, Loader, Segment } from "semantic-ui-react";
 import { setStatistics } from "../actions/poll";
