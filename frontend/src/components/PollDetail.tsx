@@ -327,7 +327,9 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
 
     render() {
         return (
-            <div className={style["align-right"]}>
+            <div className={
+                (this.props.isVoted) ? [style["align-right"], style["show-voted-hint"]].join(" ") : style["align-right"]
+            }>
                 {
                     (this.props.isVoted) && (
                         <div className={style["voted-hint"]}>
