@@ -53,3 +53,24 @@ ID = "dpolls"
 # For contexts of branches with special characters, enclose the branch name 
 # with quotes.
 [context."feat/branch"]
+
+# Redirects and headers are GLOBAL for all builds – they do not get scoped to 
+# contexts no matter where you define them in the file.
+# For context-specific rules, use _headers or _redirects files, which are 
+# PER-DEPLOY.
+
+# Set of routing rules
+[[redirects]]
+  from = "/polls/*"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/create"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/upgrade"
+  to = "/index.html"
+  status = 200
