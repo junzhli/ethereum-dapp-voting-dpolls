@@ -8,16 +8,19 @@ import { VOTING_ABI, VOTING_CORE_ABI } from "../constants/contractABIs";
 import { StoreState } from "../store/types";
 import style from "./MainListingPoll.module.css";
 import PollCard from "./PollCard";
-import { IMainListingPoll, IMainListingPollProps, IMainListingPollState, PollInitialMetadata } from "./types/MainListingPoll";
+import { IMainListingPoll, IMainListingPollProps, IMainListingPollState, PollInitialMetadata, AdditionalData } from "./types/MainListingPoll";
 import { NOTIFICATION_TITLE } from "../constants/project";
+import Fuse from "fuse.js";
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 
 class MainListingPoll extends React.Component<IMainListingPollProps, IMainListingPollState> {
     private contract: any;
+    private additionalData: AdditionalData[];
     constructor(props: IMainListingPollProps) {
         super(props);
         this.contract = new this.props.web3.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
+        this.additionalData = [];
         this.state = {
             amountPolls: null,
             inactivePolls: null,
@@ -27,6 +30,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         };
         this.inactiveCollapseToggle = this.inactiveCollapseToggle.bind(this);
         this.activeCollapseToggle = this.activeCollapseToggle.bind(this);
+        this.syncAdditionalData = this.syncAdditionalData.bind(this);
     }
 
     async componentDidMount() {
@@ -37,6 +41,14 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         if (this.props !== prevProps) {
             await this.refreshPolls();
         }
+    }
+
+    syncAdditionalData(address: AddressType, title: string, chairperson: AddressType) {
+        const data: AdditionalData = {
+            contractAddress: address,
+            chairperson,
+            title,
+        };
     }
 
     async refreshPolls() {
@@ -200,7 +212,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                                             this.state.activePolls.map((pollInitialMetadata) => {
                                                 const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
                                                 return (
-                                                    <PollCard status="active" web3={this.props.web3} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} key={address} />
+                                                    <PollCard status="active" web3={this.props.web3} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
                                                 );
                                             })
                                         }
@@ -249,7 +261,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                                             this.state.inactivePolls.map((pollInitialMetadata) => {
                                                 const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
                                                 return (
-                                                    <PollCard status="inactive" web3={this.props.web3} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} key={address} />
+                                                    <PollCard status="inactive" web3={this.props.web3} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
                                                 );
                                             })
                                         }

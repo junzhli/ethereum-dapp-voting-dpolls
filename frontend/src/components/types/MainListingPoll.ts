@@ -32,3 +32,9 @@ export interface IMainListingPollState {
     inactiveCollapse: boolean;
     activeCollapse: boolean;
 }
+
+export interface AdditionalData {
+    contractAddress: AddressType;
+    chairperson: AddressType;
+    title: string;
+}
