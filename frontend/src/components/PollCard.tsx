@@ -166,7 +166,11 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     }
 
     render() {
-        return this.renderComponent();
+        return (
+            <div className={!this.props.display ? style.hidden : undefined}>
+                {this.renderComponent()}
+            </div>
+        );
     }
 }
 

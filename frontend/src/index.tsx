@@ -15,6 +15,7 @@ import { NETWORK_NAME } from "./constants/networkID";
 import { BrowserRouter as Router } from "react-router-dom";
 import ReactGA from "react-ga";
 import MainFooter from "./components/MainFooter";
+import MainSearchBar from "./components/MainSearchBar";
 
 const GOOGLE_ANALYTICS_TRACKING_ID = process.env.REACT_APP_GOOGLE_ANALYTICS_TRACKING_CODE;
 if (GOOGLE_ANALYTICS_TRACKING_ID) {
@@ -202,7 +203,8 @@ class App extends React.Component<{}, IIndexStates> {
                                         </div>
                                     </div>
                                 </div>
-                                <div className={style.profile}>
+                                <div className={style.infobar}>
+                                    <MainSearchBar />
                                     <Profile web3={this.state.web3} />
                                 </div>
                             </div>

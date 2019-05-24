@@ -18,6 +18,8 @@
 
  export const REMOVE_MONITORING_POLLS = "REMOVE-MONITORING-POLLS";
 
+ export const SET_USER_SEARCH_KEYWORDS = "SET-USER-SEARCH-KEYWORDS";
+
 /**
  * User runtime configurations
  */

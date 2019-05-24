@@ -11,6 +11,7 @@ export interface IPollMisc {
     active: number | null;
     amount: number | null;
     monitoring: string[];
+    keywords: string | null;
 }
 
 export interface IUserMisc {

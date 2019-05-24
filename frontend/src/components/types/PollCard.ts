@@ -12,6 +12,7 @@ export namespace IPollCard {
         expiryBlockNumber: number;
         status: IPollCardStatus;
         additionalDataConnecter: (address: AddressType, title: string, chairperson: AddressType) => void;
+        display: boolean;
     }
 
     export interface IStateFromProps {

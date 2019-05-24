@@ -77,14 +77,14 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                     this.props.setNotificationStatus(true);
                     break;
                 case "default":
-                    Notification.requestPermission().then(permission => {
+                    Notification.requestPermission().then((permission) => {
                         if (permission === "granted") {
                             const notification = new Notification(NOTIFICATION_TITLE, {
                                 body: "Welcome! You'll be notified of any important message here :)",
                             });
                             this.props.setNotificationStatus(true);
                         }
-                    }).catch(error => {
+                    }).catch((error) => {
                         console.log("requestNotificationApproval failed");
                         console.log(error);
                     });

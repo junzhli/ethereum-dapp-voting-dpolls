@@ -9,6 +9,7 @@ export namespace IMainListingPoll {
         blockHeight: BlockHeightType;
         monitoring: AddressType[];
         notificationStatus: boolean | null;
+        userSearchKeywords: string | null;
     }
 
     export interface IPropsFromDispatch {
@@ -29,6 +30,7 @@ export interface IMainListingPollState {
     amountPolls: number | null;
     inactivePolls: PollInitialMetadata[] | null;
     activePolls: PollInitialMetadata[] | null;
+    filteredPolls: AddressType[] | null;
     inactiveCollapse: boolean;
     activeCollapse: boolean;
 }
