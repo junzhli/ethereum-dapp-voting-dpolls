@@ -82,6 +82,7 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                             const notification = new Notification(NOTIFICATION_TITLE, {
                                 body: "Welcome! You'll be notified of any important message here :)",
                             });
+                            this.props.setNotificationStatus(true);
                         }
                     }).catch(error => {
                         console.log("requestNotificationApproval failed");
