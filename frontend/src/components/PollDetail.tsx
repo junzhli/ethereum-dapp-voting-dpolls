@@ -325,131 +325,139 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
         };
     }
 
-    render() {
-        return (
-            <div className={
-                (this.props.isVoted) ? [style["align-right"], style["show-voted-hint"]].join(" ") : style["align-right"]
-            }>
-                {
-                    (this.props.isVoted) && (
-                        <div className={style["voted-hint"]}>
-                            (Voted)
-                        </div>
-                    )
-                }
-                <Modal
-                    dimmer={true}
-                    trigger={
-                        <Button basic={true} color="vk" size="medium">View details</Button>
+    renderComponent() {
+        if (this.props.display) {
+            return (
+                <div className={
+                    (this.props.isVoted) ? [style["align-right"], style["show-voted-hint"]].join(" ") : style["align-right"]
+                }>
+                    {
+                        (this.props.isVoted) && (
+                            <div className={style["voted-hint"]}>
+                                (Voted)
+                            </div>
+                        )
                     }
-                    closeIcon={true}
-                    closeOnDimmerClick={false}
-                    open={this.state.opened}
-                    onOpen={this.onOpenHandler}
-                    onClose={this.onCloseHandler}
-                >
-                    <Modal.Header>
-                        {this.props.title}
-                    </Modal.Header>
-                    <Modal.Content image={true}>
-                        <Modal.Description>
-
-                            {
-                                this.state.waitingMessage.show && (
-                                    <Message icon={true}>
-                                        <Icon name="circle notched" loading={true} />
-                                        <Message.Content>
-                                        <Message.Header>Just a few seconds</Message.Header>
-                                        {this.state.waitingMessage.message}
-                                        </Message.Content>
-                                    </Message>
-                                )
-                            }
-                            {
-                                this.state.errorMessage.show && (
-                                    <Message
-                                        error={true}
-                                        header="There was some errors with your submission"
-                                        list={[
-                                            this.state.errorMessage.message,
-                                        ]}
-                                    />
-                                )
-                            }
-                            {
-                                this.state.successfulMessage.show && (
-                                    <Message positive={true}>
-                                        <Message.Header>You vote successfully!</Message.Header>
-                                        {this.state.successfulMessage.message}
-                                    </Message>
-                                )
-                            }
-                            <div className={style["inline-container"]}>
-                                <div className={style["inline-left"]}>
-                                    <Form className={style["voting-box"]} size="huge">
-                                        {
-                                            this.props.options.map((option, index) => {
-                                                return (
-                                                    <Form.Field key={this.props.address + " " + index}>
-                                                        <Checkbox
-                                                            radio={true}
-                                                            label={
-                                                                (this.state.votesByIndex && this.props.votesAmount > 0) ? (
-                                                                    option + " (" + Math.floor((this.state.votesByIndex[index] / this.props.votesAmount) * 100) + "%)"
-                                                                ) : option
-                                                            }
-                                                            name={option}
-                                                            value={index}
-                                                            checked={this.state.votingMessage.selectedIndex === index}
-                                                            onChange={this.handleOptionVoted}
-                                                            disabled={this.props.isVoted || this.props.isExpired}
-                                                        />
+                    <Modal
+                        dimmer={true}
+                        trigger={
+                            <Button basic={true} color="vk" size="medium">View details</Button>
+                        }
+                        closeIcon={true}
+                        closeOnDimmerClick={false}
+                        open={this.state.opened}
+                        onOpen={this.onOpenHandler}
+                        onClose={this.onCloseHandler}
+                    >
+                        <Modal.Header>
+                            {this.props.title}
+                        </Modal.Header>
+                        <Modal.Content image={true}>
+                            <Modal.Description>
+    
+                                {
+                                    this.state.waitingMessage.show && (
+                                        <Message icon={true}>
+                                            <Icon name="circle notched" loading={true} />
+                                            <Message.Content>
+                                            <Message.Header>Just a few seconds</Message.Header>
+                                            {this.state.waitingMessage.message}
+                                            </Message.Content>
+                                        </Message>
+                                    )
+                                }
+                                {
+                                    this.state.errorMessage.show && (
+                                        <Message
+                                            error={true}
+                                            header="There was some errors with your submission"
+                                            list={[
+                                                this.state.errorMessage.message,
+                                            ]}
+                                        />
+                                    )
+                                }
+                                {
+                                    this.state.successfulMessage.show && (
+                                        <Message positive={true}>
+                                            <Message.Header>You vote successfully!</Message.Header>
+                                            {this.state.successfulMessage.message}
+                                        </Message>
+                                    )
+                                }
+                                <div className={style["inline-container"]}>
+                                    <div className={style["inline-left"]}>
+                                        <Form className={style["voting-box"]} size="huge">
+                                            {
+                                                this.props.options.map((option, index) => {
+                                                    return (
+                                                        <Form.Field key={this.props.address + " " + index}>
+                                                            <Checkbox
+                                                                radio={true}
+                                                                label={
+                                                                    (this.state.votesByIndex && this.props.votesAmount > 0) ? (
+                                                                        option + " (" + Math.floor((this.state.votesByIndex[index] / this.props.votesAmount) * 100) + "%)"
+                                                                    ) : option
+                                                                }
+                                                                name={option}
+                                                                value={index}
+                                                                checked={this.state.votingMessage.selectedIndex === index}
+                                                                onChange={this.handleOptionVoted}
+                                                                disabled={this.props.isVoted || this.props.isExpired}
+                                                            />
+                                                        </Form.Field>
+                                                    );
+                                                })
+                                            }
+                                            {
+                                                this.state.votingMessage.selectedOption && (
+                                                    <Form.Field>
+                                                        {this.props.isVoted ? ("You haved voted for") : ("You are voting for")} <b>{this.state.votingMessage.selectedOption}</b>
                                                     </Form.Field>
-                                                );
-                                            })
-                                        }
+                                                )
+                                            }
+                                        </Form>
                                         {
-                                            this.state.votingMessage.selectedOption && (
-                                                <Form.Field>
-                                                    {this.props.isVoted ? ("You haved voted for") : ("You are voting for")} <b>{this.state.votingMessage.selectedOption}</b>
-                                                </Form.Field>
+                                            (this.state.votingMessage.selectedIndex !== null && !this.props.isVoted) && (
+                                                <div className={style["voting-button"]}>
+                                                    <Button value={this.state.votingMessage.selectedIndex} content="Vote!" onClick={this.voteOnSubmitHandler}/>
+                                                </div>
                                             )
                                         }
-                                    </Form>
+                                    </div>
                                     {
-                                        (this.state.votingMessage.selectedIndex !== null && !this.props.isVoted) && (
-                                            <div className={style["voting-button"]}>
-                                                <Button value={this.state.votingMessage.selectedIndex} content="Vote!" onClick={this.voteOnSubmitHandler}/>
+                                        (this.state.chart) ?  (
+                                            <div className={style["inline-right"]}>
+                                                <Pie height={180} width={180} data={this.state.chart.option as ChartData<Chart.ChartData>} options={{cutoutPercentage: 8, legend: {display: false}}} />
+                                            </div>
+                                        ) : (
+                                            <div className={style["inline-right"]}>
+                                                <Header size="medium" color="grey">
+                                                    (No enough data available in the poll)
+                                                </Header>
                                             </div>
                                         )
                                     }
                                 </div>
                                 {
-                                    (this.state.chart) ?  (
-                                        <div className={style["inline-right"]}>
-                                            <Pie height={180} width={180} data={this.state.chart.option as ChartData<Chart.ChartData>} options={{cutoutPercentage: 8, legend: {display: false}}} />
-                                        </div>
-                                    ) : (
-                                        <div className={style["inline-right"]}>
-                                            <Header size="medium" color="grey">
-                                                (No enough data available in the poll)
-                                            </Header>
+                                    this.props.isExpired && (
+                                        <div className={[style.stamp, style.ended].join(" ")}>
+                                            Poll ended
                                         </div>
                                     )
                                 }
-                            </div>
-                            {
-                                this.props.isExpired && (
-                                    <div className={[style.stamp, style.ended].join(" ")}>
-                                        Poll ended
-                                    </div>
-                                )
-                            }
-                        </Modal.Description>
-                    </Modal.Content>
-                </Modal>
-            </div>
-        );
+                            </Modal.Description>
+                        </Modal.Content>
+                    </Modal>
+                </div>
+            );
+        } else {
+            return null;
+        }
+    }
+
+    render() {
+        return this.renderComponent();
     }
 }
 

@@ -151,6 +151,7 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
                             </Item.Extra>
                         </Item.Content>
                         <PollDetail
+                        display={this.props.display}
                         web3={this.props.web3}
                         address={this.props.address}
                         title={(this.state.externalData && this.state.externalData.title) as string}
@@ -166,11 +167,11 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     }
 
     render() {
-        return (
-            <div className={!this.props.display ? style.hidden : undefined}>
-                {this.renderComponent()}
-            </div>
-        );
+        if (this.props.display) {
+            return this.renderComponent();
+        } else {
+            return null;
+        }
     }
 }
 
