@@ -10,6 +10,7 @@ export interface IEthMisc {
 export interface IPollMisc {
     active: number | null;
     amount: number | null;
+    monitoring: string[];
 }
 
 export interface IUserMisc {

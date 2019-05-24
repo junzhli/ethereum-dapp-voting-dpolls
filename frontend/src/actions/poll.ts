@@ -1,5 +1,6 @@
-import { SET_POLL_STATISTICS } from "./constant";
-import { ISetStatistics } from "./types/poll";
+import { SET_POLL_STATISTICS, REMOVE_MONITORING_POLLS, ADD_MONITORING_POLLS } from "./constant";
+import { ISetStatistics, IAddMonitoringPolls, IRemoveMonitoringPolls } from "./types/poll";
+import { AddressType } from "./types/eth";
 
 export const setStatistics = (amount: number, active: number): ISetStatistics => {
     return {
@@ -8,5 +9,19 @@ export const setStatistics = (amount: number, active: number): ISetStatistics =>
             amount,
             active,
         },
+    };
+};
+
+export const addMonitoringPoll = (addresses: AddressType[]): IAddMonitoringPolls => {
+    return {
+        type: ADD_MONITORING_POLLS,
+        payload: addresses,
+    };
+};
+
+export const removeMonitoringPoll = (addresses: AddressType[]): IRemoveMonitoringPolls => {
+    return {
+        type: REMOVE_MONITORING_POLLS,
+        payload: addresses,
     };
 };

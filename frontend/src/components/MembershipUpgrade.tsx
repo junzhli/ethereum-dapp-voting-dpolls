@@ -12,6 +12,7 @@ import { IMembershipUpgrade, IMembershipUpgradeProps, IMembershipUpgradeStates }
 import { getEtherscanTxURL } from "../utils/etherscan";
 import { withRouter } from "react-router-dom";
 import Routes from "../constants/routes";
+import { NOTIFICATION_TITLE } from "../constants/project";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
@@ -169,7 +170,15 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                                 ),
                             },
                         });
+
                         this.props.setMembership(membership);
+
+                        if (this.props.notificationStatus === true) {
+                            const notification = new Notification(NOTIFICATION_TITLE, {
+                                body: "You are upgraded to paid membership!",
+                            });
+                        }
+
                         clearInterval(this.checkConfirmedInterval);
                         this.setTimeoutHolder = setTimeout(() => {
                             this.setState({
@@ -324,6 +333,7 @@ const mapStateToProps = (state: StoreState, ownProps: IMembershipUpgrade.IInnerP
         accountAddress: state.ethMisc.accountAddress,
         blockHeight: state.ethMisc.blockHeight,
         membership: state.ethMisc.membership,
+        notificationStatus: state.userMisc.notificationStatus,
     };
 };
 

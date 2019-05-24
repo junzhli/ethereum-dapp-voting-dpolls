@@ -18,6 +18,7 @@ export namespace IMainBanner {
         setBlockHeight: (blockHeight: BlockHeightType) => void;
         setAccountAddress: (accountAddress: AddressType) => void;
         setMembership: (nextMembership: Membership) => void;
+        setNotificationStatus: (status: boolean) => void;
     }
 }
 

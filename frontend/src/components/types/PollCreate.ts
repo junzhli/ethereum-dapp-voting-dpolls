@@ -11,10 +11,12 @@ export namespace IPollCreate {
         accountAddress: AddressType | null;
         blockHeight: BlockHeightType;
         membership: Membership | null;
+        notificationStatus: boolean | null;
     }
 
     export interface IPropsFromDispatch {
         setMembership: (nextMembership: Membership) => void;
+        addMonitoringPolls: (polls: AddressType[]) => void;
     }
 }
 

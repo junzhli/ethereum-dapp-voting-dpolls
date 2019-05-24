@@ -9,10 +9,14 @@
  export const SET_MEMBERSHIP = "SET-MEMBERSHIP";
 
 /**
- * Poll statistics
+ * Poll
  */
 
  export const SET_POLL_STATISTICS = "SET-POLL-STATISTICS";
+
+ export const ADD_MONITORING_POLLS = "ADD-MONITORING-POLLS";
+
+ export const REMOVE_MONITORING_POLLS = "REMOVE-MONITORING-POLLS";
 
 /**
  * User runtime configurations

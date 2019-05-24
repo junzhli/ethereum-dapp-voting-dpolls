@@ -1,14 +1,15 @@
 import React, { Dispatch, useContext } from "react";
 import { connect } from "react-redux";
 import { Button, Header, Icon, Item, Loader, Segment } from "semantic-ui-react";
-import { setStatistics } from "../actions/poll";
-import { BlockHeightType } from "../actions/types/eth";
+import { setStatistics, removeMonitoringPoll } from "../actions/poll";
+import { BlockHeightType, AddressType } from "../actions/types/eth";
 import { PollActionType } from "../actions/types/poll";
 import { VOTING_ABI, VOTING_CORE_ABI } from "../constants/contractABIs";
 import { StoreState } from "../store/types";
 import style from "./MainListingPoll.module.css";
 import PollCard from "./PollCard";
 import { IMainListingPoll, IMainListingPollProps, IMainListingPollState, PollInitialMetadata } from "./types/MainListingPoll";
+import { NOTIFICATION_TITLE } from "../constants/project";
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 
@@ -28,6 +29,16 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         this.activeCollapseToggle = this.activeCollapseToggle.bind(this);
     }
 
+    async componentDidMount() {
+        await this.refreshPolls();
+    }
+
+    async componentDidUpdate(prevProps: IMainListingPollProps) {
+        if (this.props !== prevProps) {
+            await this.refreshPolls();
+        }
+    }
+
     async refreshPolls() {
         const data = await this.fetchPolls();
 
@@ -36,6 +47,24 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
             const { activePolls, inactivePolls } = this.filePolls(polls);
 
             this.props.setPollStatistics(amountPolls, activePolls.length);
+
+            if (this.props.notificationStatus === true) {
+                const notifiedVotings: AddressType[] = [];
+                polls.forEach((poll) => {
+                    if (this.props.monitoring.includes(poll.address)) {
+                        notifiedVotings.push(poll.address);
+
+                        const notification = new Notification(NOTIFICATION_TITLE, {
+                            body: "Your poll have just been published!",
+                        });
+                    }
+                });
+
+                if (notifiedVotings.length !== 0) {
+                    this.props.removeMonitoringPolls(notifiedVotings);
+                }
+            }
+
             this.setState({
                 amountPolls,
                 activePolls,
@@ -105,16 +134,6 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         this.setState({
             activeCollapse: !this.state.activeCollapse,
         });
-    }
-
-    async componentDidMount() {
-        await this.refreshPolls();
-    }
-
-    async componentDidUpdate(prevProps: IMainListingPollProps) {
-        if (this.props !== prevProps) {
-            await this.refreshPolls();
-        }
     }
 
     renderComponent() {
@@ -259,12 +278,15 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
 const mapStateToProps = (state: StoreState, ownProps: IMainListingPoll.IInnerProps): IMainListingPoll.IStateFromProps => {
     return {
         blockHeight: state.ethMisc.blockHeight,
+        monitoring: state.pollMisc.monitoring,
+        notificationStatus: state.userMisc.notificationStatus,
     };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch<PollActionType>, ownProps: IMainListingPoll.IInnerProps): IMainListingPoll.IPropsFromDispatch => {
     return {
         setPollStatistics: (amount: number, active: number) => dispatch(setStatistics(amount, active)),
+        removeMonitoringPolls: (addresses: AddressType[]) => dispatch(removeMonitoringPoll(addresses)),
     };
 };
 

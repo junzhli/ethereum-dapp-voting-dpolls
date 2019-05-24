@@ -1,4 +1,4 @@
-import { BlockHeightType } from "../../actions/types/eth";
+import { BlockHeightType, AddressType } from "../../actions/types/eth";
 
 export namespace IMainListingPoll {
     export interface IInnerProps {
@@ -7,10 +7,13 @@ export namespace IMainListingPoll {
 
     export interface IStateFromProps {
         blockHeight: BlockHeightType;
+        monitoring: AddressType[];
+        notificationStatus: boolean | null;
     }
 
     export interface IPropsFromDispatch {
         setPollStatistics: (amount: number, active: number) => void;
+        removeMonitoringPolls: (addresses: AddressType[]) => void;
     }
 }
 

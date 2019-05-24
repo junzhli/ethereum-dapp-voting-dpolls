@@ -35,7 +35,6 @@ declare global {
 
 class App extends React.Component<{}, IIndexStates> {
     private networkName: string | null;
-    private notificationEnabled: boolean | null;
     constructor(props: {}) {
         super(props);
         let web3 = null;
@@ -60,13 +59,10 @@ class App extends React.Component<{}, IIndexStates> {
             },
         };
         this.networkName = null;
-        this.notificationEnabled = null;
         this.userWalletUnlockApproval = this.userWalletUnlockApproval.bind(this);
     }
 
     async componentDidMount() {
-        this.initialDesktopNotification();
-
         if (GOOGLE_ANALYTICS_TRACKING_ID) {
             ReactGA.pageview("/");
         }
@@ -96,31 +92,6 @@ class App extends React.Component<{}, IIndexStates> {
                 this.setState({
                     approved: true,
                 });
-            }
-        }
-    }
-
-    initialDesktopNotification() {
-        if ("Notification" in window) {
-            switch (Notification.permission) {
-                case "denied":
-                    this.notificationEnabled = false;
-                    break;
-                case "granted":
-                    this.notificationEnabled = true;
-                    break;
-                case "default":
-                    Notification.requestPermission().then(permission => {
-                        if (permission === "granted") {
-                            const notification = new Notification("dPolls", {
-                                body: "Welcome! You'll be notified of any important message here :)",
-                            });
-                        }
-                    }).catch(error => {
-                        console.log("requestNotificationApproval failed");
-                        console.log(error);
-                    });
-                    break;
             }
         }
     }

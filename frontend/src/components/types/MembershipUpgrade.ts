@@ -11,6 +11,7 @@ export namespace IMembershipUpgrade {
         accountAddress: AddressType | null;
         blockHeight: BlockHeightType;
         membership: Membership | null;
+        notificationStatus: boolean | null;
     }
 
     export interface IPropsFromDispatch {
