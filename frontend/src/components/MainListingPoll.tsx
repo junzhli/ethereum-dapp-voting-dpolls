@@ -44,11 +44,21 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
     }
 
     syncAdditionalData(address: AddressType, title: string, chairperson: AddressType) {
-        const data: AdditionalData = {
+        const beUpdated: AdditionalData = {
             contractAddress: address,
             chairperson,
             title,
         };
+
+        const atIndex = this.additionalData.findIndex((data) => {
+            return data.contractAddress === beUpdated.contractAddress;
+        });
+
+        if (atIndex !== -1) {
+            Object.assign(this.additionalData[atIndex], beUpdated);
+        } else {
+            this.additionalData.push(beUpdated);
+        }
     }
 
     async refreshPolls() {

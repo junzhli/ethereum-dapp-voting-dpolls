@@ -92,6 +92,7 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
                 votesAmount,
             },
         });
+        this.props.additionalDataConnecter(this.props.address, title, chairperson);
     }
 
     renderComponent() {
