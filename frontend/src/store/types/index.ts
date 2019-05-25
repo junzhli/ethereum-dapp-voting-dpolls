@@ -12,10 +12,12 @@ export interface IPollMisc {
     amount: number | null;
     monitoring: string[];
     keywords: string | null;
+    searchResultsAmount: number | null;
 }
 
 export interface IUserMisc {
     notificationStatus: boolean | null;
+    searchbarEnabled: boolean;
 }
 
 export interface StoreState {

@@ -1,8 +1,13 @@
-import { SET_NOTIFICATION_STATUS } from "../constant";
+import { SET_NOTIFICATION_STATUS, SET_SEARCH_BAR } from "../constant";
 
 export interface ISetNotificationStatus {
     type: typeof SET_NOTIFICATION_STATUS;
     payload: boolean;
 }
 
-export type UserActionType = ISetNotificationStatus;
+export interface ISetSearchBar {
+    type: typeof SET_SEARCH_BAR;
+    payload: boolean;
+}
+
+export type UserActionType = ISetNotificationStatus | ISetSearchBar;

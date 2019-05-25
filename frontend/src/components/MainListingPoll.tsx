@@ -1,7 +1,7 @@
 import React, { Dispatch } from "react";
 import { connect } from "react-redux";
 import { Button, Header, Icon, Item, Loader, Segment } from "semantic-ui-react";
-import { setStatistics, removeMonitoringPoll } from "../actions/poll";
+import { setStatistics, removeMonitoringPoll, setSearchResultsAmount } from "../actions/poll";
 import { BlockHeightType, AddressType } from "../actions/types/eth";
 import { PollActionType } from "../actions/types/poll";
 import { VOTING_ABI, VOTING_CORE_ABI } from "../constants/contractABIs";
@@ -11,13 +11,17 @@ import PollCard from "./PollCard";
 import { IMainListingPoll, IMainListingPollProps, IMainListingPollState, PollInitialMetadata, AdditionalData } from "./types/MainListingPoll";
 import { NOTIFICATION_TITLE } from "../constants/project";
 import Fuse from "fuse.js";
+import { setSearchBar } from "../actions/user";
+import { UserActionType } from "../actions/types/user";
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 
 class MainListingPoll extends React.Component<IMainListingPollProps, IMainListingPollState> {
     private contract: any;
     private additionalData: AdditionalData[];
+    private pollCardsSearchable: number | null;
     private showNoSearchResult: {
+        [key: string]: boolean,
         active: boolean,
         inactive: boolean,
     };
@@ -25,6 +29,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         super(props);
         this.contract = new this.props.web3.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
         this.additionalData = [];
+        this.pollCardsSearchable = null;
         this.showNoSearchResult = {
             active: false,
             inactive: false,
@@ -47,10 +52,16 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
             if (nextProps.userSearchKeywords !== this.props.userSearchKeywords) {
                 if (nextProps.userSearchKeywords !== null) {
                     const filteredPolls = this.searchPolls(nextProps.userSearchKeywords);
+                    this.props.setSearchResultsAmount(filteredPolls.length);
                     this.setState({
                         filteredPolls,
                     });
                 } else {
+                    // set to inital state
+                    Object.keys(this.showNoSearchResult).forEach((key) => {
+                        this.showNoSearchResult[key] = false;
+                    });
+                    this.props.setSearchResultsAmount(null);
                     this.setState({
                         filteredPolls: null,
                     });
@@ -61,6 +72,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
 
     async componentDidMount() {
         await this.refreshPolls();
+        this.pollCardsSearchable = 0;
     }
 
     async componentDidUpdate(prevProps: IMainListingPollProps) {
@@ -81,6 +93,10 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
     }
 
     syncAdditionalData(address: AddressType, title: string, chairperson: AddressType) {
+        if (this.pollCardsSearchable === null) {
+            return;
+        }
+
         const beUpdated: AdditionalData = {
             contractAddress: address,
             chairperson,
@@ -95,6 +111,10 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
             Object.assign(this.additionalData[atIndex], beUpdated);
         } else {
             this.additionalData.push(beUpdated);
+        }
+
+        if (++this.pollCardsSearchable === this.state.amountPolls) {
+            this.props.setSearchBar(true);
         }
     }
 
@@ -122,6 +142,10 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                 if (notifiedVotings.length !== 0) {
                     this.props.removeMonitoringPolls(notifiedVotings);
                 }
+            }
+
+            if (this.state.amountPolls && this.state.amountPolls < amountPolls) {
+                this.props.setSearchBar(false);
             }
 
             this.setState({
@@ -177,7 +201,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
             return pollInitialMetadata;
         };
         for (let i = 0; i < amountPolls; i++) {
-            awaitingPolls.push(getPollInitialMetadata(i));
+            awaitingPolls.unshift(getPollInitialMetadata(i));
         }
         const polls = (await Promise.all(awaitingPolls));
 
@@ -420,10 +444,12 @@ const mapStateToProps = (state: StoreState, ownProps: IMainListingPoll.IInnerPro
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<PollActionType>, ownProps: IMainListingPoll.IInnerProps): IMainListingPoll.IPropsFromDispatch => {
+const mapDispatchToProps = (dispatch: Dispatch<PollActionType | UserActionType>, ownProps: IMainListingPoll.IInnerProps): IMainListingPoll.IPropsFromDispatch => {
     return {
         setPollStatistics: (amount: number, active: number) => dispatch(setStatistics(amount, active)),
         removeMonitoringPolls: (addresses: AddressType[]) => dispatch(removeMonitoringPoll(addresses)),
+        setSearchResultsAmount: (amount: number | null) => dispatch(setSearchResultsAmount(amount)),
+        setSearchBar: (enabled: boolean) => dispatch(setSearchBar(enabled)),
     };
 };
 

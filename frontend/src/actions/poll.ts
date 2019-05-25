@@ -1,5 +1,5 @@
-import { SET_POLL_STATISTICS, REMOVE_MONITORING_POLLS, ADD_MONITORING_POLLS, SET_USER_SEARCH_KEYWORDS } from "./constant";
-import { ISetStatistics, IAddMonitoringPolls, IRemoveMonitoringPolls, ISetUserSearchKeywords } from "./types/poll";
+import { SET_POLL_STATISTICS, REMOVE_MONITORING_POLLS, ADD_MONITORING_POLLS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT } from "./constant";
+import { ISetStatistics, IAddMonitoringPolls, IRemoveMonitoringPolls, ISetUserSearchKeywords, ISetSearchResultsAmount } from "./types/poll";
 import { AddressType } from "./types/eth";
 
 export const setStatistics = (amount: number, active: number): ISetStatistics => {
@@ -30,5 +30,12 @@ export const setUserSearchKeywords = (keywords: string | null): ISetUserSearchKe
     return {
         type: SET_USER_SEARCH_KEYWORDS,
         payload: keywords,
+    };
+};
+
+export const setSearchResultsAmount = (amount: number | null): ISetSearchResultsAmount => {
+    return {
+        type: SET_SEARCH_RESULTS_AMOUNT,
+        payload: amount,
     };
 };

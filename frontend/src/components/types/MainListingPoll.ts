@@ -15,6 +15,8 @@ export namespace IMainListingPoll {
     export interface IPropsFromDispatch {
         setPollStatistics: (amount: number, active: number) => void;
         removeMonitoringPolls: (addresses: AddressType[]) => void;
+        setSearchResultsAmount: (amount: number | null) => void;
+        setSearchBar: (enabled: boolean) => void;
     }
 }
 

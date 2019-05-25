@@ -20,8 +20,12 @@
 
  export const SET_USER_SEARCH_KEYWORDS = "SET-USER-SEARCH-KEYWORDS";
 
+ export const SET_SEARCH_RESULTS_AMOUNT = "SET-SEARCH-RESULTS-AMOUNT";
+
 /**
  * User runtime configurations
  */
 
  export const SET_NOTIFICATION_STATUS = "SET-NOTIFICATION-STATUS";
+
+ export const SET_SEARCH_BAR = "SET-SEARCH-BAR";

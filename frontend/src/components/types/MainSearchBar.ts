@@ -3,6 +3,8 @@ export namespace IMainSearchBar {
     }
 
     export interface IStateFromProps {
+        searchResultsAmount: number | null;
+        searchBarEnabled: boolean;
     }
 
     export interface IPropsFromDispatch {

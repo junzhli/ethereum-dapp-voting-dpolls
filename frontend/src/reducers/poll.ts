@@ -1,4 +1,4 @@
-import { SET_POLL_STATISTICS, ADD_MONITORING_POLLS, REMOVE_MONITORING_POLLS, SET_USER_SEARCH_KEYWORDS } from "../actions/constant";
+import { SET_POLL_STATISTICS, ADD_MONITORING_POLLS, REMOVE_MONITORING_POLLS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT } from "../actions/constant";
 import { PollActionType } from "../actions/types/poll";
 import { IPollMisc } from "../store/types";
 import { AddressType } from "../actions/types/eth";
@@ -8,6 +8,7 @@ const initialState: IPollMisc = {
     amount: null,
     monitoring: [],
     keywords: null,
+    searchResultsAmount: null,
 };
 
 const poll = (state: IPollMisc = initialState, action: PollActionType): IPollMisc => {
@@ -47,6 +48,13 @@ const poll = (state: IPollMisc = initialState, action: PollActionType): IPollMis
             return {
                 ...state,
                 keywords,
+            };
+        }
+        case SET_SEARCH_RESULTS_AMOUNT: {
+            const searchResultsAmount = action.payload;
+            return {
+                ...state,
+                searchResultsAmount,
             };
         }
     }
