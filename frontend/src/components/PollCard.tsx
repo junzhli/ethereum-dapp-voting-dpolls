@@ -110,7 +110,7 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
             case "loading":
             case "non-loaded-completely":
                 return (
-                    <Segment color={this.status.inactive.border}>
+                    <Segment className={!this.props.display ? style.hidden : undefined} color={this.status.inactive.border}>
                         <Placeholder style={{ height: 56, width: 56 }}>
                             <Placeholder.Image />
                         </Placeholder>
@@ -128,7 +128,7 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
                 );
             case "completed":
                 return (
-                    <Segment color={this.status[this.props.status].border}>
+                    <Segment className={!this.props.display ? style.hidden : undefined} color={this.status[this.props.status].border}>
                         <div className={style["top-bottom-border"]}>
                             <Icon size="huge" name={this.status[this.props.status].icon} />
                         </div>
@@ -151,7 +151,6 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
                             </Item.Extra>
                         </Item.Content>
                         <PollDetail
-                        display={this.props.display}
                         web3={this.props.web3}
                         address={this.props.address}
                         title={(this.state.externalData && this.state.externalData.title) as string}
@@ -167,11 +166,7 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     }
 
     render() {
-        if (this.props.display) {
-            return this.renderComponent();
-        } else {
-            return null;
-        }
+        return this.renderComponent();
     }
 }
 

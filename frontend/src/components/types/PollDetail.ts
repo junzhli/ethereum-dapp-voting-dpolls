@@ -13,7 +13,6 @@ export namespace IPollDetail {
         isExpired: boolean;
         isVoted: boolean;
         votesAmount: number;
-        display: boolean;
     }
 
     export interface IStateFromProps {

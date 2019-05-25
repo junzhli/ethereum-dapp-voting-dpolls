@@ -17,10 +17,18 @@ const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 class MainListingPoll extends React.Component<IMainListingPollProps, IMainListingPollState> {
     private contract: any;
     private additionalData: AdditionalData[];
+    private showNoSearchResult: {
+        active: boolean,
+        inactive: boolean,
+    };
     constructor(props: IMainListingPollProps) {
         super(props);
         this.contract = new this.props.web3.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
         this.additionalData = [];
+        this.showNoSearchResult = {
+            active: false,
+            inactive: false,
+        };
         this.state = {
             amountPolls: null,
             inactivePolls: null,
@@ -187,7 +195,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         });
     }
 
-    renderFiltered(polls: PollInitialMetadata[], filter: AddressType[]) {
+    renderFiltered(polls: PollInitialMetadata[], filter: AddressType[], listType: "active" | "inactive") {
         const categoriedPolls = polls.map((pollInitialMetadata) => {
             if (filter.includes(pollInitialMetadata.address)) {
                 return Object.assign(pollInitialMetadata, {
@@ -201,24 +209,36 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         });
 
         if (categoriedPolls.filter((pollInitialMetadata) => pollInitialMetadata.filtered === true).length === 0) {
-            return (
-                <Header textAlign="center" size="small">
-                    <div>
-                        No result...
-                    </div>
-                    <div>
-                        {
-                            categoriedPolls.map((pollInitialMetadata) => {
-                                const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
+            switch (listType) {
+                case "active":
+                    this.showNoSearchResult.active = true;
+                    break;
+                case "inactive":
+                    this.showNoSearchResult.inactive = true;
+                    break;
+                default:
+                    throw new Error("Toggle showNoSearchResult off: unsupported list type");
+            }
 
-                                return <PollCard display={false} status="active" web3={this.props.web3} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />;
-                            })
-                        }
-                    </div>
-                </Header>
+            return (
+                categoriedPolls.map((pollInitialMetadata) => {
+                    const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
+
+                    return <PollCard display={false} status="active" web3={this.props.web3} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />;
+                })
             );
         }
 
+        switch (listType) {
+            case "active":
+                this.showNoSearchResult.active = false;
+                break;
+            case "inactive":
+                this.showNoSearchResult.inactive = false;
+                break;
+            default:
+                throw new Error("Toggle showNoSearchResult on: unsupported list type");
+        }
         return (
             categoriedPolls.map((pollInitialMetadata) => {
                 const { address, isExpired, expiryBlockNumber, contract, filtered } = pollInitialMetadata;
@@ -229,6 +249,28 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                     <PollCard display={false} status="active" web3={this.props.web3} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
                 );
             })
+        );
+    }
+
+    renderNoMatchesAvailable() {
+        return (
+            <Header className={style["no-search-result"]} textAlign="center" size="small">
+                <div>
+                    No matches found...
+                </div>
+            </Header>
+        );
+    }
+
+    renderNoPollsAvailable() {
+        return (
+            <Segment>
+                <Header textAlign="center" size="small">
+                    <div>
+                        No polls are available...
+                    </div>
+                </Header>
+            </Segment>
         );
     }
 
@@ -293,7 +335,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                                         )}>
                                     <Segment>
                                         {
-                                            (this.state.filteredPolls !== null) ? this.renderFiltered(this.state.activePolls, this.state.filteredPolls) : (
+                                            (this.state.filteredPolls !== null) ? this.renderFiltered(this.state.activePolls, this.state.filteredPolls, "active") : (
                                                 this.state.activePolls.map((pollInitialMetadata) => {
                                                     const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
                                                     return (
@@ -302,17 +344,12 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                                                 })
                                             )
                                         }
+                                        {
+                                            (this.showNoSearchResult.active) && this.renderNoMatchesAvailable()
+                                        }
                                     </Segment>
                                 </div>
-                            ) : (
-                                    <Segment>
-                                        <Header textAlign="center" size="small">
-                                            <div>
-                                                No polls are available...
-                                        </div>
-                                        </Header>
-                                    </Segment>
-                                )
+                            ) : this.renderNoPollsAvailable()
                         }
 
                         <br />
@@ -344,7 +381,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                                         )}>
                                     <Segment>
                                         {
-                                            (this.state.filteredPolls !== null) ? this.renderFiltered(this.state.inactivePolls, this.state.filteredPolls) : (
+                                            (this.state.filteredPolls !== null) ? this.renderFiltered(this.state.inactivePolls, this.state.filteredPolls, "inactive") : (
                                                 this.state.inactivePolls.map((pollInitialMetadata) => {
                                                     const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
                                                     return (
@@ -353,17 +390,12 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                                                 })
                                             )
                                         }
+                                        {
+                                            (this.showNoSearchResult.inactive) && this.renderNoMatchesAvailable()
+                                        }
                                     </Segment>
                                 </div>
-                            ) : (
-                                    <Segment>
-                                        <Header textAlign="center" size="small">
-                                            <div>
-                                                No polls are available...
-                                        </div>
-                                        </Header>
-                                    </Segment>
-                                )
+                            ) : this.renderNoPollsAvailable()
                         }
                     </Item.Group>
                 );
