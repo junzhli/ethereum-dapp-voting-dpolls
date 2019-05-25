@@ -161,9 +161,9 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         }
 
         const amountPolls: number = (await this.contract.methods.getAmountVotings().call()).toNumber();
-        const polls: PollInitialMetadata[] = [];
-        for (let i = 0; i < amountPolls; i++) {
-            const address = await this.contract.methods.getVotingItemByIndex(i).call();
+        const awaitingPolls: Array<Promise<PollInitialMetadata>> = [];
+        const getPollInitialMetadata = async (index: number) => {
+            const address = await this.contract.methods.getVotingItemByIndex(index).call();
             const contract = new this.props.web3.eth.Contract(VOTING_ABI, address);
             const expiryBlockNumber = (await contract.methods.expiryBlockNumber().call()).toNumber();
             const isExpired = this.checkIfExpired(expiryBlockNumber) as boolean;
@@ -174,8 +174,12 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                 expiryBlockNumber,
                 isExpired,
             };
-            polls.unshift(pollInitialMetadata);
+            return pollInitialMetadata;
+        };
+        for (let i = 0; i < amountPolls; i++) {
+            awaitingPolls.push(getPollInitialMetadata(i));
         }
+        const polls = (await Promise.all(awaitingPolls));
 
         return {
             amountPolls,

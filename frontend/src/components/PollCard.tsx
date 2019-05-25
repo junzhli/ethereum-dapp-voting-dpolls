@@ -38,7 +38,7 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
             return null;
         }
 
-        const isExpired = await this.contract.methods.isVoted(address).call();
+        const isExpired = await this.contract.methods.isVoted(address).call() as boolean;
         return isExpired;
     }
 
@@ -74,15 +74,27 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     }
 
     async componentDidMount() {
-        const chairperson = await this.contract.methods.chairperson().call();
-        const title = this.props.web3.utils.hexToUtf8(await this.contract.methods.title().call()) as string;
-        const isVoted = await this.checkIfVoted(this.props.accountAddress);
+        const awaitingChairperson = this.contract.methods.chairperson().call();
+        const awaitingTitle = this.contract.methods.title().call();
+        const awaitingIsVoted = this.checkIfVoted(this.props.accountAddress);
         const amountOptions = Number(await this.contract.methods.optionsAmount().call());
-        const options = [];
+        const awaitingOptions = [];
         for (let i = 0; i < amountOptions; i++) {
-            options.push(this.props.web3.utils.hexToUtf8(await this.contract.methods.getOptionTitleByIndex(i).call()) as string);
+            awaitingOptions.push(this.contract.methods.getOptionTitleByIndex(i).call());
         }
-        const votesAmount = (await this.contract.methods.votesAmount().call()).toNumber();
+        const awaitingVotesAmount = this.contract.methods.votesAmount().call();
+
+        const jsonRpcData = await Promise.all([awaitingChairperson, awaitingTitle, awaitingIsVoted, awaitingVotesAmount, ...awaitingOptions]);
+
+        const chairperson = jsonRpcData[0] as string;
+        const title = this.props.web3.utils.hexToUtf8(jsonRpcData[1]) as string;
+        const isVoted = jsonRpcData[2];
+        const votesAmount = jsonRpcData[3].toNumber() as number;
+        const options: string[] = [];
+        for (let i = 4; i < amountOptions + 4; i++) {
+            options.push(this.props.web3.utils.hexToUtf8(jsonRpcData[i]) as string);
+        }
+
         this.setState({
             externalData: {
                 chairperson,
