@@ -37,3 +37,7 @@
 .inline-button {
     display: inline-block;
 }
+
+.no-search-result {
+    margin: auto !important;
+}

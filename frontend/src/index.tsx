@@ -12,8 +12,10 @@ import style from "./index.module.css";
 import store from "./store";
 import { IIndexStates } from "./types";
 import { NETWORK_NAME } from "./constants/networkID";
+import { BrowserRouter as Router } from "react-router-dom";
 import ReactGA from "react-ga";
 import MainFooter from "./components/MainFooter";
+import MainSearchBar from "./components/MainSearchBar";
 
 const GOOGLE_ANALYTICS_TRACKING_ID = process.env.REACT_APP_GOOGLE_ANALYTICS_TRACKING_CODE;
 if (GOOGLE_ANALYTICS_TRACKING_ID) {
@@ -61,6 +63,40 @@ class App extends React.Component<{}, IIndexStates> {
         this.userWalletUnlockApproval = this.userWalletUnlockApproval.bind(this);
     }
 
+    async componentDidMount() {
+        if (GOOGLE_ANALYTICS_TRACKING_ID) {
+            ReactGA.pageview("/");
+        }
+
+        if (this.state.web3) {
+            if (typeof NETWORK_ID !== "undefined") {
+                const networkId: string = (await this.state.web3.eth.net.getId() as number).toString();
+                if (NETWORK_ID === networkId) {
+                    this.setState({
+                        networkChecked: true,
+                    });
+                } else {
+                    if (NETWORK_ID in NETWORK_NAME) {
+                        this.networkName = NETWORK_NAME[NETWORK_ID];
+                        this.forceUpdate();
+                    }
+                }
+            } else {
+                this.setState({
+                    networkChecked: true,
+                });
+            }
+
+            if ((await this.state.web3.eth.getAccounts()).length === 0) {
+                await this.userWalletUnlockApproval();
+            } else {
+                this.setState({
+                    approved: true,
+                });
+            }
+        }
+    }
+
     async userWalletUnlockApproval() {
         if (typeof window.ethereum !== "undefined") {
             try {
@@ -102,40 +138,6 @@ class App extends React.Component<{}, IIndexStates> {
             showUserPrivacyModeDeniedMessage: false,
             showUserWalletLockedMessage: false,
         });
-    }
-
-    async componentDidMount() {
-        if (GOOGLE_ANALYTICS_TRACKING_ID) {
-            ReactGA.pageview("/");
-        }
-
-        if (this.state.web3) {
-            if (typeof NETWORK_ID !== "undefined") {
-                const networkId: string = (await this.state.web3.eth.net.getId() as number).toString();
-                if (NETWORK_ID === networkId) {
-                    this.setState({
-                        networkChecked: true,
-                    });
-                } else {
-                    if (NETWORK_ID in NETWORK_NAME) {
-                        this.networkName = NETWORK_NAME[NETWORK_ID];
-                        this.forceUpdate();
-                    }
-                }
-            } else {
-                this.setState({
-                    networkChecked: true,
-                });
-            }
-
-            if ((await this.state.web3.eth.getAccounts()).length === 0) {
-                await this.userWalletUnlockApproval();
-            } else {
-                this.setState({
-                    approved: true,
-                });
-            }
-        }
     }
 
     renderComponent() {
@@ -186,30 +188,33 @@ class App extends React.Component<{}, IIndexStates> {
             }
         } else {
             return (
-                <div className={style["page-container"]}>
-                    <div>
-                        <MainBanner web3={this.state.web3} userWalletUnlockApproval={this.userWalletUnlockApproval} />
-                    </div>
+                <Router>
+                    <div className={style["page-container"]}>
+                        <div>
+                            <MainBanner web3={this.state.web3} userWalletUnlockApproval={this.userWalletUnlockApproval} />
+                        </div>
 
-                    <div className={style["content-wrap"]}>
-                        <div className={style["content-part"]}>
-                            <div className={[commonStyle.border, style["listing-outer"]].join(" ")}>
-                                <div className={style["listing-inner"]}>
-                                    <div className={style["listing-inner-content"]}>
-                                        <MainListingPoll web3={this.state.web3} />
+                        <div className={style["content-wrap"]}>
+                            <div className={style["content-part"]}>
+                                <div className={[commonStyle.border, style["listing-outer"]].join(" ")}>
+                                    <div className={style["listing-inner"]}>
+                                        <div className={style["listing-inner-content"]}>
+                                            <MainListingPoll web3={this.state.web3} />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className={style.profile}>
-                                <Profile web3={this.state.web3} />
+                                <div className={style.infobar}>
+                                    <MainSearchBar />
+                                    <Profile web3={this.state.web3} />
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div className={style.footer}>
-                        <MainFooter />
+                        <div className={style.footer}>
+                            <MainFooter />
+                        </div>
                     </div>
-                </div>
+                </Router>
             );
         }
     }

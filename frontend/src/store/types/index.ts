@@ -10,9 +10,18 @@ export interface IEthMisc {
 export interface IPollMisc {
     active: number | null;
     amount: number | null;
+    monitoring: string[];
+    keywords: string | null;
+    searchResultsAmount: number | null;
+}
+
+export interface IUserMisc {
+    notificationStatus: boolean | null;
+    searchbarEnabled: boolean;
 }
 
 export interface StoreState {
     ethMisc: IEthMisc;
     pollMisc: IPollMisc;
+    userMisc: IUserMisc;
 }

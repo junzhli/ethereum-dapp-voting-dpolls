@@ -1,5 +1,6 @@
 import { ChartData } from "react-chartjs-2";
 import { AddressType, BlockHeightType } from "../../actions/types/eth";
+import { RouteComponentProps } from "react-router-dom";
 
 export namespace IPollDetail {
     export interface IInnerProps {
@@ -20,7 +21,7 @@ export namespace IPollDetail {
     }
 }
 
-export type IPollDetailProps = IPollDetail.IInnerProps & IPollDetail.IStateFromProps;
+export type IPollDetailProps = RouteComponentProps<{}> & IPollDetail.IInnerProps & IPollDetail.IStateFromProps;
 
 export interface IPollDetailStates {
     waitingMessage: {
@@ -44,4 +45,5 @@ export interface IPollDetailStates {
     chart: {
         option: ChartData<Chart.ChartData>;
     } | null;
+    opened: boolean;
 }

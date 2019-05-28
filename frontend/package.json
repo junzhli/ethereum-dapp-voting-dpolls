@@ -11,6 +11,7 @@
     "@types/react": "16.8.14",
     "@types/react-dom": "16.8.4",
     "@types/react-redux": "^7.0.8",
+    "@types/react-router-dom": "^4.3.3",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "9.0.0",
     "babel-jest": "23.6.0",
@@ -32,6 +33,7 @@
     "eslint-plugin-react": "7.12.4",
     "file-loader": "2.0.0",
     "fs-extra": "7.0.1",
+    "fuse.js": "^3.4.4",
     "html-webpack-plugin": "4.0.0-alpha.2",
     "identity-obj-proxy": "3.0.0",
     "jest": "23.6.0",
@@ -52,6 +54,7 @@
     "react-dom": "^16.8.6",
     "react-ga": "^2.5.7",
     "react-redux": "^7.0.2",
+    "react-router-dom": "^5.0.0",
     "redux": "^4.0.1",
     "resolve": "1.10.0",
     "sass-loader": "7.1.0",
@@ -122,8 +125,8 @@
       "node"
     ],
     "watchPlugins": [
-      "/home/jeremy_li/HTCProjects/Exodus/ethereum-dapps-final-project/fronend/node_modules/jest-watch-typeahead/filename.js",
-      "/home/jeremy_li/HTCProjects/Exodus/ethereum-dapps-final-project/fronend/node_modules/jest-watch-typeahead/testname.js"
+      "jest-watch-typeahead/filename.js",
+      "jest-watch-typeahead/testname.js"
     ]
   },
   "babel": {

@@ -1,4 +1,4 @@
-import { BlockHeightType } from "../../actions/types/eth";
+import { BlockHeightType, AddressType } from "../../actions/types/eth";
 
 export namespace IMainListingPoll {
     export interface IInnerProps {
@@ -7,10 +7,16 @@ export namespace IMainListingPoll {
 
     export interface IStateFromProps {
         blockHeight: BlockHeightType;
+        monitoring: AddressType[];
+        notificationStatus: boolean | null;
+        userSearchKeywords: string | null;
     }
 
     export interface IPropsFromDispatch {
         setPollStatistics: (amount: number, active: number) => void;
+        removeMonitoringPolls: (addresses: AddressType[]) => void;
+        setSearchResultsAmount: (amount: number | null) => void;
+        setSearchBar: (enabled: boolean) => void;
     }
 }
 
@@ -26,6 +32,13 @@ export interface IMainListingPollState {
     amountPolls: number | null;
     inactivePolls: PollInitialMetadata[] | null;
     activePolls: PollInitialMetadata[] | null;
+    filteredPolls: AddressType[] | null;
     inactiveCollapse: boolean;
     activeCollapse: boolean;
+}
+
+export interface AdditionalData {
+    contractAddress: AddressType;
+    chairperson: AddressType;
+    title: string;
 }

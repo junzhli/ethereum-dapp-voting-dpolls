@@ -49,9 +49,8 @@
 }
 
 .ended {
-    position: absolute;
-    left: 70px;
-    top: 90px;
+    position: relative;
+    top: -55%;
 }
 
 .voted-hint {

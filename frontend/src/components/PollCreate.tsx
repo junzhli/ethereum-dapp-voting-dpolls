@@ -2,7 +2,7 @@ import React, { Dispatch } from "react";
 import { connect } from "react-redux";
 import { Button, Form, Icon, Label, Menu, Message, Modal, ModalProps } from "semantic-ui-react";
 import { setMembership } from "../actions/eth";
-import { ETHActionType } from "../actions/types/eth";
+import { ETHActionType, AddressType } from "../actions/types/eth";
 import { VOTING_CORE_ABI } from "../constants/contractABIs";
 import { StoreState } from "../store/types";
 import { Membership } from "../types";
@@ -11,20 +11,24 @@ import MembershipUpgradePromotion from "./MembershipUpgradePromotion";
 import style from "./PollCreate.module.css";
 import { IPollCreate, IPollCreateProps, IPollCreateStates } from "./types/PollCreate";
 import { getEtherscanTxURL } from "../utils/etherscan";
+import { withRouter } from "react-router-dom";
+import Routes from "../constants/routes";
+import { addMonitoringPoll } from "../actions/poll";
+import { PollActionType } from "../actions/types/poll";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS as string;
 
 class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
     private contract: any;
-    private checkConfirmedInterval: any;
+    private checkConfirmedIntervals: any[];
     private setTimeoutHolder: any;
     private initialState: IPollCreateStates;
     private formOnSubmitHandler: any;
     constructor(props: IPollCreateProps) {
         super(props);
         this.contract = new this.props.web3.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
-        this.checkConfirmedInterval = null;
+        this.checkConfirmedIntervals = [];
         this.setTimeoutHolder = null;
         this.initialState = {
             waitingMessage: {
@@ -47,7 +51,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             inputHints: {
                 blockHeight: false,
             },
-            opened: false,
+            opened: (this.props.location.pathname === Routes.CREATE) ? true : false,
         };
         this.state = Object.assign({}, this.initialState);
         this.formOnSubmitHandler = this.createPoll.bind(this);
@@ -66,15 +70,25 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
     }
 
     async componentWillReceiveProps(nextProps: IPollCreateProps) {
+        if (nextProps.location.pathname !== this.props.location.pathname) {
+            if (nextProps.location.pathname === Routes.CREATE) {
+                this.setState({
+                    opened: true,
+                });
+            } else {
+                this.setState({
+                    opened: false,
+                });
+            }
+        }
+
         if (nextProps.membership) {
             await this.refreshQuota(nextProps.membership);
         }
     }
 
     componentWillUnmount() {
-        if (this.checkConfirmedInterval) {
-            clearInterval(this.checkConfirmedInterval);
-        }
+        this.checkConfirmedIntervals.forEach((interval) => clearInterval(interval));
 
         if (this.setTimeoutHolder) {
             clearTimeout(this.setTimeoutHolder);
@@ -86,6 +100,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             this.setState({
                 opened: true,
             });
+            this.props.history.push(Routes.CREATE);
         }
     }
 
@@ -94,6 +109,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             this.setState({
                 opened: false,
             });
+            this.props.history.push(Routes.ROOT);
         }
     }
 
@@ -275,11 +291,24 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             });
 
             const lastBlockNumber = this.props.blockHeight;
-            this.checkConfirmedInterval = setInterval(async () => {
+            const checkConfirmedInterval = setInterval(async () => {
                 try {
                     const blockNumber = await this.props.web3.eth.getBlockNumber();
                     const receipt = await this.props.web3.eth.getTransactionReceipt(txid);
                     if (receipt && (lastBlockNumber !== blockNumber)) {
+                        if (this.props.notificationStatus === true) {
+                            const logAbi = [{
+                                type: "address",
+                                name: "_voting",
+                            }];
+                            const logData = receipt.logs[0].data;
+                            const logTopics = receipt.logs[0].topics;
+
+                            const decodedLog = this.props.web3.eth.abi.decodeLog(logAbi, logData, logTopics);
+                            const newVotingAddress = decodedLog._voting;
+                            this.props.addMonitoringPolls([newVotingAddress]);
+                        }
+
                         this.setState({
                             waitingMessage: {
                                 show: false,
@@ -298,7 +327,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                                 ),
                             },
                         });
-                        clearInterval(this.checkConfirmedInterval);
+                        clearInterval(checkConfirmedInterval);
                         this.setTimeoutHolder = setTimeout(async () => {
                             const membership = (await this.contract.methods.getMembership(this.props.accountAddress).call()).toNumber();
                             this.props.setMembership(membership);
@@ -317,6 +346,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     console.log("checkConfirmedInterval error occurred: " + error);
                 }
             }, 1000);
+            this.checkConfirmedIntervals.push(checkConfirmedInterval);
         } catch (error) {
             this.setState({
                 waitingMessage: {
@@ -474,16 +504,18 @@ const mapStateToProps = (state: StoreState, ownProps: IPollCreate.IInnerProps): 
         accountAddress: state.ethMisc.accountAddress,
         blockHeight: state.ethMisc.blockHeight,
         membership: state.ethMisc.membership,
+        notificationStatus: state.userMisc.notificationStatus,
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<ETHActionType>, ownProps: IPollCreate.IInnerProps): IPollCreate.IPropsFromDispatch => {
+const mapDispatchToProps = (dispatch: Dispatch<ETHActionType | PollActionType>, ownProps: IPollCreate.IInnerProps): IPollCreate.IPropsFromDispatch => {
     return {
         setMembership: (nextMembership: Membership) => dispatch(setMembership(nextMembership)),
+        addMonitoringPolls: (polls: AddressType[]) => dispatch(addMonitoringPoll(polls)),
     };
 };
 
-export default connect(
+export default withRouter(connect(
     mapStateToProps,
     mapDispatchToProps,
-)(PollCreate);
+)(PollCreate));

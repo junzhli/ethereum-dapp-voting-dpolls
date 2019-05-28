@@ -1,5 +1,6 @@
 import { AddressType, BlockHeightType } from "../../actions/types/eth";
 import { Membership } from "../../types";
+import { RouteComponentProps } from "react-router-dom";
 
 export namespace IPollCreate {
     export interface IInnerProps {
@@ -10,14 +11,16 @@ export namespace IPollCreate {
         accountAddress: AddressType | null;
         blockHeight: BlockHeightType;
         membership: Membership | null;
+        notificationStatus: boolean | null;
     }
 
     export interface IPropsFromDispatch {
         setMembership: (nextMembership: Membership) => void;
+        addMonitoringPolls: (polls: AddressType[]) => void;
     }
 }
 
-export type IPollCreateProps = IPollCreate.IInnerProps & IPollCreate.IStateFromProps & IPollCreate.IPropsFromDispatch;
+export type IPollCreateProps = RouteComponentProps<{}> & IPollCreate.IInnerProps & IPollCreate.IStateFromProps & IPollCreate.IPropsFromDispatch;
 
 export interface IPollCreateStates {
     waitingMessage: {

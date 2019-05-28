@@ -1,22 +1,26 @@
 import React, { SyntheticEvent } from "react";
 import { ChartData, Pie } from "react-chartjs-2";
 import { connect } from "react-redux";
-import { Button, Checkbox, Form, Header, Icon, Message, Modal, ButtonProps } from "semantic-ui-react";
+import { Button, Checkbox, Form, Header, Icon, Message, Modal, ButtonProps, ModalProps } from "semantic-ui-react";
 import { VOTING_ABI } from "../constants/contractABIs";
 import { StoreState } from "../store/types";
 import { sendTransaction } from "../utils/web3";
 import style from "./PollDetail.module.css";
 import { IPollDetail, IPollDetailProps, IPollDetailStates } from "./types/PollDetail";
 import { getEtherscanTxURL } from "../utils/etherscan";
+import Routes from "../constants/routes";
+import { withRouter } from "react-router-dom";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
     private checkConfirmedInterval: any;
     private setTimeoutHolder: any;
     private contract: any;
+    private path: string;
 
     constructor(props: IPollDetailProps) {
         super(props);
+        this.path = Routes.POLLS_BASE + this.props.address;
         this.contract = new this.props.web3.eth.Contract(VOTING_ABI, this.props.address);
         this.checkConfirmedInterval = null;
         this.setTimeoutHolder = null;
@@ -40,13 +44,28 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             votedOption: null,
             chart: null,
             votesByIndex: null,
+            opened: (this.props.location.pathname === this.path) ? true : false,
         };
         this.handleOptionVoted = this.handleOptionVoted.bind(this);
         this.voteOnSubmitHandler = this.voteOnSubmitHandler.bind(this);
+        this.onOpenHandler = this.onOpenHandler.bind(this);
+        this.onCloseHandler = this.onCloseHandler.bind(this);
     }
 
     async componentWillReceiveProps(nextProps: IPollDetailProps) {
         if (this.props !== nextProps) {
+            if (nextProps.location.pathname !== this.props.location.pathname) {
+                if (nextProps.location.pathname === this.path) {
+                    this.setState({
+                        opened: true,
+                    });
+                } else {
+                    this.setState({
+                        opened: false,
+                    });
+                }
+            }
+
             if (nextProps.isVoted) {
                 try {
                     const selectedIndex = (await this.contract.methods.getMyOption(nextProps.accountAddress).call()).toNumber();
@@ -124,6 +143,24 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                     },
                 });
             }
+        }
+    }
+
+    onOpenHandler(event: React.MouseEvent<HTMLElement, MouseEvent>, data: ModalProps) {
+        if (data.open === false) {
+            this.setState({
+                opened: true,
+            });
+            this.props.history.push(this.path);
+        }
+    }
+
+    onCloseHandler(event: React.MouseEvent<HTMLElement, MouseEvent>, data: ModalProps) {
+        if (data.open === true) {
+            this.setState({
+                opened: false,
+            });
+            this.props.history.push(Routes.ROOT);
         }
     }
 
@@ -288,7 +325,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
         };
     }
 
-    render() {
+    renderComponent() {
         return (
             <div className={
                 (this.props.isVoted) ? [style["align-right"], style["show-voted-hint"]].join(" ") : style["align-right"]
@@ -307,6 +344,9 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                     }
                     closeIcon={true}
                     closeOnDimmerClick={false}
+                    open={this.state.opened}
+                    onOpen={this.onOpenHandler}
+                    onClose={this.onCloseHandler}
                 >
                     <Modal.Header>
                         {this.props.title}
@@ -411,6 +451,10 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             </div>
         );
     }
+
+    render() {
+        return this.renderComponent();
+    }
 }
 
 const mapStateToProps = (state: StoreState, ownProps: IPollDetail.IInnerProps): IPollDetail.IStateFromProps => {
@@ -420,7 +464,7 @@ const mapStateToProps = (state: StoreState, ownProps: IPollDetail.IInnerProps): 
     };
 };
 
-export default connect(
+export default withRouter(connect(
     mapStateToProps,
     null,
-)(PollDetail);
+)(PollDetail));
