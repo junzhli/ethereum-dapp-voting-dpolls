@@ -66,6 +66,20 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                 }
             }
 
+            if ((this.props.votesAmount !== nextProps.votesAmount) && nextProps.votesAmount !== 0) {
+                const votesByIndex = await this.fetchVotesByIndex();
+                this.setState({
+                    votesByIndex,
+                });
+
+                const chartOptions = this.fetchChartOption();
+                this.setState({
+                    chart: {
+                        option: chartOptions,
+                    },
+                });
+            }
+
             if (nextProps.isVoted) {
                 try {
                     const selectedIndex = (await this.contract.methods.getMyOption(nextProps.accountAddress).call()).toNumber();
@@ -125,24 +139,6 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
 
         if (this.setTimeoutHolder) {
             clearTimeout(this.setTimeoutHolder);
-        }
-    }
-
-    async componentDidUpdate(prevProps: IPollDetailProps) {
-        if (this.props !== prevProps) {
-            const votesByIndex = await this.fetchVotesByIndex();
-            this.setState({
-                votesByIndex,
-            });
-
-            if (this.props.votesAmount !== 0) {
-                const chartOptions = this.fetchChartOption();
-                this.setState({
-                    chart: {
-                        option: chartOptions,
-                    },
-                });
-            }
         }
     }
 
@@ -411,7 +407,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                                         {
                                             this.state.votingMessage.selectedOption && (
                                                 <Form.Field>
-                                                    {this.props.isVoted ? ("You haved voted for") : ("You are voting for")} <b>{this.state.votingMessage.selectedOption}</b>
+                                                    {this.props.isVoted ? ("You have voted for") : ("You are voting for")} <b>{this.state.votingMessage.selectedOption}</b>
                                                 </Form.Field>
                                             )
                                         }

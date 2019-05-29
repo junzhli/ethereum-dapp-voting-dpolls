@@ -1,6 +1,6 @@
 import React, { Dispatch } from "react";
 import { connect } from "react-redux";
-import { Button, Form, Icon, Label, Menu, Message, Modal, ModalProps } from "semantic-ui-react";
+import { Button, Form, Icon, Label, Menu, Message, Modal, ModalProps, Input, Header, Ref } from "semantic-ui-react";
 import { setMembership } from "../actions/eth";
 import { ETHActionType, AddressType } from "../actions/types/eth";
 import { VOTING_CORE_ABI } from "../constants/contractABIs";
@@ -56,11 +56,11 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         this.state = Object.assign({}, this.initialState);
         this.formOnSubmitHandler = this.createPoll.bind(this);
         this.blockHeightCheckHandler = this.blockHeightCheckHandler.bind(this);
-        this.addOption = this.addOption.bind(this);
         this.blockHeightFocusOutHandler = this.blockHeightFocusOutHandler.bind(this);
         this.blockHeightFocusInHandler = this.blockHeightFocusInHandler.bind(this);
         this.onOpenHandler = this.onOpenHandler.bind(this);
         this.onCloseHandler = this.onCloseHandler.bind(this);
+        this.onLastOptionInputHandler = this.onLastOptionInputHandler.bind(this);
     }
 
     async componentDidMount() {
@@ -93,6 +93,12 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         if (this.setTimeoutHolder) {
             clearTimeout(this.setTimeoutHolder);
         }
+    }
+
+    onLastOptionInputHandler(event: React.FocusEvent<HTMLInputElement>) {
+        this.setState({
+            optionsAmount: this.state.optionsAmount + 1,
+        });
     }
 
     onOpenHandler(event: React.MouseEvent<HTMLElement, MouseEvent>, data: ModalProps) {
@@ -182,12 +188,6 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         }
     }
 
-    addOption() {
-        this.setState({
-            optionsAmount: this.state.optionsAmount + 1,
-        });
-    }
-
     async createPoll(event: React.FormEvent) {
         this.setState({
             waitingMessage: {
@@ -218,15 +218,14 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
 
         let duplicate: boolean = false;
         const optionsText: string[] = [];
-        const options = Array.from(Array(this.state.optionsAmount), (entity, index) => {
-                const option = (this.refs["option" + index] as any as HTMLInputElement).value;
+        let options = Array.from(Array(this.state.optionsAmount), (entity, index) => {
+                const option = (this.refs["option" + index] as any).inputRef.current.value;
                 if (option === "") {
-                    errors.push("Option " + index + " is empty");
                     return null;
                 }
 
                 if (option.length > 20) {
-                    errors.push("Option" + index + " exceeds 20 chars");
+                    errors.push("Option" + (index + 1) + " exceeds 20 chars");
                     return null;
                 }
 
@@ -234,15 +233,20 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     if (duplicate) {
                         return null;
                     }
-
                     duplicate = true;
                     errors.push("Duplicate options");
                 }
 
                 const hex = this.props.web3.utils.padRight(this.props.web3.utils.utf8ToHex(option), 64);
+                optionsText.push(option);
 
                 return hex;
         });
+
+        options = options.filter((option) => option !== null); // de-null
+        if (options.length < 2) {
+            errors.push("At least two options should exist");
+        }
 
         if (errors.length > 0) {
             return this.setState({
@@ -431,7 +435,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                         <input onFocus={this.blockHeightFocusInHandler} onBlur={this.blockHeightFocusOutHandler} onKeyPress={this.blockHeightCheckHandler} placeholder="When will the poll expire?" ref="block" />
                         {
                             (this.state.inputHints.blockHeight) && (
-                                <Label basic={true} color="teal" pointing={true}>
+                                <Label size="large" basic={true} color="teal" pointing={true}>
                                     Specify block number with more than {this.props.blockHeight + 1}
                                 </Label>
                             )
@@ -448,22 +452,17 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                         <label>Options</label>
                         <div className={style["options-wrapper"]}>
                             <div className={style["option-outer"]}>
-                                <input placeholder="Option 0" ref="option0" />
                                 {
                                     Array.from(Array(this.state.optionsAmount), (entity, index) => {
-                                        if (index !== 0) {
-                                            return (
-                                                <div key={index} className={style["option-divider"]}>
-                                                    <input placeholder={"Option " + index} ref={"option" + index} />
-                                                </div>
-                                            );
-                                        }
+                                        return (
+                                            <div key={index} className={style["option-divider"]}>
+                                                {/* <Ref innerRef={}> */}
+                                                <Input icon={<Header textAlign="center" className={style["form-option-id"]}>{(index + 1) + "."}</Header>} iconPosition="left" onFocus={(index === this.state.optionsAmount - 1) ? this.onLastOptionInputHandler : undefined} placeholder={"Enter an option"} ref={"option" + index} />
+                                                {/* </Ref> */}
+                                            </div>
+                                        );
                                     })
                                 }
-                            </div>
-
-                            <div className={style["button-outer"]}>
-                                <Button circular={true} icon="plus" onClick={this.addOption} type="button" />
                             </div>
                         </div>
 
