@@ -216,6 +216,8 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             errors.push("Block number is behind the latest block");
         }
 
+        let duplicate: boolean = false;
+        const optionsText: string[] = [];
         const options = Array.from(Array(this.state.optionsAmount), (entity, index) => {
                 const option = (this.refs["option" + index] as any as HTMLInputElement).value;
                 if (option === "") {
@@ -227,6 +229,16 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     errors.push("Option" + index + " exceeds 20 chars");
                     return null;
                 }
+
+                if (optionsText.includes(option)) {
+                    if (duplicate) {
+                        return null;
+                    }
+
+                    duplicate = true;
+                    errors.push("Duplicate options");
+                }
+
                 const hex = this.props.web3.utils.padRight(this.props.web3.utils.utf8ToHex(option), 64);
 
                 return hex;
