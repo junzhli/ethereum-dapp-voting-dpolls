@@ -128,7 +128,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
 
             this.props.setPollStatistics(amountPolls, activePolls.length);
 
-            if (this.props.notificationStatus === true) {
+            if (!this.props.userWindowFocus && this.props.notificationStatus === true) {
                 const notifiedVotings: AddressType[] = [];
                 polls.forEach((poll) => {
                     if (this.props.monitoring.includes(poll.address)) {
@@ -443,6 +443,7 @@ const mapStateToProps = (state: StoreState, ownProps: IMainListingPoll.IInnerPro
         monitoring: state.pollMisc.monitoring,
         notificationStatus: state.userMisc.notificationStatus,
         userSearchKeywords: state.pollMisc.keywords,
+        userWindowFocus: state.userMisc.userWindowsFocus,
     };
 };
 

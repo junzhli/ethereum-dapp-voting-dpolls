@@ -12,6 +12,7 @@ export namespace IMembershipUpgrade {
         blockHeight: BlockHeightType;
         membership: Membership | null;
         notificationStatus: boolean | null;
+        userWindowFocus: boolean;
     }
 
     export interface IPropsFromDispatch {

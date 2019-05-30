@@ -15,6 +15,8 @@ import { withRouter } from "react-router-dom";
 import Routes from "../constants/routes";
 import { addMonitoringPoll } from "../actions/poll";
 import { PollActionType } from "../actions/types/poll";
+import { toast } from "react-toastify";
+import toastConfig from "../commons/tostConfig";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS as string;
@@ -61,6 +63,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         this.onOpenHandler = this.onOpenHandler.bind(this);
         this.onCloseHandler = this.onCloseHandler.bind(this);
         this.onLastOptionInputHandler = this.onLastOptionInputHandler.bind(this);
+        toast.configure(toastConfig);
     }
 
     async componentDidMount() {
@@ -322,6 +325,8 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                             const decodedLog = this.props.web3.eth.abi.decodeLog(logAbi, logData, logTopics);
                             const newVotingAddress = decodedLog._voting;
                             this.props.addMonitoringPolls([newVotingAddress]);
+                        } else {
+                            toast("Poll successfully created");
                         }
 
                         this.setState({

@@ -19,6 +19,7 @@ export namespace IMainBanner {
         setAccountAddress: (accountAddress: AddressType) => void;
         setMembership: (nextMembership: Membership) => void;
         setNotificationStatus: (status: boolean) => void;
+        setUserWindowsFocus: (focus: boolean) => void;
     }
 }
 

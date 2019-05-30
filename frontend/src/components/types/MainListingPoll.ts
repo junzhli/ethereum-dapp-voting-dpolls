@@ -11,6 +11,7 @@ export namespace IMainListingPoll {
         monitoring: AddressType[];
         notificationStatus: boolean | null;
         userSearchKeywords: string | null;
+        userWindowFocus: boolean;
     }
 
     export interface IPropsFromDispatch {

@@ -13,6 +13,8 @@ import { getEtherscanTxURL } from "../utils/etherscan";
 import { withRouter } from "react-router-dom";
 import Routes from "../constants/routes";
 import { NOTIFICATION_TITLE } from "../constants/project";
+import { toast } from "react-toastify";
+import toastConfig from "../commons/tostConfig";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
@@ -42,6 +44,7 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
         this.upgradeButtonOnClick = this.upgradeHandler.bind(this);
         this.onOpenHandler = this.onOpenHandler.bind(this);
         this.onCloseHandler = this.onCloseHandler.bind(this);
+        toast.configure(toastConfig);
     }
 
     async componentWillReceiveProps(nextProps: IMembershipUpgradeProps) {
@@ -175,10 +178,13 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
 
                         this.props.setMembership(membership);
 
-                        if (this.props.notificationStatus === true) {
+                        const notificationText = "You are upgraded to paid membership!";
+                        if (!this.props.userWindowFocus && this.props.notificationStatus === true) {
                             const notification = new Notification(NOTIFICATION_TITLE, {
-                                body: "You are upgraded to paid membership!",
+                                body: notificationText,
                             });
+                        } else {
+                            toast(notificationText);
                         }
 
                         clearInterval(this.checkConfirmedInterval);
@@ -339,6 +345,7 @@ const mapStateToProps = (state: StoreState, ownProps: IMembershipUpgrade.IInnerP
         blockHeight: state.ethMisc.blockHeight,
         membership: state.ethMisc.membership,
         notificationStatus: state.userMisc.notificationStatus,
+        userWindowFocus: state.userMisc.userWindowsFocus,
     };
 };
 

@@ -1,10 +1,11 @@
-import { SET_NOTIFICATION_STATUS, SET_SEARCH_BAR } from "../actions/constant";
+import { SET_NOTIFICATION_STATUS, SET_SEARCH_BAR, SET_USER_WINDOW_FOCUS_STATUS } from "../actions/constant";
 import { IUserMisc } from "../store/types";
 import { UserActionType } from "../actions/types/user";
 
 const initialState: IUserMisc = {
     notificationStatus: null,
     searchbarEnabled: false,
+    userWindowsFocus: true,
 };
 
 const user = (state: IUserMisc = initialState, action: UserActionType): IUserMisc => {
@@ -21,6 +22,13 @@ const user = (state: IUserMisc = initialState, action: UserActionType): IUserMis
             return {
                 ...state,
                 searchbarEnabled,
+            };
+        }
+        case SET_USER_WINDOW_FOCUS_STATUS: {
+            const userWindowsFocus = action.payload;
+            return {
+                ...state,
+                userWindowsFocus,
             };
         }
     }

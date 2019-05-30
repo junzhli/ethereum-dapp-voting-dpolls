@@ -26,6 +26,8 @@
  * User runtime configurations
  */
 
+ export const SET_USER_WINDOW_FOCUS_STATUS = "SET-USER-WINDOW-FOCUS-STATUS";
+
  export const SET_NOTIFICATION_STATUS = "SET-NOTIFICATION-STATUS";
 
  export const SET_SEARCH_BAR = "SET-SEARCH-BAR";

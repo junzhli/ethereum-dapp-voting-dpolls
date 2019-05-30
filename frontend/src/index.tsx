@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import "semantic-ui-css/semantic.min.css";
+import "react-toastify/dist/ReactToastify.css";
 import { Dimmer, Loader } from "semantic-ui-react";
 import Web3 from "web3";
 import commonStyle from "./commons/styles/index.module.css";
