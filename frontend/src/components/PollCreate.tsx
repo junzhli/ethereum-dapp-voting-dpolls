@@ -306,12 +306,11 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                 },
             });
 
-            const lastBlockNumber = this.props.blockHeight;
             const checkConfirmedInterval = setInterval(async () => {
                 try {
                     const blockNumber = await this.props.web3.eth.getBlockNumber();
                     const receipt = await this.props.web3.eth.getTransactionReceipt(txid);
-                    if (receipt && (lastBlockNumber !== blockNumber)) {
+                    if (receipt && (receipt.blockNumber === blockNumber)) {
                         if (this.props.notificationStatus === true) {
                             const logAbi = [{
                                 type: "address",
@@ -344,6 +343,10 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                             },
                         });
                         clearInterval(checkConfirmedInterval);
+
+                        if (this.setTimeoutHolder) {
+                            clearTimeout(this.setTimeoutHolder);
+                        }
                         this.setTimeoutHolder = setTimeout(async () => {
                             const membership = (await this.contract.methods.getMembership(this.props.accountAddress).call()).toNumber();
                             this.props.setMembership(membership);
@@ -377,6 +380,9 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                 },
             });
 
+            if (this.setTimeoutHolder) {
+                clearTimeout(this.setTimeoutHolder);
+            }
             this.setTimeoutHolder = setTimeout(() => {
                 this.setState({
                     errorMessage: {

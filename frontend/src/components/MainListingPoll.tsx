@@ -13,6 +13,7 @@ import { NOTIFICATION_TITLE } from "../constants/project";
 import Fuse from "fuse.js";
 import { setSearchBar } from "../actions/user";
 import { UserActionType } from "../actions/types/user";
+import { withRouter } from "react-router-dom";
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 
@@ -133,6 +134,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                     if (this.props.monitoring.includes(poll.address)) {
                         notifiedVotings.push(poll.address);
 
+                        this.props.history.replace("/");
                         const notification = new Notification(NOTIFICATION_TITLE, {
                             body: "Your poll have just been published!",
                         });
@@ -453,7 +455,7 @@ const mapDispatchToProps = (dispatch: Dispatch<PollActionType | UserActionType>,
     };
 };
 
-export default connect(
+export default withRouter(connect(
     mapStateToProps,
     mapDispatchToProps,
-)(MainListingPoll);
+)(MainListingPoll));

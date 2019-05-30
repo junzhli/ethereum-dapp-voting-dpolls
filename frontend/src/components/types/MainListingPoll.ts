@@ -1,4 +1,5 @@
 import { BlockHeightType, AddressType } from "../../actions/types/eth";
+import { RouteComponentProps } from "react-router-dom";
 
 export namespace IMainListingPoll {
     export interface IInnerProps {
@@ -20,7 +21,7 @@ export namespace IMainListingPoll {
     }
 }
 
-export type IMainListingPollProps = IMainListingPoll.IInnerProps & IMainListingPoll.IStateFromProps & IMainListingPoll.IPropsFromDispatch;
+export type IMainListingPollProps = RouteComponentProps<{}> & IMainListingPoll.IInnerProps & IMainListingPoll.IStateFromProps & IMainListingPoll.IPropsFromDispatch;
 
 export interface PollInitialMetadata {
     address: string;

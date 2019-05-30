@@ -216,11 +216,17 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             });
 
             const lastBlockNumber = this.props.blockHeight;
+
+            if (this.checkConfirmedInterval) {
+                clearInterval(this.checkConfirmedInterval);
+            }
             this.checkConfirmedInterval = setInterval(async () => {
                 try {
                     const blockNumber = await this.props.web3.eth.getBlockNumber();
                     const receipt = await this.props.web3.eth.getTransactionReceipt(txid);
-                    if (receipt && (lastBlockNumber !== blockNumber)) {
+                    console.log(receipt);
+                    console.log(blockNumber);
+                    if (receipt && (receipt.blockNumber === blockNumber)) {
                         const chartOptions = await this.fetchChartOption();
                         this.setState({
                             waitingMessage: {
@@ -244,6 +250,9 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                             },
                         });
                         clearInterval(this.checkConfirmedInterval);
+                        if (this.setTimeoutHolder) {
+                            clearTimeout(this.setTimeoutHolder);
+                        }
                         this.setTimeoutHolder = setTimeout(() => {
                             this.setState({
                                 successfulMessage: {
@@ -271,6 +280,9 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                 },
             });
 
+            if (this.setTimeoutHolder) {
+                clearTimeout(this.setTimeoutHolder);
+            }
             this.setTimeoutHolder = setTimeout(() => {
                 this.setState({
                     errorMessage: {

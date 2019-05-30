@@ -146,12 +146,14 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                 },
             });
 
-            const lastBlockNumber = this.props.blockHeight;
+            if (this.checkConfirmedInterval) {
+                clearInterval(this.checkConfirmedInterval);
+            }
             this.checkConfirmedInterval = setInterval(async () => {
                 try {
                     const blockNumber = await this.props.web3.eth.getBlockNumber();
                     const receipt = await this.props.web3.eth.getTransactionReceipt(txid);
-                    if (receipt && (lastBlockNumber !== blockNumber)) {
+                    if (receipt && (receipt.blockNumber === blockNumber)) {
                         this.setState({
                             waitingMessage: {
                                 show: false,
@@ -207,6 +209,9 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                 },
             });
 
+            if (this.setTimeoutHolder) {
+                clearTimeout(this.setTimeoutHolder);
+            }
             this.setTimeoutHolder = setTimeout(() => {
                 this.setState({
                     errorMessage: {
