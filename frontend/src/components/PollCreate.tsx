@@ -424,7 +424,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                 <Form className={style["form-ui"]} size="large" onSubmit={this.formOnSubmitHandler}>
                     <Form.Field>
                         <label>Title</label>
-                        <input placeholder="Enter a poll question" ref="title" />
+                        <input disabled={this.state.inProgress} placeholder="Enter a poll question" ref="title" />
                     </Form.Field>
                     <Form.Field>
                         <label>Host</label>
@@ -432,7 +432,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     </Form.Field>
                     <Form.Field>
                         <label>Expiry Block Height</label>
-                        <input onFocus={this.blockHeightFocusInHandler} onBlur={this.blockHeightFocusOutHandler} onKeyPress={this.blockHeightCheckHandler} placeholder="When will the poll expire?" ref="block" />
+                        <input disabled={this.state.inProgress} onFocus={this.blockHeightFocusInHandler} onBlur={this.blockHeightFocusOutHandler} onKeyPress={this.blockHeightCheckHandler} placeholder="When will the poll expire?" ref="block" />
                         {
                             (this.state.inputHints.blockHeight) && (
                                 <Label size="large" basic={true} color="teal" pointing={true}>
@@ -456,9 +456,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                                     Array.from(Array(this.state.optionsAmount), (entity, index) => {
                                         return (
                                             <div key={index} className={style["option-divider"]}>
-                                                {/* <Ref innerRef={}> */}
-                                                <Input icon={<Header textAlign="center" className={style["form-option-id"]}>{(index + 1) + "."}</Header>} iconPosition="left" onFocus={(index === this.state.optionsAmount - 1) ? this.onLastOptionInputHandler : undefined} placeholder={"Enter an option"} ref={"option" + index} />
-                                                {/* </Ref> */}
+                                                <Input disabled={this.state.inProgress} icon={<Header textAlign="center" className={style["form-option-id"]}>{(index + 1) + "."}</Header>} iconPosition="left" onFocus={(index === this.state.optionsAmount - 1) ? this.onLastOptionInputHandler : undefined} placeholder={"Enter an option"} ref={"option" + index} />
                                             </div>
                                         );
                                     })
