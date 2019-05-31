@@ -1,5 +1,5 @@
 # dPolls - Decentralized voting system
-[![Netlify Status](https://api.netlify.com/api/v1/badges/34104410-f4a4-48a3-8603-876aeef24cbf/deploy-status)](https://app.netlify.com/sites/dpolls/deploys)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Netlify Status](https://api.netlify.com/api/v1/badges/34104410-f4a4-48a3-8603-876aeef24cbf/deploy-status)](https://app.netlify.com/sites/dpolls/deploys)
 
 A decentralized voting system proposed in NTU DApp course - [https://dpolls.netlify.com](https://dpolls.netlify.com)
 
@@ -82,3 +82,6 @@ $ cd build
 ```
 
 Place files inside folder ```build``` in static web server (e.g. **Nginx**)
+
+## Donation
+[Buy me a coffee](https://www.buymeacoffee.com/XSNsIxjm2)
