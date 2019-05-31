@@ -37,7 +37,7 @@ class MainSearchBar extends React.Component<IMainSearchBarProps, IMainSearchBarS
                     <Header size="tiny" color="red">({this.props.searchResultsAmount} matches found)</Header>
                 </div>
                 <Ref innerRef={this.searchBar}>
-                    <Input disabled={!this.props.searchBarEnabled} onChange={this.userInputOnChange} fluid={true} size="large" icon={(this.props.userSearchKeywords === null) ? "search" : <Icon name="times" link={true} onClick={this.clearSearchHandler} />} placeholder="Search polls..." />
+                    <Input disabled={!this.props.searchBarEnabled} onChange={this.userInputOnChange} fluid={true} size="large" icon={(this.props.userSearchKeywords === null) ? "search" : <Icon name="times" link={true} onClick={this.clearSearchHandler} />} placeholder={this.props.searchBarEnabled ? "Search polls" : "Search polls (still loading...)"} />
                 </Ref>
             </div>
         );

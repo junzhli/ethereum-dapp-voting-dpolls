@@ -44,4 +44,5 @@ export interface IPollCreateStates {
         blockHeight: boolean,
     };
     opened: boolean;
+    inProgress: boolean;
 }

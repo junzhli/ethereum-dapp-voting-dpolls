@@ -15,8 +15,6 @@ import { withRouter } from "react-router-dom";
 import Routes from "../constants/routes";
 import { addMonitoringPoll } from "../actions/poll";
 import { PollActionType } from "../actions/types/poll";
-import { toast } from "react-toastify";
-import toastConfig from "../commons/tostConfig";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS as string;
@@ -54,6 +52,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                 blockHeight: false,
             },
             opened: (this.props.location.pathname === Routes.CREATE) ? true : false,
+            inProgress: false,
         };
         this.state = Object.assign({}, this.initialState);
         this.formOnSubmitHandler = this.createPoll.bind(this);
@@ -63,7 +62,6 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         this.onOpenHandler = this.onOpenHandler.bind(this);
         this.onCloseHandler = this.onCloseHandler.bind(this);
         this.onLastOptionInputHandler = this.onLastOptionInputHandler.bind(this);
-        toast.configure(toastConfig);
     }
 
     async componentDidMount() {
@@ -201,6 +199,11 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                 show: false,
                 message: null,
             },
+            successfulMessage: {
+                show: false,
+                message: null,
+            },
+            inProgress: true,
         });
 
         const errors: string[] = [];
@@ -261,23 +264,9 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     show: false,
                     message: null,
                 },
+                inProgress: false,
             });
         }
-
-        this.setState({
-            errorMessage: {
-                show: false,
-                message: null,
-            },
-            waitingMessage: {
-                show: true,
-                message: (
-                    <div>
-                        Waiting for user prompt...
-                    </div>
-                ),
-            },
-        });
 
         const web3 = this.props.web3;
         const from = this.props.accountAddress as string;
@@ -325,8 +314,6 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                             const decodedLog = this.props.web3.eth.abi.decodeLog(logAbi, logData, logTopics);
                             const newVotingAddress = decodedLog._voting;
                             this.props.addMonitoringPolls([newVotingAddress]);
-                        } else {
-                            toast("Poll successfully created");
                         }
 
                         this.setState({
@@ -346,6 +333,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                                     </div>
                                 ),
                             },
+                            inProgress: false,
                         });
                         clearInterval(checkConfirmedInterval);
 
@@ -383,6 +371,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                         error.message,
                     ],
                 },
+                inProgress: false,
             });
 
             if (this.setTimeoutHolder) {
@@ -480,7 +469,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     </Form.Field>
                     <div className={style["inline-container"]}>
                         <div className={style["inline-component"]}>
-                            <Button type="submit">Submit</Button>
+                            <Button disabled={this.state.inProgress} loading={this.state.inProgress} type="submit">Submit</Button>
                         </div>
                         <div className={[style["inline-component"], style.quota].join(" ")}>
                             {

@@ -1,3 +1,15 @@
 .border {
     margin: 10px;
 }
+
+.toast-card {
+    background: #7ad6bb;
+    border-radius: 5px;
+    color: rgb(71, 71, 71);
+    height: 2px;
+    opacity: .88;
+}
+
+.toast-bell-icon {
+    color: #737373 !important;
+}

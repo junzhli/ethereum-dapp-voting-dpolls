@@ -45,6 +45,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             chart: null,
             votesByIndex: null,
             opened: (this.props.location.pathname === this.path) ? true : false,
+            inProgress: false,
         };
         this.handleOptionVoted = this.handleOptionVoted.bind(this);
         this.voteOnSubmitHandler = this.voteOnSubmitHandler.bind(this);
@@ -93,13 +94,6 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                     console.log("getMyOption failed");
                     console.log(error);
                 }
-            } else {
-                this.setState({
-                    votingMessage: {
-                        selectedIndex: null,
-                        selectedOption: null,
-                    },
-                });
             }
         }
     }
@@ -178,11 +172,14 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                 message: null,
             },
             waitingMessage: {
-                show: true,
-                message: (
-                    <div>Waiting for user prompt...</div>
-                ),
+                show: false,
+                message: null,
             },
+            successfulMessage: {
+                show: false,
+                message: null,
+            },
+            inProgress: true,
         });
 
         const web3 = this.props.web3;
@@ -224,8 +221,6 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                 try {
                     const blockNumber = await this.props.web3.eth.getBlockNumber();
                     const receipt = await this.props.web3.eth.getTransactionReceipt(txid);
-                    console.log(receipt);
-                    console.log(blockNumber);
                     if (receipt && (receipt.blockNumber === blockNumber)) {
                         const chartOptions = await this.fetchChartOption();
                         this.setState({
@@ -248,6 +243,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                             chart: {
                                 option: chartOptions,
                             },
+                            inProgress: false,
                         });
                         clearInterval(this.checkConfirmedInterval);
                         if (this.setTimeoutHolder) {
@@ -278,6 +274,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                     show: true,
                     message: error.message,
                 },
+                inProgress: false,
             });
 
             if (this.setTimeoutHolder) {
@@ -410,7 +407,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                                                             value={index}
                                                             checked={this.state.votingMessage.selectedIndex === index}
                                                             onChange={this.handleOptionVoted}
-                                                            disabled={this.props.isVoted || this.props.isExpired}
+                                                            disabled={this.props.isVoted || this.props.isExpired || this.state.inProgress}
                                                         />
                                                     </Form.Field>
                                                 );
@@ -427,7 +424,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                                     {
                                         (this.state.votingMessage.selectedIndex !== null && !this.props.isVoted) && (
                                             <div className={style["voting-button"]}>
-                                                <Button value={this.state.votingMessage.selectedIndex} content="Vote!" onClick={this.voteOnSubmitHandler}/>
+                                                <Button disabled={this.state.inProgress} loading={this.state.inProgress} value={this.state.votingMessage.selectedIndex} content="Vote!" onClick={this.voteOnSubmitHandler}/>
                                             </div>
                                         )
                                     }

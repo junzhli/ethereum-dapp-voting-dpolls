@@ -46,4 +46,5 @@ export interface IPollDetailStates {
         option: ChartData<Chart.ChartData>;
     } | null;
     opened: boolean;
+    inProgress: boolean;
 }

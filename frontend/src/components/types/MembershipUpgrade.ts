@@ -36,4 +36,5 @@ export interface IMembershipUpgradeStates {
         message: JSX.Element | null,
     };
     opened: boolean;
+    inProgress: boolean;
 }

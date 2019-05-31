@@ -25,7 +25,6 @@ const poll = (state: IPollMisc = initialState, action: PollActionType): IPollMis
             const monitoring = Object.assign([], state.monitoring);
             const addresses = action.payload;
             Array.prototype.push.apply(monitoring, addresses);
-
             return {
                 ...state,
                 monitoring,
