@@ -88,6 +88,12 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                 opened: false,
             });
             this.props.history.push(Routes.ROOT);
+
+            if (this.state.inProgress) {
+                toast((
+                    <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> Membership upgrade is still in progress...</p>
+                ));
+            }
         }
     }
 

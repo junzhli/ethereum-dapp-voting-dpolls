@@ -17,6 +17,7 @@ import { withRouter } from "react-router-dom";
 import { toast } from "react-toastify";
 import toastConfig from "../commons/tostConfig";
 import commonStyle from "../commons/styles/index.module.css";
+import Routes from "../constants/routes";
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 
@@ -49,6 +50,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         this.inactiveCollapseToggle = this.inactiveCollapseToggle.bind(this);
         this.activeCollapseToggle = this.activeCollapseToggle.bind(this);
         this.syncAdditionalData = this.syncAdditionalData.bind(this);
+        this.linkPoll = this.linkPoll.bind(this);
         toast.configure(toastConfig);
     }
 
@@ -84,6 +86,10 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         if (this.props !== prevProps) {
             await this.refreshPolls();
         }
+    }
+
+    linkPoll(pollAddress: AddressType) {
+        this.props.history.replace(Routes.POLLS_BASE + pollAddress);
     }
 
     searchPolls(keywords: string) {
@@ -141,7 +147,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                     this.props.history.replace("/");
 
                     toast((
-                        <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> Your poll have just been published!</p>
+                        <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> Your poll have just been published! <Icon size="small" name="external alternate" onClick={this.linkPoll.bind(this, poll.address)} /></p>
                     ));
                     if (!this.props.userWindowFocus && this.props.notificationStatus === true) {
                         const notification = new Notification(NOTIFICATION_TITLE, {

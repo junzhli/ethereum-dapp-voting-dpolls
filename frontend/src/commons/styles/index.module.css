@@ -3,11 +3,13 @@
 }
 
 .toast-card {
-    background: #7ad6bb;
+    background: #5de2ba;
     border-radius: 5px;
     color: rgb(71, 71, 71);
     height: 2px;
     opacity: .88;
+    top: -15px;
+    text-align: center;
 }
 
 .toast-bell-icon {

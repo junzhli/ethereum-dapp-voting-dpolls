@@ -6,10 +6,13 @@ import { VOTING_ABI } from "../constants/contractABIs";
 import { StoreState } from "../store/types";
 import { sendTransaction } from "../utils/web3";
 import style from "./PollDetail.module.css";
+import commonStyle from "../commons/styles/index.module.css";
 import { IPollDetail, IPollDetailProps, IPollDetailStates } from "./types/PollDetail";
 import { getEtherscanTxURL } from "../utils/etherscan";
 import Routes from "../constants/routes";
 import { withRouter } from "react-router-dom";
+import { toast } from "react-toastify";
+import toastConfig from "../commons/tostConfig";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
@@ -51,6 +54,8 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
         this.voteOnSubmitHandler = this.voteOnSubmitHandler.bind(this);
         this.onOpenHandler = this.onOpenHandler.bind(this);
         this.onCloseHandler = this.onCloseHandler.bind(this);
+        this.linkSelf = this.linkSelf.bind(this);
+        toast.configure(toastConfig);
     }
 
     async componentWillReceiveProps(nextProps: IPollDetailProps) {
@@ -136,6 +141,10 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
         }
     }
 
+    linkSelf() {
+        this.props.history.push(this.path);
+    }
+
     onOpenHandler(event: React.MouseEvent<HTMLElement, MouseEvent>, data: ModalProps) {
         if (data.open === false) {
             this.setState({
@@ -151,6 +160,12 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                 opened: false,
             });
             this.props.history.push(Routes.ROOT);
+
+            if (this.state.inProgress) {
+                toast((
+                    <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> Your submission is still in progress...</p>
+                ));
+            }
         }
     }
 
@@ -245,6 +260,13 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                             },
                             inProgress: false,
                         });
+
+                        if (!this.state.opened) {
+                            toast((
+                                <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> Your vote has been submitted. <Icon size="small" name="external alternate" onClick={this.linkSelf} /></p>
+                            ));
+                        }
+
                         clearInterval(this.checkConfirmedInterval);
                         if (this.setTimeoutHolder) {
                             clearTimeout(this.setTimeoutHolder);
