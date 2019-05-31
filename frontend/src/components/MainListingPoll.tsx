@@ -118,7 +118,8 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
             this.additionalData.push(beUpdated);
         }
 
-        if (++this.pollCardsSearchable === this.state.amountPolls) {
+        this.pollCardsSearchable += 1;
+        if (this.pollCardsSearchable === this.state.amountPolls) {
             this.props.setSearchBar(true);
         }
     }
