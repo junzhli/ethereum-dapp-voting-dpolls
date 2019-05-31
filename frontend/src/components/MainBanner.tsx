@@ -53,6 +53,11 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
             }
 
             if (accountAddress[0] !== this.props.accountAddress) {
+                // force window to reload once current browser's (metamask/mist) account address changed
+                if (this.props.accountAddress !== null) {
+                    window.location.reload();
+                }
+
                 this.props.setAccountAddress(accountAddress[0]);
                 try {
                     const membership = (await this.contract.methods.getMembership(accountAddress[0]).call()).toNumber();
