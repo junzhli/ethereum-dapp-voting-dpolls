@@ -1,6 +1,6 @@
 import React, { Dispatch } from "react";
 import { connect } from "react-redux";
-import { Button, Form, Icon, Label, Menu, Message, Modal, ModalProps } from "semantic-ui-react";
+import { Button, Form, Icon, Label, Menu, Message, Modal, ModalProps, Input, Header, Ref } from "semantic-ui-react";
 import { setMembership } from "../actions/eth";
 import { ETHActionType, AddressType } from "../actions/types/eth";
 import { VOTING_CORE_ABI } from "../constants/contractABIs";
@@ -15,6 +15,9 @@ import { withRouter } from "react-router-dom";
 import Routes from "../constants/routes";
 import { addMonitoringPoll } from "../actions/poll";
 import { PollActionType } from "../actions/types/poll";
+import { toast } from "react-toastify";
+import toastConfig from "../commons/tostConfig";
+import commonStyle from "../commons/styles/index.module.css";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS as string;
@@ -52,15 +55,17 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                 blockHeight: false,
             },
             opened: (this.props.location.pathname === Routes.CREATE) ? true : false,
+            inProgress: false,
         };
         this.state = Object.assign({}, this.initialState);
         this.formOnSubmitHandler = this.createPoll.bind(this);
         this.blockHeightCheckHandler = this.blockHeightCheckHandler.bind(this);
-        this.addOption = this.addOption.bind(this);
         this.blockHeightFocusOutHandler = this.blockHeightFocusOutHandler.bind(this);
         this.blockHeightFocusInHandler = this.blockHeightFocusInHandler.bind(this);
         this.onOpenHandler = this.onOpenHandler.bind(this);
         this.onCloseHandler = this.onCloseHandler.bind(this);
+        this.onLastOptionInputHandler = this.onLastOptionInputHandler.bind(this);
+        toast.configure(toastConfig);
     }
 
     async componentDidMount() {
@@ -95,6 +100,12 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         }
     }
 
+    onLastOptionInputHandler(event: React.FocusEvent<HTMLInputElement>) {
+        this.setState({
+            optionsAmount: this.state.optionsAmount + 1,
+        });
+    }
+
     onOpenHandler(event: React.MouseEvent<HTMLElement, MouseEvent>, data: ModalProps) {
         if (data.open === false) {
             this.setState({
@@ -110,6 +121,12 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                 opened: false,
             });
             this.props.history.push(Routes.ROOT);
+
+            if (this.state.inProgress) {
+                toast((
+                    <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> Poll creation is still in progress...</p>
+                ));
+            }
         }
     }
 
@@ -182,12 +199,6 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         }
     }
 
-    addOption() {
-        this.setState({
-            optionsAmount: this.state.optionsAmount + 1,
-        });
-    }
-
     async createPoll(event: React.FormEvent) {
         this.setState({
             waitingMessage: {
@@ -198,6 +209,11 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                 show: false,
                 message: null,
             },
+            successfulMessage: {
+                show: false,
+                message: null,
+            },
+            inProgress: true,
         });
 
         const errors: string[] = [];
@@ -216,21 +232,37 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             errors.push("Block number is behind the latest block");
         }
 
-        const options = Array.from(Array(this.state.optionsAmount), (entity, index) => {
-                const option = (this.refs["option" + index] as any as HTMLInputElement).value;
+        let duplicate: boolean = false;
+        const optionsText: string[] = [];
+        let options = Array.from(Array(this.state.optionsAmount), (entity, index) => {
+                const option = (this.refs["option" + index] as any).inputRef.current.value;
                 if (option === "") {
-                    errors.push("Option " + index + " is empty");
                     return null;
                 }
 
                 if (option.length > 20) {
-                    errors.push("Option" + index + " exceeds 20 chars");
+                    errors.push("Option" + (index + 1) + " exceeds 20 chars");
                     return null;
                 }
+
+                if (optionsText.includes(option)) {
+                    if (duplicate) {
+                        return null;
+                    }
+                    duplicate = true;
+                    errors.push("Duplicate options");
+                }
+
                 const hex = this.props.web3.utils.padRight(this.props.web3.utils.utf8ToHex(option), 64);
+                optionsText.push(option);
 
                 return hex;
         });
+
+        options = options.filter((option) => option !== null); // de-null
+        if (options.length < 2) {
+            errors.push("At least two options should exist");
+        }
 
         if (errors.length > 0) {
             return this.setState({
@@ -242,23 +274,9 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     show: false,
                     message: null,
                 },
+                inProgress: false,
             });
         }
-
-        this.setState({
-            errorMessage: {
-                show: false,
-                message: null,
-            },
-            waitingMessage: {
-                show: true,
-                message: (
-                    <div>
-                        Waiting for user prompt...
-                    </div>
-                ),
-            },
-        });
 
         const web3 = this.props.web3;
         const from = this.props.accountAddress as string;
@@ -290,12 +308,11 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                 },
             });
 
-            const lastBlockNumber = this.props.blockHeight;
             const checkConfirmedInterval = setInterval(async () => {
                 try {
                     const blockNumber = await this.props.web3.eth.getBlockNumber();
                     const receipt = await this.props.web3.eth.getTransactionReceipt(txid);
-                    if (receipt && (lastBlockNumber !== blockNumber)) {
+                    if (receipt && (receipt.blockNumber === blockNumber)) {
                         if (this.props.notificationStatus === true) {
                             const logAbi = [{
                                 type: "address",
@@ -326,8 +343,13 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                                     </div>
                                 ),
                             },
+                            inProgress: false,
                         });
                         clearInterval(checkConfirmedInterval);
+
+                        if (this.setTimeoutHolder) {
+                            clearTimeout(this.setTimeoutHolder);
+                        }
                         this.setTimeoutHolder = setTimeout(async () => {
                             const membership = (await this.contract.methods.getMembership(this.props.accountAddress).call()).toNumber();
                             this.props.setMembership(membership);
@@ -359,8 +381,12 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                         error.message,
                     ],
                 },
+                inProgress: false,
             });
 
+            if (this.setTimeoutHolder) {
+                clearTimeout(this.setTimeoutHolder);
+            }
             this.setTimeoutHolder = setTimeout(() => {
                 this.setState({
                     errorMessage: {
@@ -408,7 +434,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                 <Form className={style["form-ui"]} size="large" onSubmit={this.formOnSubmitHandler}>
                     <Form.Field>
                         <label>Title</label>
-                        <input placeholder="Enter a poll question" ref="title" />
+                        <input disabled={this.state.inProgress} placeholder="Enter a poll question" ref="title" />
                     </Form.Field>
                     <Form.Field>
                         <label>Host</label>
@@ -416,10 +442,10 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     </Form.Field>
                     <Form.Field>
                         <label>Expiry Block Height</label>
-                        <input onFocus={this.blockHeightFocusInHandler} onBlur={this.blockHeightFocusOutHandler} onKeyPress={this.blockHeightCheckHandler} placeholder="When will the poll expire?" ref="block" />
+                        <input disabled={this.state.inProgress} onFocus={this.blockHeightFocusInHandler} onBlur={this.blockHeightFocusOutHandler} onKeyPress={this.blockHeightCheckHandler} placeholder="When will the poll expire?" ref="block" />
                         {
                             (this.state.inputHints.blockHeight) && (
-                                <Label basic={true} color="teal" pointing={true}>
+                                <Label size="large" basic={true} color="teal" pointing={true}>
                                     Specify block number with more than {this.props.blockHeight + 1}
                                 </Label>
                             )
@@ -436,29 +462,22 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                         <label>Options</label>
                         <div className={style["options-wrapper"]}>
                             <div className={style["option-outer"]}>
-                                <input placeholder="Option 0" ref="option0" />
                                 {
                                     Array.from(Array(this.state.optionsAmount), (entity, index) => {
-                                        if (index !== 0) {
-                                            return (
-                                                <div key={index} className={style["option-divider"]}>
-                                                    <input placeholder={"Option " + index} ref={"option" + index} />
-                                                </div>
-                                            );
-                                        }
+                                        return (
+                                            <div key={index} className={style["option-divider"]}>
+                                                <Input disabled={this.state.inProgress} icon={<Header textAlign="center" className={style["form-option-id"]}>{(index + 1) + "."}</Header>} iconPosition="left" onFocus={(index === this.state.optionsAmount - 1) ? this.onLastOptionInputHandler : undefined} placeholder={"Enter an option"} ref={"option" + index} />
+                                            </div>
+                                        );
                                     })
                                 }
-                            </div>
-
-                            <div className={style["button-outer"]}>
-                                <Button circular={true} icon="plus" onClick={this.addOption} type="button" />
                             </div>
                         </div>
 
                     </Form.Field>
                     <div className={style["inline-container"]}>
                         <div className={style["inline-component"]}>
-                            <Button type="submit">Submit</Button>
+                            <Button disabled={this.state.inProgress} loading={this.state.inProgress} type="submit">Submit</Button>
                         </div>
                         <div className={[style["inline-component"], style.quota].join(" ")}>
                             {

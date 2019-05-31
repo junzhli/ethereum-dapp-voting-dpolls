@@ -11,7 +11,7 @@ import MembershipUpgrade from "./MembershipUpgrade";
 import PollCreate from "./PollCreate";
 import { IMainBanner, IMainBannerProps, IMainBannerStates } from "./types/MainBanner";
 import { withRouter } from "react-router-dom";
-import { setNotificationStatus } from "../actions/user";
+import { setNotificationStatus, setUserWindowsFocusStatus } from "../actions/user";
 import { UserActionType } from "../actions/types/user";
 import { NOTIFICATION_TITLE } from "../constants/project";
 
@@ -29,6 +29,9 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
         this.state = {
             isLoaded: false,
         };
+
+        window.addEventListener("focus", () => this.props.setUserWindowsFocus(true));
+        window.addEventListener("blur", () => this.props.setUserWindowsFocus(false));
     }
 
     async componentDidMount() {
@@ -50,6 +53,11 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
             }
 
             if (accountAddress[0] !== this.props.accountAddress) {
+                // force window to reload once current browser's (metamask/mist) account address changed
+                if (this.props.accountAddress !== null) {
+                    window.location.reload();
+                }
+
                 this.props.setAccountAddress(accountAddress[0]);
                 try {
                     const membership = (await this.contract.methods.getMembership(accountAddress[0]).call()).toNumber();
@@ -144,6 +152,7 @@ const mapDispatchToProps = (dispatch: Dispatch<ETHActionType | UserActionType>, 
         setAccountAddress: (accountAddress: AddressType) => dispatch(setAccountAddress(accountAddress)),
         setMembership: (nextMembership: Membership) => dispatch(setMembership(nextMembership)),
         setNotificationStatus: (status: boolean) => dispatch(setNotificationStatus(status)),
+        setUserWindowsFocus: (focus: boolean) => dispatch(setUserWindowsFocusStatus(focus)),
     };
 };
 

@@ -8,11 +8,14 @@ import { StoreState } from "../store/types";
 import { Membership } from "../types";
 import { sendTransaction } from "../utils/web3";
 import style from "./MembershipUpgrade.module.css";
+import commonStyle from "../commons/styles/index.module.css";
 import { IMembershipUpgrade, IMembershipUpgradeProps, IMembershipUpgradeStates } from "./types/MembershipUpgrade";
 import { getEtherscanTxURL } from "../utils/etherscan";
 import { withRouter } from "react-router-dom";
 import Routes from "../constants/routes";
 import { NOTIFICATION_TITLE } from "../constants/project";
+import { toast } from "react-toastify";
+import toastConfig from "../commons/tostConfig";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
@@ -38,10 +41,12 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                 message: null,
             },
             opened: (this.props.location.pathname === Routes.UPGRADE) ? true : false,
+            inProgress: false,
         };
         this.upgradeButtonOnClick = this.upgradeHandler.bind(this);
         this.onOpenHandler = this.onOpenHandler.bind(this);
         this.onCloseHandler = this.onCloseHandler.bind(this);
+        toast.configure(toastConfig);
     }
 
     async componentWillReceiveProps(nextProps: IMembershipUpgradeProps) {
@@ -83,6 +88,12 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                 opened: false,
             });
             this.props.history.push(Routes.ROOT);
+
+            if (this.state.inProgress) {
+                toast((
+                    <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> Membership upgrade is still in progress...</p>
+                ));
+            }
         }
     }
 
@@ -106,13 +117,14 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                 message: null,
             },
             waitingMessage: {
-                show: true,
-                message: (
-                    <div>
-                        Waiting for user prompt...
-                    </div>
-                ),
+                show: false,
+                message: null,
             },
+            successfulMessage: {
+                show: false,
+                message: null,
+            },
+            inProgress: true,
         });
 
         const web3 = this.props.web3;
@@ -146,12 +158,14 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                 },
             });
 
-            const lastBlockNumber = this.props.blockHeight;
+            if (this.checkConfirmedInterval) {
+                clearInterval(this.checkConfirmedInterval);
+            }
             this.checkConfirmedInterval = setInterval(async () => {
                 try {
                     const blockNumber = await this.props.web3.eth.getBlockNumber();
                     const receipt = await this.props.web3.eth.getTransactionReceipt(txid);
-                    if (receipt && (lastBlockNumber !== blockNumber)) {
+                    if (receipt && (receipt.blockNumber === blockNumber)) {
                         this.setState({
                             waitingMessage: {
                                 show: false,
@@ -173,11 +187,15 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
 
                         this.props.setMembership(membership);
 
-                        if (this.props.notificationStatus === true) {
+                        const notificationText = "You are upgraded to paid membership!";
+                        if (!this.props.userWindowFocus && this.props.notificationStatus === true) {
                             const notification = new Notification(NOTIFICATION_TITLE, {
-                                body: "You are upgraded to paid membership!",
+                                body: notificationText,
                             });
                         }
+                        toast((
+                            <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> {notificationText}</p>
+                        ));
 
                         clearInterval(this.checkConfirmedInterval);
                         this.setTimeoutHolder = setTimeout(() => {
@@ -205,8 +223,12 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                     show: true,
                     message: error.message,
                 },
+                inProgress: false,
             });
 
+            if (this.setTimeoutHolder) {
+                clearTimeout(this.setTimeoutHolder);
+            }
             this.setTimeoutHolder = setTimeout(() => {
                 this.setState({
                     errorMessage: {
@@ -278,7 +300,7 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                                         <Segment size="big" textAlign="center" vertical={true}>24/7 Exclusive Customer Service</Segment>
                                     </div>
 
-                                    <Button value={Membership.CITIZEN} content="Upgrade now" primary={true} onClick={this.upgradeButtonOnClick} disabled={this.props.membership !== Membership.NO_BODY} />
+                                    <Button loading={this.state.inProgress} value={Membership.CITIZEN} content="Upgrade now" primary={true} onClick={this.upgradeButtonOnClick} disabled={(this.state.inProgress) || (this.props.membership !== Membership.NO_BODY)} />
                                     {
                                         (this.props.membership === Membership.CITIZEN) && (
                                             <div className={style["note-below"]}>(Already)</div>
@@ -311,7 +333,7 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                                         <Segment size="big" textAlign="center" vertical={true}>24/7 Exclusive Customer Service</Segment>
                                     </div>
 
-                                    <Button value={Membership.DIAMOND} content="Upgrade now" primary={true} onClick={this.upgradeButtonOnClick} disabled={(this.props.membership !== Membership.CITIZEN) && (this.props.membership !== Membership.NO_BODY)} />
+                                    <Button loading={this.state.inProgress} value={Membership.DIAMOND} content="Upgrade now" primary={true} onClick={this.upgradeButtonOnClick} disabled={(this.state.inProgress) || ((this.props.membership !== Membership.CITIZEN) && (this.props.membership !== Membership.NO_BODY))} />
                                     {
                                         (this.props.membership === Membership.DIAMOND) && (
                                             <div className={style["note-below"]}>(Already)</div>
@@ -334,6 +356,7 @@ const mapStateToProps = (state: StoreState, ownProps: IMembershipUpgrade.IInnerP
         blockHeight: state.ethMisc.blockHeight,
         membership: state.ethMisc.membership,
         notificationStatus: state.userMisc.notificationStatus,
+        userWindowFocus: state.userMisc.userWindowsFocus,
     };
 };
 

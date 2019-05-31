@@ -6,10 +6,13 @@ import { VOTING_ABI } from "../constants/contractABIs";
 import { StoreState } from "../store/types";
 import { sendTransaction } from "../utils/web3";
 import style from "./PollDetail.module.css";
+import commonStyle from "../commons/styles/index.module.css";
 import { IPollDetail, IPollDetailProps, IPollDetailStates } from "./types/PollDetail";
 import { getEtherscanTxURL } from "../utils/etherscan";
 import Routes from "../constants/routes";
 import { withRouter } from "react-router-dom";
+import { toast } from "react-toastify";
+import toastConfig from "../commons/tostConfig";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
@@ -45,11 +48,14 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             chart: null,
             votesByIndex: null,
             opened: (this.props.location.pathname === this.path) ? true : false,
+            inProgress: false,
         };
         this.handleOptionVoted = this.handleOptionVoted.bind(this);
         this.voteOnSubmitHandler = this.voteOnSubmitHandler.bind(this);
         this.onOpenHandler = this.onOpenHandler.bind(this);
         this.onCloseHandler = this.onCloseHandler.bind(this);
+        this.linkSelf = this.linkSelf.bind(this);
+        toast.configure(toastConfig);
     }
 
     async componentWillReceiveProps(nextProps: IPollDetailProps) {
@@ -66,6 +72,20 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                 }
             }
 
+            if ((this.props.votesAmount !== nextProps.votesAmount) && nextProps.votesAmount !== 0) {
+                const votesByIndex = await this.fetchVotesByIndex();
+                this.setState({
+                    votesByIndex,
+                });
+
+                const chartOptions = this.fetchChartOption();
+                this.setState({
+                    chart: {
+                        option: chartOptions,
+                    },
+                });
+            }
+
             if (nextProps.isVoted) {
                 try {
                     const selectedIndex = (await this.contract.methods.getMyOption(nextProps.accountAddress).call()).toNumber();
@@ -79,13 +99,6 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                     console.log("getMyOption failed");
                     console.log(error);
                 }
-            } else {
-                this.setState({
-                    votingMessage: {
-                        selectedIndex: null,
-                        selectedOption: null,
-                    },
-                });
             }
         }
     }
@@ -128,22 +141,8 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
         }
     }
 
-    async componentDidUpdate(prevProps: IPollDetailProps) {
-        if (this.props !== prevProps) {
-            const votesByIndex = await this.fetchVotesByIndex();
-            this.setState({
-                votesByIndex,
-            });
-
-            if (this.props.votesAmount !== 0) {
-                const chartOptions = this.fetchChartOption();
-                this.setState({
-                    chart: {
-                        option: chartOptions,
-                    },
-                });
-            }
-        }
+    linkSelf() {
+        this.props.history.push(this.path);
     }
 
     onOpenHandler(event: React.MouseEvent<HTMLElement, MouseEvent>, data: ModalProps) {
@@ -161,6 +160,12 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                 opened: false,
             });
             this.props.history.push(Routes.ROOT);
+
+            if (this.state.inProgress) {
+                toast((
+                    <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> Your submission is still in progress...</p>
+                ));
+            }
         }
     }
 
@@ -182,11 +187,14 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                 message: null,
             },
             waitingMessage: {
-                show: true,
-                message: (
-                    <div>Waiting for user prompt...</div>
-                ),
+                show: false,
+                message: null,
             },
+            successfulMessage: {
+                show: false,
+                message: null,
+            },
+            inProgress: true,
         });
 
         const web3 = this.props.web3;
@@ -220,11 +228,15 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             });
 
             const lastBlockNumber = this.props.blockHeight;
+
+            if (this.checkConfirmedInterval) {
+                clearInterval(this.checkConfirmedInterval);
+            }
             this.checkConfirmedInterval = setInterval(async () => {
                 try {
                     const blockNumber = await this.props.web3.eth.getBlockNumber();
                     const receipt = await this.props.web3.eth.getTransactionReceipt(txid);
-                    if (receipt && (lastBlockNumber !== blockNumber)) {
+                    if (receipt && (receipt.blockNumber === blockNumber)) {
                         const chartOptions = await this.fetchChartOption();
                         this.setState({
                             waitingMessage: {
@@ -246,8 +258,19 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                             chart: {
                                 option: chartOptions,
                             },
+                            inProgress: false,
                         });
+
+                        if (!this.state.opened) {
+                            toast((
+                                <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> Your vote has been submitted. <Icon size="small" name="external alternate" onClick={this.linkSelf} /></p>
+                            ));
+                        }
+
                         clearInterval(this.checkConfirmedInterval);
+                        if (this.setTimeoutHolder) {
+                            clearTimeout(this.setTimeoutHolder);
+                        }
                         this.setTimeoutHolder = setTimeout(() => {
                             this.setState({
                                 successfulMessage: {
@@ -273,8 +296,12 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                     show: true,
                     message: error.message,
                 },
+                inProgress: false,
             });
 
+            if (this.setTimeoutHolder) {
+                clearTimeout(this.setTimeoutHolder);
+            }
             this.setTimeoutHolder = setTimeout(() => {
                 this.setState({
                     errorMessage: {
@@ -402,7 +429,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                                                             value={index}
                                                             checked={this.state.votingMessage.selectedIndex === index}
                                                             onChange={this.handleOptionVoted}
-                                                            disabled={this.props.isVoted || this.props.isExpired}
+                                                            disabled={this.props.isVoted || this.props.isExpired || this.state.inProgress}
                                                         />
                                                     </Form.Field>
                                                 );
@@ -411,7 +438,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                                         {
                                             this.state.votingMessage.selectedOption && (
                                                 <Form.Field>
-                                                    {this.props.isVoted ? ("You haved voted for") : ("You are voting for")} <b>{this.state.votingMessage.selectedOption}</b>
+                                                    {this.props.isVoted ? ("You have voted for") : ("You are voting for")} <b>{this.state.votingMessage.selectedOption}</b>
                                                 </Form.Field>
                                             )
                                         }
@@ -419,7 +446,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                                     {
                                         (this.state.votingMessage.selectedIndex !== null && !this.props.isVoted) && (
                                             <div className={style["voting-button"]}>
-                                                <Button value={this.state.votingMessage.selectedIndex} content="Vote!" onClick={this.voteOnSubmitHandler}/>
+                                                <Button disabled={this.state.inProgress} loading={this.state.inProgress} value={this.state.votingMessage.selectedIndex} content="Vote!" onClick={this.voteOnSubmitHandler}/>
                                             </div>
                                         )
                                     }

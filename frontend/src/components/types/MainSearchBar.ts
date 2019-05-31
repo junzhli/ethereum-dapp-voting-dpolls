@@ -5,6 +5,7 @@ export namespace IMainSearchBar {
     export interface IStateFromProps {
         searchResultsAmount: number | null;
         searchBarEnabled: boolean;
+        userSearchKeywords: string | null;
     }
 
     export interface IPropsFromDispatch {

@@ -12,6 +12,7 @@ export namespace IMembershipUpgrade {
         blockHeight: BlockHeightType;
         membership: Membership | null;
         notificationStatus: boolean | null;
+        userWindowFocus: boolean;
     }
 
     export interface IPropsFromDispatch {
@@ -35,4 +36,5 @@ export interface IMembershipUpgradeStates {
         message: JSX.Element | null,
     };
     opened: boolean;
+    inProgress: boolean;
 }

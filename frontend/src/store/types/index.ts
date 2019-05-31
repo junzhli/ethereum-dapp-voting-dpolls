@@ -18,6 +18,7 @@ export interface IPollMisc {
 export interface IUserMisc {
     notificationStatus: boolean | null;
     searchbarEnabled: boolean;
+    userWindowsFocus: boolean;
 }
 
 export interface StoreState {

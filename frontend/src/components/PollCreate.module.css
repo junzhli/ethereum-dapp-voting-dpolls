@@ -1,8 +1,3 @@
-.button-outer {
-    margin-left: 5px;
-    float: left;
-}
-
 .option-outer {
     float: left;
     width: 45%;
@@ -18,6 +13,29 @@
 
 .form-ui {
     max-width: 500px;
+}
+
+.form-option-id {
+    right: auto;
+    left: 1px;
+    border-radius: .28571429rem 0 0 .28571429rem;
+    cursor: default;
+    position: absolute;
+    line-height: 2.5em !important;
+    text-align: center;
+    top: 0;
+    margin: 0 auto !important;
+    height: 100%;
+    width: 2.67142857em;
+    opacity: .15;
+    font-size: 1em;
+    display: inline-block;
+    font-family: Icons;
+    font-style: normal;
+    font-weight: initial !important;
+    text-decoration: inherit;
+    font-size: 1.1em !important;
+    left: -2px;
 }
 
 .quota {
