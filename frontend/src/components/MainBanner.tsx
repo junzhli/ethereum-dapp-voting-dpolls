@@ -17,18 +17,22 @@ import { UserActionType } from "../actions/types/user";
 import { NOTIFICATION_TITLE, LOCAL_STORAGE } from "../constants/project";
 import { toast } from "react-toastify";
 import toastConfig from "../commons/tostConfig";
+import { promiseTimeout, PROMISE_TIMEOUT_MESSAGE } from "../utils/helper";
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
     private contract: any;
     private checkBlockNumberInterval: any;
     private checkAccountAddressInterval: any;
+    private userNotifiedNetworkUnavailable: boolean;
 
     constructor(props: IMainBannerProps) {
         super(props);
         this.contract = new this.props.web3.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
+        this.userNotifiedNetworkUnavailable = true; // initialized to true
         this.checkBlockNumberInterval = null;
         this.checkAccountAddressInterval = null;
+        this.userNotifiedNetworkUnavailableHandler = this.userNotifiedNetworkUnavailableHandler.bind(this);
         this.state = {
             isLoaded: false,
         };
@@ -52,12 +56,27 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
 
         this.initialDesktopNotification();
 
+        const ONE_SECONDS = 1000;
         this.checkBlockNumberInterval = setInterval(async () => {
-            const blockNumber = await this.props.web3.eth.getBlockNumber();
-            if (blockNumber !== this.props.blockHeight) {
-                this.props.setBlockHeight(blockNumber);
+            try {
+                const blockNumber = await promiseTimeout(ONE_SECONDS * 10, this.props.web3.eth.getBlockNumber());
+                if (blockNumber !== this.props.blockHeight) {
+                    this.props.setBlockHeight(blockNumber);
+                }
+            } catch (error) {
+                if (error instanceof Error && error.message === PROMISE_TIMEOUT_MESSAGE) {
+                    if (this.userNotifiedNetworkUnavailable) {
+                        toast((
+                            <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> We are unable to get access to Ethereum network for now...</p>
+                        ), {
+                            autoClose: false,
+                            onClose: this.userNotifiedNetworkUnavailableHandler,
+                        });
+                        this.userNotifiedNetworkUnavailable = false;
+                    }
+                }
             }
-        }, 1000);
+        }, ONE_SECONDS);
 
         this.checkAccountAddressInterval = setInterval(async () => {
             const accountAddress = await this.props.web3.eth.getAccounts();
@@ -88,6 +107,11 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
     componentWillUnmount() {
         clearInterval(this.checkAccountAddressInterval);
         clearInterval(this.checkBlockNumberInterval);
+    }
+
+    userNotifiedNetworkUnavailableHandler() {
+        console.log("user setonClose");
+        this.userNotifiedNetworkUnavailable = true;
     }
 
     initialDesktopNotification() {
