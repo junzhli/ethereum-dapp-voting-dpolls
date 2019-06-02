@@ -7,13 +7,16 @@ import { VOTING_CORE_ABI } from "../constants/contractABIs";
 import { StoreState } from "../store/types";
 import { Membership } from "../types";
 import style from "./MainBanner.module.css";
+import commonStyle from "../commons/styles/index.module.css";
 import MembershipUpgrade from "./MembershipUpgrade";
 import PollCreate from "./PollCreate";
 import { IMainBanner, IMainBannerProps, IMainBannerStates } from "./types/MainBanner";
 import { withRouter } from "react-router-dom";
 import { setNotificationStatus, setUserWindowsFocusStatus } from "../actions/user";
 import { UserActionType } from "../actions/types/user";
-import { NOTIFICATION_TITLE } from "../constants/project";
+import { NOTIFICATION_TITLE, LOCAL_STORAGE } from "../constants/project";
+import { toast } from "react-toastify";
+import toastConfig from "../commons/tostConfig";
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
@@ -30,11 +33,23 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
             isLoaded: false,
         };
 
+        toast.configure(toastConfig);
+
         window.addEventListener("focus", () => this.props.setUserWindowsFocus(true));
         window.addEventListener("blur", () => this.props.setUserWindowsFocus(false));
     }
 
     async componentDidMount() {
+        if (localStorage.getItem(LOCAL_STORAGE.TUTORIAL) === null) {
+            toast((
+                <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> dPolls: A decentralized voting system<br />Let's getting started!</p>
+            ), {
+                autoClose: false,
+            });
+
+            localStorage.setItem(LOCAL_STORAGE.TUTORIAL, "1");
+        }
+
         this.initialDesktopNotification();
 
         this.checkBlockNumberInterval = setInterval(async () => {

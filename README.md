@@ -40,6 +40,11 @@ Smart Contracts
 * VotingRegistry - Maintain a list of active/inactive polls
 * Voting - A poll entity
 
+#### Initialize dependencies
+```shell
+$ npm ci
+```
+
 #### Run testing units
 ```shell
 $ truffle test
@@ -52,7 +57,6 @@ Set all parameters in file ```.env``` (referenced from ```.env.template```) or a
 * ```DEPOSIT_ACCOUNT``` - Deposit account for ethers withdrawals from core contract
 
 ```shell
-$ npm install
 $ # All required environment parameters in file .env are ready at this point.
 $ truffle deploy --network <NETWORK>
 ```
@@ -68,6 +72,11 @@ Set all parameters in file ```.env``` (referenced from ```.env.template```) or a
 * ```REACT_APP_GOOGLE_ANALYTICS_TRACKING_CODE``` - Set tracking code for page views *(optional - disabled by default)*
 * ```REACT_APP_HOST_ENV``` - Host environment to build conditional static content *(optional - defaults to 'production')*
   * except for ```production``` - Tell search engine not to index
+
+#### Initialize dependencies
+```shell
+$ npm ci
+```
 
 #### Run dev server
 ```shell
