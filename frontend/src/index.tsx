@@ -145,7 +145,7 @@ class App extends React.Component<{}, IIndexStates> {
         if (this.state.web3 === null) {
             return (
                 <div>
-                    Please install Metamask/Mist at first!
+                    Please install Metamask (https://metamask.io/) at first!
                 </div>
             );
         } else if (!this.state.networkChecked) {
@@ -157,7 +157,7 @@ class App extends React.Component<{}, IIndexStates> {
                         ) : (
                             "unknown network (Network ID: " + NETWORK_ID + ")"
                         )
-                    }
+                    }. Please change the network where the Metamask connects to!
                 </div>
             );
         } else if (!this.state.approved) {
