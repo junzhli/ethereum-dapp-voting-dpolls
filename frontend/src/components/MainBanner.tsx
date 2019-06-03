@@ -110,7 +110,6 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
     }
 
     userNotifiedNetworkUnavailableHandler() {
-        console.log("user setonClose");
         this.userNotifiedNetworkUnavailable = true;
     }
 
