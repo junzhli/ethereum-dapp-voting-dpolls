@@ -12,6 +12,10 @@
     text-align: center;
 }
 
+.toast-card-container {
+    z-index: 999 !important;
+}
+
 .toast-bell-icon {
     color: #737373 !important;
 }

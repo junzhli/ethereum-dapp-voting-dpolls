@@ -11,6 +11,7 @@ const toastConfig: ToastContainerProps = {
         progressClassName: style["toast-card"],
     },
     toastClassName: style["toast-card"],
+    className: style["toast-card-container"],
 };
 
 export default toastConfig;
