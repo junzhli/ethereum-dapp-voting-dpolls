@@ -182,7 +182,7 @@ class App extends React.Component<{}, IIndexStates> {
                 return (
                     <div className={style["info-segment"]}>
                             <Dimmer active={true}>
-                                <Loader size="massive">Preparing for all required user information</Loader>
+                                <Loader size="massive">Preparing for all required user information: trying to access user's wallet</Loader>
                             </Dimmer>
                     </div>
                 );
