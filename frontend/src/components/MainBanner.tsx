@@ -46,7 +46,7 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
     async componentDidMount() {
         if (localStorage.getItem(LOCAL_STORAGE.TUTORIAL) === null) {
             toast((
-                <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> dPolls: A decentralized voting system<br />Let's getting started!</p>
+                <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> dPolls: Let's getting started!</p>
             ), {
                 autoClose: false,
             });
