@@ -32,7 +32,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
     };
     constructor(props: IMainListingPollProps) {
         super(props);
-        this.contract = new this.props.web3.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
+        this.contract = new this.props.web3Rpc.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
         this.additionalData = [];
         this.pollCardsSearchable = null;
         this.showNoSearchResult = {
@@ -205,7 +205,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         const awaitingPolls: Array<Promise<PollInitialMetadata>> = [];
         const getPollInitialMetadata = async (index: number) => {
             const address = await this.contract.methods.getVotingItemByIndex(index).call();
-            const contract = new this.props.web3.eth.Contract(VOTING_ABI, address);
+            const contract = new this.props.web3Rpc.eth.Contract(VOTING_ABI, address);
             const expiryBlockNumber = (await contract.methods.expiryBlockNumber().call()).toNumber();
             const isExpired = this.checkIfExpired(expiryBlockNumber) as boolean;
 
@@ -269,7 +269,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                 categoriedPolls.map((pollInitialMetadata) => {
                     const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
 
-                    return <PollCard display={false} status="active" web3={this.props.web3} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />;
+                    return <PollCard display={false} status="active" web3={this.props.web3} web3Rpc={this.props.web3Rpc} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />;
                 })
             );
         }
@@ -289,9 +289,9 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                 const { address, isExpired, expiryBlockNumber, contract, filtered } = pollInitialMetadata;
 
                 return (filtered) ? (
-                    <PollCard display={true} status="active" web3={this.props.web3} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
+                    <PollCard display={true} status="active" web3={this.props.web3} web3Rpc={this.props.web3Rpc} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
                 ) : (
-                    <PollCard display={false} status="active" web3={this.props.web3} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
+                    <PollCard display={false} status="active" web3={this.props.web3} web3Rpc={this.props.web3Rpc} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
                 );
             })
         );
@@ -384,7 +384,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                                                 this.state.activePolls.map((pollInitialMetadata) => {
                                                     const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
                                                     return (
-                                                        <PollCard display={true} status="active" web3={this.props.web3} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
+                                                        <PollCard display={true} status="active" web3={this.props.web3} web3Rpc={this.props.web3Rpc} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
                                                     );
                                                 })
                                             )
@@ -430,7 +430,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                                                 this.state.inactivePolls.map((pollInitialMetadata) => {
                                                     const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
                                                     return (
-                                                        <PollCard display={true} status="inactive" web3={this.props.web3} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
+                                                        <PollCard display={true} status="inactive" web3={this.props.web3} web3Rpc={this.props.web3Rpc} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
                                                     );
                                                 })
                                             )

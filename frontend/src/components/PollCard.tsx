@@ -43,7 +43,7 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     }
 
     async componentWillReceiveProps(nextProps: IPollCardProps) {
-        if (this.props !== nextProps) {
+        if (this.props !== nextProps && nextProps.web3) {
             const isVoted = await this.checkIfVoted(nextProps.accountAddress);
             if (this.state.externalData) {
                 if (isVoted !== this.state.externalData.isVoted) {
@@ -59,7 +59,11 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     }
 
     async componentDidUpdate(prevProps: IPollCardProps) {
-        const isVoted = await this.checkIfVoted(this.props.accountAddress);
+        let isVoted = null;
+        if (this.props.web3) {
+            isVoted = await this.checkIfVoted(this.props.accountAddress);
+        }
+
         const votesAmount = (await this.contract.methods.votesAmount().call()).toNumber();
         if (this.state.externalData) {
             if (votesAmount !== this.state.externalData.votesAmount) {
@@ -87,12 +91,12 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
         const jsonRpcData = await Promise.all([awaitingChairperson, awaitingTitle, awaitingIsVoted, awaitingVotesAmount, ...awaitingOptions]);
 
         const chairperson = jsonRpcData[0] as string;
-        const title = this.props.web3.utils.hexToUtf8(jsonRpcData[1]) as string;
+        const title = this.props.web3Rpc.utils.hexToUtf8(jsonRpcData[1]) as string;
         const isVoted = jsonRpcData[2];
         const votesAmount = jsonRpcData[3].toNumber() as number;
         const options: string[] = [];
         for (let i = 4; i < amountOptions + 4; i++) {
-            options.push(this.props.web3.utils.hexToUtf8(jsonRpcData[i]) as string);
+            options.push(this.props.web3Rpc.utils.hexToUtf8(jsonRpcData[i]) as string);
         }
 
         this.setState({
@@ -108,19 +112,18 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     }
 
     renderComponent() {
-        let state: "loading" | "non-loaded-completely" | "completed" | null = null;
+        let state: "loading" | "non-loaded-completely/web3-not-injected" | "completed" | null = null;
 
         if (this.state.externalData && (this.state.externalData.isVoted !== null)) {
             state = "completed";
         } else if (this.state.externalData && (this.state.externalData.isVoted === null)) {
-            state = "non-loaded-completely";
+            state = "non-loaded-completely/web3-not-injected";
         } else {
             state = "loading";
         }
 
         switch (state) {
             case "loading":
-            case "non-loaded-completely":
                 return (
                     <Segment className={!this.props.display ? style.hidden : undefined} color={this.status.inactive.border}>
                         <Placeholder style={{ height: 56, width: 56 }}>
@@ -138,6 +141,7 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
                         </Placeholder>
                     </Segment>
                 );
+            case "non-loaded-completely/web3-not-injected":
             case "completed":
                 return (
                     <Segment className={!this.props.display ? style.hidden : undefined} color={this.status[this.props.status].border}>
@@ -164,13 +168,14 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
                         </Item.Content>
                         <PollDetail
                         web3={this.props.web3}
+                        web3Rpc={this.props.web3Rpc}
                         address={this.props.address}
                         title={(this.state.externalData && this.state.externalData.title) as string}
                         options={(this.state.externalData && this.state.externalData.options) as string[]}
                         votesAmount={(this.state.externalData && this.state.externalData.votesAmount) as number}
                         expiryBlockHeight={this.props.expiryBlockNumber}
                         isExpired={this.props.isExpired}
-                        isVoted={(this.state.externalData && this.state.externalData.isVoted) as boolean}
+                        isVoted={this.state.externalData && this.state.externalData.isVoted}
                         contract={this.contract} />
                     </Segment>
                 );

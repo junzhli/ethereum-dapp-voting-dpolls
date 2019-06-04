@@ -5,13 +5,14 @@ import { RouteComponentProps } from "react-router-dom";
 export namespace IPollDetail {
     export interface IInnerProps {
         web3: any;
+        web3Rpc: any;
         contract: any;
         address: AddressType;
         title: string;
         options: string[];
         expiryBlockHeight: BlockHeightType;
         isExpired: boolean;
-        isVoted: boolean;
+        isVoted: boolean | null;
         votesAmount: number;
     }
 

@@ -6,6 +6,7 @@ export type IPollCardStatus = "active" | "inactive";
 export namespace IPollCard {
     export interface IInnerProps {
         web3: any;
+        web3Rpc: any;
         address: Address;
         contract: any;
         isExpired: boolean;

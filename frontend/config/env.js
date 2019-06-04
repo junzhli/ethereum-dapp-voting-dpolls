@@ -96,7 +96,8 @@ function getClientEnvironment(publicUrl) {
  * Environment variable checks
  */
 const ENV_VARS = [
-  'VOTING_CORE_ADDRESS'
+  'VOTING_CORE_ADDRESS',
+  'WEB3_PROVIDER'
 ];
 
 ENV_VARS.forEach(value => {

@@ -1,4 +1,3 @@
-import { any } from "prop-types";
 import { AddressType } from "../actions/types/eth";
 
 export type Address = string;
@@ -11,10 +10,11 @@ export enum Membership {
 
 export interface IIndexStates {
     web3: any;
-    networkChecked: boolean;
-    approved: boolean;
-    showUserPrivacyModeDeniedMessage: boolean;
-    showUserWalletLockedMessage: boolean;
+    web3Rpc: any;
+    networkChecked: boolean | null;
+    approved: boolean | null;
+    showUserPrivacyModeDeniedMessage: boolean | null;
+    showUserWalletLockedMessage: boolean | null;
     voting: {
         selector: AddressType | null,
     };

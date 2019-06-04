@@ -19,7 +19,7 @@ ID = "dpolls"
   command = "npm run build"
 
   # Environment variables
-  environment = { REACT_APP_NETWORK_ID = "3", REACT_APP_VOTING_CORE_ADDRESS = "0x55D7f084e97eD41811Ad03256348626053162AC8" }
+  environment = { REACT_APP_NETWORK_ID = "3", REACT_APP_VOTING_CORE_ADDRESS = "0x55D7f084e97eD41811Ad03256348626053162AC8", REACT_APP_WEB3_PROVIDER = "https://ropsten.infura.io/v3/3ac646754c93467bb73cc7bfcb337d81" }
 
 # Production context: all deploys from the Production branch set in your site's 
 # deploy contexts will inherit these settings.

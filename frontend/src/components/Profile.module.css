@@ -46,3 +46,7 @@
 .statistics {
     margin-top: 5px;
 }
+
+.no-wallet-found {
+    margin-top: .3em !important;
+}

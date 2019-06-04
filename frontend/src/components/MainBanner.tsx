@@ -28,7 +28,7 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
 
     constructor(props: IMainBannerProps) {
         super(props);
-        this.contract = new this.props.web3.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
+        this.contract = new this.props.web3Rpc.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
         this.userNotifiedNetworkUnavailable = true; // initialized to true
         this.checkBlockNumberInterval = null;
         this.checkAccountAddressInterval = null;
@@ -56,10 +56,14 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
 
         this.initialDesktopNotification();
 
+        const blockNumber = await this.props.web3Rpc.eth.getBlockNumber();
+        if (blockNumber !== this.props.blockHeight) {
+            this.props.setBlockHeight(blockNumber);
+        }
         const ONE_SECONDS = 1000;
         this.checkBlockNumberInterval = setInterval(async () => {
             try {
-                const blockNumber = await promiseTimeout(ONE_SECONDS * 10, this.props.web3.eth.getBlockNumber());
+                const blockNumber = await promiseTimeout(ONE_SECONDS * 20, this.props.web3Rpc.eth.getBlockNumber());
                 if (blockNumber !== this.props.blockHeight) {
                     this.props.setBlockHeight(blockNumber);
                 }
@@ -76,32 +80,49 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                     }
                 }
             }
-        }, ONE_SECONDS);
+        }, ONE_SECONDS * 10);
 
-        this.checkAccountAddressInterval = setInterval(async () => {
-            const accountAddress = await this.props.web3.eth.getAccounts();
+        if (this.props.web3) {
+            // detect account changes
+            this.checkAccountAddressInterval = setInterval(async () => {
+                const accountAddress = await this.props.web3.eth.getAccounts();
 
-            if (accountAddress.length === 0) {
-                this.props.userWalletUnlockApproval();
-                return;
-            }
+                if (accountAddress.length === 0) {
+                    this.props.userWalletUnlockApproval();
+                    return;
+                }
 
-            if (accountAddress[0] !== this.props.accountAddress) {
-                // force window to reload once current browser's (metamask/mist) account address changed
-                if (this.props.accountAddress !== null) {
+                if (accountAddress[0] !== this.props.accountAddress) {
+                    // force window to reload once current browser's (metamask/mist) account address changed
+                    if (this.props.accountAddress !== null) {
+                        window.location.reload();
+                    }
+
+                    this.props.setAccountAddress(accountAddress[0]);
+                    try {
+                        const membership = (await this.contract.methods.getMembership(accountAddress[0]).call()).toNumber();
+                        this.props.setMembership(membership);
+                    } catch (error) {
+                        console.log("getMembership failed");
+                        console.log(error);
+                    }
+                }
+            }, 1000);
+        } else {
+            toast((
+                <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> We are unable to detect Metamask. Some features are unavailable.</p>
+            ), {
+                autoClose: false,
+                onClose: this.userNotifiedNetworkUnavailableHandler,
+            });
+
+            // detect web3 get injected
+            this.checkAccountAddressInterval = setInterval(async () => {
+                if (this.props.web3) {
                     window.location.reload();
                 }
-
-                this.props.setAccountAddress(accountAddress[0]);
-                try {
-                    const membership = (await this.contract.methods.getMembership(accountAddress[0]).call()).toNumber();
-                    this.props.setMembership(membership);
-                } catch (error) {
-                    console.log("getMembership failed");
-                    console.log(error);
-                }
-            }
-        }, 1000);
+            }, 1000);
+        }
     }
 
     componentWillUnmount() {
@@ -162,10 +183,10 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                     </div>
                     <div className={style.menu}>
                         <Menu secondary={true} inverted={true}>
-                            <PollCreate web3={this.props.web3} />
+                            <PollCreate web3={this.props.web3} web3Rpc={this.props.web3Rpc} />
                             {
-                                (this.props.membership === Membership.NO_BODY) && (
-                                    <MembershipUpgrade web3={this.props.web3} />
+                                (this.props.membership === Membership.NO_BODY || this.props.membership === null) && (
+                                    <MembershipUpgrade web3={this.props.web3} web3Rpc={this.props.web3Rpc} />
                                 )
                             }
                         </Menu>
