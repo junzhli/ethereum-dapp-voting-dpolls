@@ -24,6 +24,7 @@ if (GOOGLE_ANALYTICS_TRACKING_ID) {
 }
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
+const WEB3_PROVIDER = process.env.REACT_APP_WEB3_PROVIDER as string;
 
 /**
  * global declaration
@@ -40,18 +41,22 @@ class App extends React.Component<{}, IIndexStates> {
     constructor(props: {}) {
         super(props);
         let web3 = null;
-        const approved = false;
-        const networkChecked = false;
-        const showUserPrivacyModeDeniedMessage = false;
-        const showUserWalletLockedMessage = false;
-
         // Checking if Web3 has been injected by the browser (Mist/MetaMask)
         if (typeof window.web3 !== "undefined") {
             web3 = new Web3(window.web3.currentProvider);
         }
 
+        const approved = (web3 !== null) ? false : null;
+        const networkChecked = (web3 !== null) ? false : null;
+        const showUserPrivacyModeDeniedMessage = (web3 !== null) ? false : null;
+        const showUserWalletLockedMessage = (web3 !== null) ? false : null;
+
+        // Used for any JSON-RPC except user's operations
+        const web3Rpc = new Web3(WEB3_PROVIDER);
+
         this.state = {
             web3,
+            web3Rpc,
             networkChecked,
             approved,
             showUserPrivacyModeDeniedMessage,
@@ -142,13 +147,7 @@ class App extends React.Component<{}, IIndexStates> {
     }
 
     renderComponent() {
-        if (this.state.web3 === null) {
-            return (
-                <div>
-                    Please install Metamask (https://metamask.io/) at first!
-                </div>
-            );
-        } else if (!this.state.networkChecked) {
+        if (this.state.networkChecked === false) {
             return (
                 <div>
                     This website is only available on {
@@ -160,7 +159,7 @@ class App extends React.Component<{}, IIndexStates> {
                     }. Please change the network where the Metamask connects to!
                 </div>
             );
-        } else if (!this.state.approved) {
+        } else if (this.state.approved === false) {
             if (this.state.showUserPrivacyModeDeniedMessage) {
                 return (
                     <div className={style["info-segment"]}>
@@ -192,7 +191,7 @@ class App extends React.Component<{}, IIndexStates> {
                 <Router>
                     <div className={style["page-container"]}>
                         <div>
-                            <MainBanner web3={this.state.web3} userWalletUnlockApproval={this.userWalletUnlockApproval} />
+                            <MainBanner web3={this.state.web3} web3Rpc={this.state.web3Rpc} userWalletUnlockApproval={this.userWalletUnlockApproval} />
                         </div>
 
                         <div className={style["content-wrap"]}>
@@ -200,7 +199,7 @@ class App extends React.Component<{}, IIndexStates> {
                                 <div className={[commonStyle.border, style["listing-outer"]].join(" ")}>
                                     <div className={style["listing-inner"]}>
                                         <div className={style["listing-inner-content"]}>
-                                            <MainListingPoll web3={this.state.web3} />
+                                            <MainListingPoll web3={this.state.web3} web3Rpc={this.state.web3Rpc} />
                                         </div>
                                     </div>
                                 </div>

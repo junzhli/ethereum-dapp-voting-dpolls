@@ -13,6 +13,7 @@ import Routes from "../constants/routes";
 import { withRouter } from "react-router-dom";
 import { toast } from "react-toastify";
 import toastConfig from "../commons/tostConfig";
+import { ERROR_METAMASK_NOT_INSTALLED } from "../constants/project";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
@@ -24,7 +25,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
     constructor(props: IPollDetailProps) {
         super(props);
         this.path = Routes.POLLS_BASE + this.props.address;
-        this.contract = new this.props.web3.eth.Contract(VOTING_ABI, this.props.address);
+        this.contract = new this.props.web3Rpc.eth.Contract(VOTING_ABI, this.props.address);
         this.checkConfirmedInterval = null;
         this.setTimeoutHolder = null;
         this.state = {
@@ -234,8 +235,8 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             }
             this.checkConfirmedInterval = setInterval(async () => {
                 try {
-                    const blockNumber = await this.props.web3.eth.getBlockNumber();
-                    const receipt = await this.props.web3.eth.getTransactionReceipt(txid);
+                    const blockNumber = await this.props.web3Rpc.eth.getBlockNumber();
+                    const receipt = await this.props.web3Rpc.eth.getTransactionReceipt(txid);
                     if (receipt && (receipt.blockNumber === blockNumber)) {
                         const chartOptions = await this.fetchChartOption();
                         this.setState({
@@ -380,7 +381,6 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                     </Modal.Header>
                     <Modal.Content image={true}>
                         <Modal.Description>
-
                             {
                                 this.state.waitingMessage.show && (
                                     <Message icon={true}>
@@ -413,6 +413,11 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                             }
                             <div className={style["inline-container"]}>
                                 <div className={style["inline-left"]}>
+                                    {
+                                        (!this.props.web3) && (
+                                            <Header color="red">({ERROR_METAMASK_NOT_INSTALLED})</Header>
+                                        )
+                                    }
                                     <Form className={style["voting-box"]} size="huge">
                                         {
                                             this.props.options.map((option, index) => {
@@ -429,7 +434,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                                                             value={index}
                                                             checked={this.state.votingMessage.selectedIndex === index}
                                                             onChange={this.handleOptionVoted}
-                                                            disabled={this.props.isVoted || this.props.isExpired || this.state.inProgress}
+                                                            disabled={!this.props.web3 || this.props.isVoted || this.props.isExpired || this.state.inProgress}
                                                         />
                                                     </Form.Field>
                                                 );

@@ -18,6 +18,7 @@ import { PollActionType } from "../actions/types/poll";
 import { toast } from "react-toastify";
 import toastConfig from "../commons/tostConfig";
 import commonStyle from "../commons/styles/index.module.css";
+import { ERROR_METAMASK_NOT_INSTALLED } from "../constants/project";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS as string;
@@ -30,7 +31,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
     private formOnSubmitHandler: any;
     constructor(props: IPollCreateProps) {
         super(props);
-        this.contract = new this.props.web3.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
+        this.contract = new this.props.web3Rpc.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
         this.checkConfirmedIntervals = [];
         this.setTimeoutHolder = null;
         this.initialState = {
@@ -221,7 +222,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         if (title === "") {
             errors.push("Title is empty");
         }
-        title = this.props.web3.utils.padRight(this.props.web3.utils.utf8ToHex(title), 64);
+        title = this.props.web3Rpc.utils.padRight(this.props.web3Rpc.utils.utf8ToHex(title), 64);
 
         const block = (this.refs.block as any as HTMLInputElement).value;
         if (block === "") {
@@ -253,7 +254,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     errors.push("Duplicate options");
                 }
 
-                const hex = this.props.web3.utils.padRight(this.props.web3.utils.utf8ToHex(option), 64);
+                const hex = this.props.web3Rpc.utils.padRight(this.props.web3Rpc.utils.utf8ToHex(option), 64);
                 optionsText.push(option);
 
                 return hex;
@@ -310,8 +311,8 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
 
             const checkConfirmedInterval = setInterval(async () => {
                 try {
-                    const blockNumber = await this.props.web3.eth.getBlockNumber();
-                    const receipt = await this.props.web3.eth.getTransactionReceipt(txid);
+                    const blockNumber = await this.props.web3Rpc.eth.getBlockNumber();
+                    const receipt = await this.props.web3Rpc.eth.getTransactionReceipt(txid);
                     if (receipt && (receipt.blockNumber === blockNumber)) {
                         if (this.props.notificationStatus === true) {
                             const logAbi = [{
@@ -321,7 +322,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                             const logData = receipt.logs[0].data;
                             const logTopics = receipt.logs[0].topics;
 
-                            const decodedLog = this.props.web3.eth.abi.decodeLog(logAbi, logData, logTopics);
+                            const decodedLog = this.props.web3Rpc.eth.abi.decodeLog(logAbi, logData, logTopics);
                             const newVotingAddress = decodedLog._voting;
                             this.props.addMonitoringPolls([newVotingAddress]);
                         }
@@ -432,9 +433,14 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     )
                 }
                 <Form className={style["form-ui"]} size="large" onSubmit={this.formOnSubmitHandler}>
+                    {
+                        (!this.props.web3) && (
+                            <Header color="red">({ERROR_METAMASK_NOT_INSTALLED})</Header>
+                        )
+                    }
                     <Form.Field>
                         <label>Title</label>
-                        <input disabled={this.state.inProgress} placeholder="Enter a poll question" ref="title" />
+                        <input disabled={this.state.inProgress || !this.props.web3} placeholder="Enter a poll question" ref="title" />
                     </Form.Field>
                     <Form.Field>
                         <label>Host</label>
@@ -442,7 +448,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     </Form.Field>
                     <Form.Field>
                         <label>Expiry Block Height</label>
-                        <input disabled={this.state.inProgress} onFocus={this.blockHeightFocusInHandler} onBlur={this.blockHeightFocusOutHandler} onKeyPress={this.blockHeightCheckHandler} placeholder="When will the poll expire?" ref="block" />
+                        <input disabled={this.state.inProgress || !this.props.web3} onFocus={this.blockHeightFocusInHandler} onBlur={this.blockHeightFocusOutHandler} onKeyPress={this.blockHeightCheckHandler} placeholder="When will the poll expire?" ref="block" />
                         {
                             (this.state.inputHints.blockHeight) && (
                                 <Label size="large" basic={true} color="teal" pointing={true}>
@@ -466,7 +472,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                                     Array.from(Array(this.state.optionsAmount), (entity, index) => {
                                         return (
                                             <div key={index} className={style["option-divider"]}>
-                                                <Input disabled={this.state.inProgress} icon={<Header textAlign="center" className={style["form-option-id"]}>{(index + 1) + "."}</Header>} iconPosition="left" onFocus={(index === this.state.optionsAmount - 1) ? this.onLastOptionInputHandler : undefined} placeholder={"Enter an option"} ref={"option" + index} />
+                                                <Input disabled={this.state.inProgress || !this.props.web3} icon={<Header textAlign="center" className={style["form-option-id"]}>{(index + 1) + "."}</Header>} iconPosition="left" onFocus={(index === this.state.optionsAmount - 1) ? this.onLastOptionInputHandler : undefined} placeholder={"Enter an option"} ref={"option" + index} />
                                             </div>
                                         );
                                     })
@@ -477,7 +483,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     </Form.Field>
                     <div className={style["inline-container"]}>
                         <div className={style["inline-component"]}>
-                            <Button disabled={this.state.inProgress} loading={this.state.inProgress} type="submit">Submit</Button>
+                            <Button disabled={this.state.inProgress || !this.props.web3} loading={this.state.inProgress} type="submit">Submit</Button>
                         </div>
                         <div className={[style["inline-component"], style.quota].join(" ")}>
                             {

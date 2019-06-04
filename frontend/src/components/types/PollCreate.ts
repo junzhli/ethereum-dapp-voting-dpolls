@@ -5,6 +5,7 @@ import { RouteComponentProps } from "react-router-dom";
 export namespace IPollCreate {
     export interface IInnerProps {
         web3: any;
+        web3Rpc: any;
     }
 
     export interface IStateFromProps {

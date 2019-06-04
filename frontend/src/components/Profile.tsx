@@ -1,10 +1,11 @@
 import React from "react";
 import { connect } from "react-redux";
-import { Card, Icon, Loader, Statistic } from "semantic-ui-react";
+import { Card, Icon, Loader, Statistic, Header } from "semantic-ui-react";
 import { StoreState } from "../store/types";
 import { Membership } from "../types";
 import style from "./Profile.module.css";
 import { IProfile, IProfileProps, IProfileStates } from "./types/Profile";
+import { ERROR_NO_WALLET_FOUND } from "../constants/project";
 
 class Profile extends React.Component<IProfileProps, IProfileStates> {
     constructor(props: IProfileProps) {
@@ -74,20 +75,28 @@ class Profile extends React.Component<IProfileProps, IProfileStates> {
                 </Card.Content>
                 <Card.Content>
                     <Card.Header><Icon color="red" name="user outline" />Current User</Card.Header>
-                    <div className={style.address}>
-                        {
-                            this.props.accountAddress ? (
-                                this.props.accountAddress
-                            ) : (
-                                <Loader active={true} inline="centered" />
-                            )
-                        }
-                    </div>
+                    {
+                        (!this.props.web3) ? (
+                            <Header className={style["no-wallet-found"]} size="small" color="red">({ERROR_NO_WALLET_FOUND})</Header>
+                        ) : (
+                            <div className={style.address}>
+                                {
+                                    this.props.accountAddress ? (
+                                        this.props.accountAddress
+                                    ) : (
+                                        <Loader active={true} inline="centered" />
+                                    )
+                                }
+                            </div>
+                        )
+                    }
                 </Card.Content>
                 <Card.Content>
                     <Card.Header><Icon color="grey" name="id badge" />Membership</Card.Header>
                     {
-                        this.getMembership() !== null ? (
+                        (!this.props.web3) ? (
+                            <Header className={style["no-wallet-found"]} size="small" color="red">({ERROR_NO_WALLET_FOUND})</Header>
+                        ) : (this.getMembership() !== null) ? (
                             this.getMembership()
                         ) : (
                             <Loader active={true} inline="centered" />

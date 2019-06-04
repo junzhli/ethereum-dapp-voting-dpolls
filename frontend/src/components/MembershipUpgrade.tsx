@@ -1,6 +1,6 @@
 import React, { Dispatch, SyntheticEvent } from "react";
 import { connect } from "react-redux";
-import { Button, Grid, Icon, Label, Message, Modal, Segment, ModalProps } from "semantic-ui-react";
+import { Button, Grid, Icon, Label, Message, Modal, Segment, ModalProps, Header } from "semantic-ui-react";
 import { setMembership } from "../actions/eth";
 import { ETHActionType } from "../actions/types/eth";
 import { VOTING_CORE_ABI } from "../constants/contractABIs";
@@ -13,7 +13,7 @@ import { IMembershipUpgrade, IMembershipUpgradeProps, IMembershipUpgradeStates }
 import { getEtherscanTxURL } from "../utils/etherscan";
 import { withRouter } from "react-router-dom";
 import Routes from "../constants/routes";
-import { NOTIFICATION_TITLE } from "../constants/project";
+import { NOTIFICATION_TITLE, ERROR_METAMASK_NOT_INSTALLED } from "../constants/project";
 import { toast } from "react-toastify";
 import toastConfig from "../commons/tostConfig";
 
@@ -26,7 +26,7 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
     private upgradeButtonOnClick: any;
     constructor(props: IMembershipUpgradeProps) {
         super(props);
-        this.contract = new this.props.web3.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
+        this.contract = new this.props.web3Rpc.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
         this.state = {
             waitingMessage: {
                 show: false,
@@ -163,8 +163,8 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
             }
             this.checkConfirmedInterval = setInterval(async () => {
                 try {
-                    const blockNumber = await this.props.web3.eth.getBlockNumber();
-                    const receipt = await this.props.web3.eth.getTransactionReceipt(txid);
+                    const blockNumber = await this.props.web3Rpc.eth.getBlockNumber();
+                    const receipt = await this.props.web3Rpc.eth.getTransactionReceipt(txid);
                     if (receipt && (receipt.blockNumber === blockNumber)) {
                         this.setState({
                             waitingMessage: {
@@ -253,6 +253,12 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                 <Modal.Header>Select a plan</Modal.Header>
                 <Modal.Content>
                     {
+                        (!this.props.web3) && (
+                            <Header color="red">({ERROR_METAMASK_NOT_INSTALLED})</Header>
+                        )
+                    }
+
+                    {
                         this.state.waitingMessage.show && (
                             <Message icon={true}>
                                 <Icon name="circle notched" loading={true} />
@@ -300,7 +306,7 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                                         <Segment size="big" textAlign="center" vertical={true}>24/7 Exclusive Customer Service</Segment>
                                     </div>
 
-                                    <Button loading={this.state.inProgress} value={Membership.CITIZEN} content="Upgrade now" primary={true} onClick={this.upgradeButtonOnClick} disabled={(this.state.inProgress) || (this.props.membership !== Membership.NO_BODY)} />
+                                    <Button loading={this.state.inProgress} value={Membership.CITIZEN} content="Upgrade now" primary={true} onClick={this.upgradeButtonOnClick} disabled={(this.state.inProgress) || (this.props.membership !== Membership.NO_BODY) || !this.props.web3} />
                                     {
                                         (this.props.membership === Membership.CITIZEN) && (
                                             <div className={style["note-below"]}>(Already)</div>
@@ -333,7 +339,7 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                                         <Segment size="big" textAlign="center" vertical={true}>24/7 Exclusive Customer Service</Segment>
                                     </div>
 
-                                    <Button loading={this.state.inProgress} value={Membership.DIAMOND} content="Upgrade now" primary={true} onClick={this.upgradeButtonOnClick} disabled={(this.state.inProgress) || ((this.props.membership !== Membership.CITIZEN) && (this.props.membership !== Membership.NO_BODY))} />
+                                    <Button loading={this.state.inProgress} value={Membership.DIAMOND} content="Upgrade now" primary={true} onClick={this.upgradeButtonOnClick} disabled={(this.state.inProgress) || ((this.props.membership !== Membership.CITIZEN) && (this.props.membership !== Membership.NO_BODY) || !this.props.web3)} />
                                     {
                                         (this.props.membership === Membership.DIAMOND) && (
                                             <div className={style["note-below"]}>(Already)</div>
