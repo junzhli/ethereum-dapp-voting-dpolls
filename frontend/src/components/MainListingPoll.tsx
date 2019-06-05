@@ -31,10 +31,14 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         active: boolean,
         inactive: boolean,
     };
+    private initialMetadata: {
+        [key: string]: PollInitialMetadata;
+    };
     constructor(props: IMainListingPollProps) {
         super(props);
         this.contract = new this.props.web3Rpc.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
         this.additionalData = [];
+        this.initialMetadata = {};
         this.pollCardsSearchable = null;
         this.showNoSearchResult = {
             active: false,
@@ -87,6 +91,17 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         if (this.props !== prevProps) {
             await this.refreshPolls();
         }
+    }
+
+    updateInitialMetadataStorage(polls: PollInitialMetadata[]) {
+        polls.forEach((poll, reversedIndex: number) => {
+            const indexed: {
+                [key: string]: PollInitialMetadata,
+            } = {};
+            const index = polls.length - 1 - reversedIndex;
+            indexed[index] = poll;
+            Object.assign(this.initialMetadata, indexed);
+        });
     }
 
     linkPoll(pollAddress: AddressType) {
@@ -205,9 +220,9 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
 
         const amountPolls: number = (await this.contract.methods.getAmountVotings().call()).toNumber();
         const getPollInitialMetadata = async (index: number) => {
-            const address = await this.contract.methods.getVotingItemByIndex(index).call();
-            const contract = new this.props.web3Rpc.eth.Contract(VOTING_ABI, address);
-            const expiryBlockNumber = (await contract.methods.expiryBlockNumber().call()).toNumber();
+            const address = (index in this.initialMetadata && this.initialMetadata[index].address) || await this.contract.methods.getVotingItemByIndex(index).call();
+            const contract = (index in this.initialMetadata && this.initialMetadata[index].contract) || new this.props.web3Rpc.eth.Contract(VOTING_ABI, address);
+            const expiryBlockNumber = (index in this.initialMetadata && this.initialMetadata[index].expiryBlockNumber) || (await contract.methods.expiryBlockNumber().call()).toNumber();
             const isExpired = this.checkIfExpired(expiryBlockNumber) as boolean;
 
             const pollInitialMetadata: PollInitialMetadata = {
@@ -227,6 +242,8 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         }, {
             concurrency: 100,
         }));
+
+        this.updateInitialMetadataStorage(polls);
 
         return {
             amountPolls,
