@@ -88,7 +88,7 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
             this.props.history.push(Routes.ROOT);
 
             if (this.state.inProgress) {
-                const title = "Membership upgrade";
+                const title = "Membership Upgrade";
                 const detail = "Membership upgrade is still in progress...";
                 toast(<Toast title={title} detail={detail} />);
             }
@@ -192,7 +192,7 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                             });
                         }
 
-                        const title = "Membership upgrade";
+                        const title = "Membership Upgrade";
                         const detail = notificationText;
                         toast(<Toast title={title} detail={detail} />);
 

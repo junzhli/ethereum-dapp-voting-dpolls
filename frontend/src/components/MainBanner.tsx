@@ -68,7 +68,7 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
             } catch (error) {
                 if (error instanceof Error && error.message === PROMISE_TIMEOUT_MESSAGE) {
                     if (this.userNotifiedNetworkUnavailable) {
-                        const title = "Connection issue";
+                        const title = "Connection Issue";
                         const detail = "We are unable to get access to Ethereum network for now.";
                         const options: ToastOptions = {
                             autoClose: false,
@@ -109,7 +109,7 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                 }
             }, 1000);
         } else {
-            const title = "Wallet not installed";
+            const title = "Wallet Not Installed";
             const detail = (<div className={style.link}>It seems Metamask is not installed. Some features are unavailable.<br /><a target="_blank" rel="noopener noreferrer" href="https://metamask.io/">(Click to install <Icon size="small" color="grey" name="external alternate" link={true} />)</a></div>);
             const options: ToastOptions = {
                 autoClose: false,
