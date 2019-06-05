@@ -89,7 +89,6 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
         const awaitingVotesAmount = this.contract.methods.votesAmount().call();
 
         const jsonRpcData = await Promise.all([awaitingChairperson, awaitingTitle, awaitingIsVoted, awaitingVotesAmount, ...awaitingOptions]);
-
         const chairperson = jsonRpcData[0] as string;
         const title = this.props.web3Rpc.utils.hexToUtf8(jsonRpcData[1]) as string;
         const isVoted = jsonRpcData[2];

@@ -8,14 +8,13 @@ import { StoreState } from "../store/types";
 import { Membership } from "../types";
 import { sendTransaction } from "../utils/web3";
 import style from "./MembershipUpgrade.module.css";
-import commonStyle from "../commons/styles/index.module.css";
 import { IMembershipUpgrade, IMembershipUpgradeProps, IMembershipUpgradeStates } from "./types/MembershipUpgrade";
 import { getEtherscanTxURL } from "../utils/etherscan";
 import { withRouter } from "react-router-dom";
 import Routes from "../constants/routes";
 import { NOTIFICATION_TITLE, ERROR_METAMASK_NOT_INSTALLED } from "../constants/project";
 import { toast } from "react-toastify";
-import toastConfig from "../commons/tostConfig";
+import Toast from "./Toast";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
@@ -46,7 +45,6 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
         this.upgradeButtonOnClick = this.upgradeHandler.bind(this);
         this.onOpenHandler = this.onOpenHandler.bind(this);
         this.onCloseHandler = this.onCloseHandler.bind(this);
-        toast.configure(toastConfig);
     }
 
     async componentWillReceiveProps(nextProps: IMembershipUpgradeProps) {
@@ -90,9 +88,9 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
             this.props.history.push(Routes.ROOT);
 
             if (this.state.inProgress) {
-                toast((
-                    <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> Membership upgrade is still in progress...</p>
-                ));
+                const title = "Membership upgrade";
+                const detail = "Membership upgrade is still in progress...";
+                toast(<Toast title={title} detail={detail} />);
             }
         }
     }
@@ -193,9 +191,10 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
                                 body: notificationText,
                             });
                         }
-                        toast((
-                            <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> {notificationText}</p>
-                        ));
+
+                        const title = "Membership upgrade";
+                        const detail = notificationText;
+                        toast(<Toast title={title} detail={detail} />);
 
                         clearInterval(this.checkConfirmedInterval);
                         this.setTimeoutHolder = setTimeout(() => {

@@ -15,9 +15,10 @@ import { setSearchBar } from "../actions/user";
 import { UserActionType } from "../actions/types/user";
 import { withRouter } from "react-router-dom";
 import { toast } from "react-toastify";
-import toastConfig from "../commons/tostConfig";
-import commonStyle from "../commons/styles/index.module.css";
 import Routes from "../constants/routes";
+import bluebird from "bluebird";
+import bluebirdConfig from "../commons/bluebirdConfig";
+import Toast from "./Toast";
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 
@@ -51,7 +52,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         this.activeCollapseToggle = this.activeCollapseToggle.bind(this);
         this.syncAdditionalData = this.syncAdditionalData.bind(this);
         this.linkPoll = this.linkPoll.bind(this);
-        toast.configure(toastConfig);
+        bluebird.config(bluebirdConfig);
     }
 
     async componentWillReceiveProps(nextProps: IMainListingPollProps) {
@@ -146,9 +147,10 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
 
                     this.props.history.replace("/");
 
-                    toast((
-                        <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> Your poll have just been published! <Icon size="small" name="external alternate" onClick={this.linkPoll.bind(this, poll.address)} /></p>
-                    ));
+                    const title = "Poll creation";
+                    const detail = "Your poll have just been published!";
+                    toast(<Toast title={title} detail={detail} />);
+
                     if (!this.props.userWindowFocus && this.props.notificationStatus === true) {
                         const notification = new Notification(NOTIFICATION_TITLE, {
                             body: "Your poll have just been published!",
@@ -202,7 +204,6 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         }
 
         const amountPolls: number = (await this.contract.methods.getAmountVotings().call()).toNumber();
-        const awaitingPolls: Array<Promise<PollInitialMetadata>> = [];
         const getPollInitialMetadata = async (index: number) => {
             const address = await this.contract.methods.getVotingItemByIndex(index).call();
             const contract = new this.props.web3Rpc.eth.Contract(VOTING_ABI, address);
@@ -217,10 +218,15 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
             };
             return pollInitialMetadata;
         };
-        for (let i = 0; i < amountPolls; i++) {
-            awaitingPolls.unshift(getPollInitialMetadata(i));
-        }
-        const polls = (await Promise.all(awaitingPolls));
+
+        const reversedIndex = Array.from(Array(amountPolls), (value, index) => {
+            return amountPolls - 1 - index;
+        });
+        const polls = await (bluebird.map(reversedIndex, (index) => {
+            return getPollInitialMetadata(index);
+        }, {
+            concurrency: 100,
+        }));
 
         return {
             amountPolls,

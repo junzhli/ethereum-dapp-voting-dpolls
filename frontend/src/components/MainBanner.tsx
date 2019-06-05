@@ -7,7 +7,6 @@ import { VOTING_CORE_ABI } from "../constants/contractABIs";
 import { StoreState } from "../store/types";
 import { Membership } from "../types";
 import style from "./MainBanner.module.css";
-import commonStyle from "../commons/styles/index.module.css";
 import MembershipUpgrade from "./MembershipUpgrade";
 import PollCreate from "./PollCreate";
 import { IMainBanner, IMainBannerProps, IMainBannerStates } from "./types/MainBanner";
@@ -15,9 +14,9 @@ import { withRouter } from "react-router-dom";
 import { setNotificationStatus, setUserWindowsFocusStatus } from "../actions/user";
 import { UserActionType } from "../actions/types/user";
 import { NOTIFICATION_TITLE, LOCAL_STORAGE } from "../constants/project";
-import { toast } from "react-toastify";
-import toastConfig from "../commons/tostConfig";
+import { toast, ToastOptions } from "react-toastify";
 import { promiseTimeout, PROMISE_TIMEOUT_MESSAGE } from "../utils/helper";
+import Toast from "./Toast";
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
@@ -37,19 +36,18 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
             isLoaded: false,
         };
 
-        toast.configure(toastConfig);
-
         window.addEventListener("focus", () => this.props.setUserWindowsFocus(true));
         window.addEventListener("blur", () => this.props.setUserWindowsFocus(false));
     }
 
     async componentDidMount() {
         if (localStorage.getItem(LOCAL_STORAGE.TUTORIAL) === null) {
-            toast((
-                <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> dPolls: Let's getting started!</p>
-            ), {
+            const title = "dPolls";
+            const detail = "Let's getting started";
+            const options: ToastOptions = {
                 autoClose: false,
-            });
+            };
+            toast(<Toast title={title} detail={detail} />, options);
 
             localStorage.setItem(LOCAL_STORAGE.TUTORIAL, "1");
         }
@@ -70,12 +68,14 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
             } catch (error) {
                 if (error instanceof Error && error.message === PROMISE_TIMEOUT_MESSAGE) {
                     if (this.userNotifiedNetworkUnavailable) {
-                        toast((
-                            <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> We are unable to get access to Ethereum network for now...</p>
-                        ), {
+                        const title = "Connection issue";
+                        const detail = "We are unable to get access to Ethereum network for now...";
+                        const options: ToastOptions = {
                             autoClose: false,
                             onClose: this.userNotifiedNetworkUnavailableHandler,
-                        });
+                        };
+                        toast(<Toast title={title} detail={detail} />, options);
+
                         this.userNotifiedNetworkUnavailable = false;
                     }
                 }
@@ -109,12 +109,13 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                 }
             }, 1000);
         } else {
-            toast((
-                <p><Icon name="bell" className={commonStyle["toast-bell-icon"]} /> We are unable to detect Metamask. Some features are unavailable.</p>
-            ), {
+            const title = "Features limited";
+            const detail = "We are unable to detect Metamask. Some features are unavailable.";
+            const options: ToastOptions = {
                 autoClose: false,
                 onClose: this.userNotifiedNetworkUnavailableHandler,
-            });
+            };
+            toast(<Toast title={title} detail={detail} />, options);
 
             // detect web3 get injected
             this.checkAccountAddressInterval = setInterval(async () => {
