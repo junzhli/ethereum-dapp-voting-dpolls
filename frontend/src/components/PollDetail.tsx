@@ -262,7 +262,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
 
                         if (!this.state.opened) {
                             const title = "Vote";
-                            const detail = "Your vote has been submitted.";
+                            const detail = (<div>Your vote has been submitted. <Icon size="small" name="external alternate" onClick={this.linkSelf} /></div>);
                             toast(<Toast title={title} detail={detail} />);
                         }
 

@@ -163,7 +163,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                     this.props.history.replace("/");
 
                     const title = "Poll creation";
-                    const detail = "Your poll have just been published!";
+                    const detail = (<div>Your poll have just been published! <Icon size="small" name="external alternate" onClick={this.linkPoll.bind(this, poll.address)} /></div>);
                     toast(<Toast title={title} detail={detail} />);
 
                     if (!this.props.userWindowFocus && this.props.notificationStatus === true) {

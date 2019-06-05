@@ -109,8 +109,8 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                 }
             }, 1000);
         } else {
-            const title = "No wallet detected";
-            const detail = "It seems Metamask is not installed. Some features are unavailable.";
+            const title = "Wallet not installed";
+            const detail = (<div className={style.link}>It seems Metamask is not installed. Some features are unavailable. <a target="_blank" rel="noopener noreferrer" href="https://metamask.io/">(Click to install <Icon size="small" color="grey" name="external alternate" link={true} />)</a></div>);
             const options: ToastOptions = {
                 autoClose: false,
                 onClose: this.userNotifiedNetworkUnavailableHandler,
