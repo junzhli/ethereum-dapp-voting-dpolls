@@ -152,14 +152,17 @@ class App extends React.Component<{}, IIndexStates> {
     renderComponent() {
         if (this.state.networkChecked === false) {
             return (
-                <div>
-                    This website is only available on {
-                        (this.networkName) ? (
-                            this.networkName
-                        ) : (
-                            "unknown network (Network ID: " + NETWORK_ID + ")"
-                        )
-                    }. Please change the network where the Metamask connects to!
+                <div className={style["info-segment"]}>
+                    <Dimmer active={true}>
+                        <Loader size="massive">We are only available on {
+                                (this.networkName) ? (
+                                    this.networkName
+                                ) : (
+                                    "unknown network (Network ID: " + NETWORK_ID + ")"
+                                )
+                            }.<br/>Please change the network type where the Metamask connects to!
+                        </Loader>
+                    </Dimmer>
                 </div>
             );
         } else if (this.state.approved === false) {
