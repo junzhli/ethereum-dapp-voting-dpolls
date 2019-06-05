@@ -122,7 +122,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             this.props.history.push(Routes.ROOT);
 
             if (this.state.inProgress) {
-                const title = "Poll creation";
+                const title = "Poll Creation";
                 const detail = "Poll creation is still in progress...";
                 toast(<Toast title={title} detail={detail} />);
             }
