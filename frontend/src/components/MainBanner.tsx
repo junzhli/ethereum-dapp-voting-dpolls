@@ -42,8 +42,8 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
 
     async componentDidMount() {
         if (localStorage.getItem(LOCAL_STORAGE.TUTORIAL) === null) {
-            const title = "dPolls";
-            const detail = "Let's getting started";
+            const title = "Welcome";
+            const detail = "Let's create a poll or vote on dPolls!";
             const options: ToastOptions = {
                 autoClose: false,
             };
@@ -69,7 +69,7 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                 if (error instanceof Error && error.message === PROMISE_TIMEOUT_MESSAGE) {
                     if (this.userNotifiedNetworkUnavailable) {
                         const title = "Connection issue";
-                        const detail = "We are unable to get access to Ethereum network for now...";
+                        const detail = "We are unable to get access to Ethereum network for now.";
                         const options: ToastOptions = {
                             autoClose: false,
                             onClose: this.userNotifiedNetworkUnavailableHandler,
@@ -109,8 +109,8 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
                 }
             }, 1000);
         } else {
-            const title = "Features limited";
-            const detail = "We are unable to detect Metamask. Some features are unavailable.";
+            const title = "No wallet detected";
+            const detail = "It seems Metamask is not installed. Some features are unavailable.";
             const options: ToastOptions = {
                 autoClose: false,
                 onClose: this.userNotifiedNetworkUnavailableHandler,

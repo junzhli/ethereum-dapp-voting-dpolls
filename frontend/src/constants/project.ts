@@ -14,6 +14,6 @@ export const LOCAL_STORAGE = {
  * Common messages
  */
 
-export const ERROR_METAMASK_NOT_INSTALLED = "No wallet found. Please install metamask!";
+export const ERROR_METAMASK_NOT_INSTALLED = "Wallet required. Please install metamask!";
 
-export const ERROR_NO_WALLET_FOUND = "No wallet found";
+export const ERROR_NO_WALLET_FOUND = "Wallet required";
