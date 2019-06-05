@@ -161,7 +161,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             this.props.history.push(Routes.ROOT);
 
             if (this.state.inProgress) {
-                const title = "Voting";
+                const title = "Vote";
                 const detail = "Your submission is still in progress...";
                 toast(<Toast title={title} detail={detail} />);
             }
@@ -261,7 +261,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                         });
 
                         if (!this.state.opened) {
-                            const title = "Voting";
+                            const title = "Vote";
                             const detail = "Your vote has been submitted.";
                             toast(<Toast title={title} detail={detail} />);
                         }
