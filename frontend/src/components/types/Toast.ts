@@ -1,7 +1,7 @@
 export namespace IToast {
     export interface IInnerProps {
         title: string;
-        detail: string;
+        detail: JSX.Element | string;
     }
 
     export interface IStateFromProps {

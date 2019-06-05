@@ -34,3 +34,7 @@
     margin: auto;
     width: 75%;
 }
+
+.link a {
+    color: inherit;
+}
