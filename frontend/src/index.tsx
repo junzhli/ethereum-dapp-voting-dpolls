@@ -17,6 +17,8 @@ import { BrowserRouter as Router } from "react-router-dom";
 import ReactGA from "react-ga";
 import MainFooter from "./components/MainFooter";
 import MainSearchBar from "./components/MainSearchBar";
+import { toast } from "react-toastify";
+import toastConfig from "./commons/toastConfig";
 
 const GOOGLE_ANALYTICS_TRACKING_ID = process.env.REACT_APP_GOOGLE_ANALYTICS_TRACKING_CODE;
 if (GOOGLE_ANALYTICS_TRACKING_ID) {
@@ -67,6 +69,7 @@ class App extends React.Component<{}, IIndexStates> {
         };
         this.networkName = null;
         this.userWalletUnlockApproval = this.userWalletUnlockApproval.bind(this);
+        toast.configure(toastConfig);
     }
 
     async componentDidMount() {
