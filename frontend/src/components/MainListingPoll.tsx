@@ -19,6 +19,7 @@ import Routes from "../constants/routes";
 import bluebird from "bluebird";
 import bluebirdConfig from "../commons/bluebirdConfig";
 import Toast from "./Toast";
+import { DBInstance, IListing } from "../utils/db";
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 
@@ -220,10 +221,35 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
 
         const amountPolls: number = (await this.contract.methods.getAmountVotings().call()).toNumber();
         const getPollInitialMetadata = async (index: number) => {
-            const address = (index in this.initialMetadata && this.initialMetadata[index].address) || await this.contract.methods.getVotingItemByIndex(index).call();
+            // find local if available
+            let localdb: IListing | undefined;
+            let localdbAvailable: boolean = false;
+            try {
+                localdb = await DBInstance.listing.get(index);
+                if (localdb) {
+                    localdbAvailable = true;
+                }
+            } catch (error) {
+                console.log("access db -> listing failed: " + index);
+                console.log(error);
+            }
+
+            const address = (index in this.initialMetadata && this.initialMetadata[index].address) || (localdb && localdb.address) || await this.contract.methods.getVotingItemByIndex(index).call();
             const contract = (index in this.initialMetadata && this.initialMetadata[index].contract) || new this.props.web3Rpc.eth.Contract(VOTING_ABI, address);
-            const expiryBlockNumber = (index in this.initialMetadata && this.initialMetadata[index].expiryBlockNumber) || (await contract.methods.expiryBlockNumber().call()).toNumber();
+            const expiryBlockNumber = (index in this.initialMetadata && this.initialMetadata[index].expiryBlockNumber) || (localdb && localdb.expiryBlockNumber) || (await contract.methods.expiryBlockNumber().call()).toNumber();
             const isExpired = this.checkIfExpired(expiryBlockNumber) as boolean;
+
+            if (!localdbAvailable) {
+                // save entity to database asynchronously
+                DBInstance.listing.put({
+                    index,
+                    address,
+                    expiryBlockNumber,
+                }).catch((error) => {
+                    console.log("save db -> listing failed: " + index);
+                    console.log(error);
+                });
+            }
 
             const pollInitialMetadata: PollInitialMetadata = {
                 address,

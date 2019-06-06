@@ -6,6 +6,7 @@ import { Address } from "../types";
 import style from "./PollCard.module.css";
 import PollDetail from "./PollDetail";
 import { IPollCard, IPollCardProps, IPollCardStates, IPollCardStatus } from "./types/PollCard";
+import { IDetail, DBInstance, IOptions } from "../utils/db";
 
 class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     private contract: any;
@@ -78,17 +79,62 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     }
 
     async componentDidMount() {
-        const awaitingChairperson = this.contract.methods.chairperson().call();
-        const awaitingTitle = this.contract.methods.title().call();
+        // find local if available
+        let localdbDetail: IDetail | undefined;
+        let localdbDetailAvailable: boolean = false;
+        try {
+            localdbDetail = await DBInstance.detail.get(this.props.address);
+            if (localdbDetail) {
+                localdbDetailAvailable = true;
+            }
+        } catch (error) {
+            console.log("access db -> detail failed: " + this.props.address);
+            console.log(error);
+        }
+
+        const awaitingChairperson = (localdbDetail && localdbDetail.chairperson) || this.contract.methods.chairperson().call();
+        const awaitingTitle = (localdbDetail && localdbDetail.title) || this.contract.methods.title().call();
         const awaitingIsVoted = this.checkIfVoted(this.props.accountAddress);
-        const amountOptions = Number(await this.contract.methods.optionsAmount().call());
+        const amountOptions = (localdbDetail && localdbDetail.amountOptions) || Number(await this.contract.methods.optionsAmount().call());
+
+        // find local if available
+        const localdbOptionsAvailable: {
+            [key: string]: boolean,
+        } = {};
+
         const awaitingOptions = [];
         for (let i = 0; i < amountOptions; i++) {
-            awaitingOptions.push(this.contract.methods.getOptionTitleByIndex(i).call());
+            let localOptions: IOptions | undefined;
+            try {
+                localOptions = await DBInstance.options.get({address: this.props.address, index: i});
+                if (localOptions) {
+                    localdbOptionsAvailable[i] = true;
+                }
+            } catch (error) {
+                console.log("access db -> options failed: " + this.props.address + " " + i);
+                console.log(error);
+            }
+
+            const awaitingOption = (localOptions && localOptions.option) || this.contract.methods.getOptionTitleByIndex(i).call();
+            awaitingOptions.push(awaitingOption);
         }
         const awaitingVotesAmount = this.contract.methods.votesAmount().call();
 
         const jsonRpcData = await Promise.all([awaitingChairperson, awaitingTitle, awaitingIsVoted, awaitingVotesAmount, ...awaitingOptions]);
+
+        if (!localdbDetailAvailable) {
+            // save entity to database asynchronously
+            DBInstance.detail.put({
+                address: this.props.address,
+                chairperson: jsonRpcData[0],
+                title: jsonRpcData[1],
+                amountOptions,
+            }).catch((error) => {
+                console.log("save db -> detail failed: " + this.props.address);
+                console.log(error);
+            });
+        }
+
         const chairperson = jsonRpcData[0] as string;
         const title = this.props.web3Rpc.utils.hexToUtf8(jsonRpcData[1]) as string;
         const isVoted = jsonRpcData[2];
@@ -96,6 +142,19 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
         const options: string[] = [];
         for (let i = 4; i < amountOptions + 4; i++) {
             options.push(this.props.web3Rpc.utils.hexToUtf8(jsonRpcData[i]) as string);
+
+            const optionIndex = i - 4;
+            if (!(optionIndex in localdbOptionsAvailable)) {
+                // save entity to database asynchronously
+                DBInstance.options.put({
+                    address: this.props.address,
+                    index: optionIndex,
+                    option: jsonRpcData[i],
+                }).catch((error) => {
+                    console.log("save db -> options failed: " + this.props.address + " " + optionIndex);
+                    console.log(error);
+                });
+            }
         }
 
         this.setState({

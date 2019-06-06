@@ -24,6 +24,7 @@
     "case-sensitive-paths-webpack-plugin": "2.2.0",
     "chart.js": "^2.8.0",
     "css-loader": "1.0.0",
+    "dexie": "^2.0.4",
     "dotenv": "^6.0.0",
     "dotenv-expand": "4.2.0",
     "eslint": "5.12.0",
