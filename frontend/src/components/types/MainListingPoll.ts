@@ -37,8 +37,6 @@ export interface IMainListingPollState {
     inactivePolls: PollInitialMetadata[] | null;
     activePolls: PollInitialMetadata[] | null;
     filteredPolls: AddressType[] | null;
-    inactiveCollapse: boolean;
-    activeCollapse: boolean;
     filteredView: FilteredViewOptions;
 }
 

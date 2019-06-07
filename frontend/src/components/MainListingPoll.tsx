@@ -52,13 +52,9 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
             amountPolls: null,
             inactivePolls: null,
             activePolls: null,
-            inactiveCollapse: true,
-            activeCollapse: true,
             filteredPolls: null,
             filteredView: "all",
         };
-        this.inactiveCollapseToggle = this.inactiveCollapseToggle.bind(this);
-        this.activeCollapseToggle = this.activeCollapseToggle.bind(this);
         this.syncAdditionalData = this.syncAdditionalData.bind(this);
         this.linkPoll = this.linkPoll.bind(this);
         this.selectedFilteredView = this.selectedFilteredView.bind(this);
@@ -289,18 +285,6 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         };
     }
 
-    inactiveCollapseToggle() {
-        this.setState({
-            inactiveCollapse: !this.state.inactiveCollapse,
-        });
-    }
-
-    activeCollapseToggle() {
-        this.setState({
-            activeCollapse: !this.state.activeCollapse,
-        });
-    }
-
     renderFiltered(polls: PollInitialMetadata[], filter: AddressType[], listType: FilteredViewOptions) {
         const categoriedPolls = polls.map((pollInitialMetadata) => {
             if (filter.includes(pollInitialMetadata.address)) {
@@ -452,7 +436,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                                                     this.state.activePolls.map((pollInitialMetadata) => {
                                                         const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
                                                         return (
-                                                            <PollCard display={true} status="inactive" web3={this.props.web3} web3Rpc={this.props.web3Rpc} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
+                                                            <PollCard display={true} status="active" web3={this.props.web3} web3Rpc={this.props.web3Rpc} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
                                                         );
                                                     })
                                                 )
