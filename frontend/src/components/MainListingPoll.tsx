@@ -1,6 +1,6 @@
 import React, { Dispatch } from "react";
 import { connect } from "react-redux";
-import { Button, Header, Icon, Item, Loader, Segment } from "semantic-ui-react";
+import { Header, Icon, Item, Loader, Segment, Menu } from "semantic-ui-react";
 import { setStatistics, removeMonitoringPoll, setSearchResultsAmount } from "../actions/poll";
 import { BlockHeightType, AddressType } from "../actions/types/eth";
 import { PollActionType } from "../actions/types/poll";
@@ -8,7 +8,7 @@ import { VOTING_ABI, VOTING_CORE_ABI } from "../constants/contractABIs";
 import { StoreState } from "../store/types";
 import style from "./MainListingPoll.module.css";
 import PollCard from "./PollCard";
-import { IMainListingPoll, IMainListingPollProps, IMainListingPollState, PollInitialMetadata, AdditionalData } from "./types/MainListingPoll";
+import { IMainListingPoll, IMainListingPollProps, IMainListingPollState, PollInitialMetadata, AdditionalData, FilteredViewOptions } from "./types/MainListingPoll";
 import { NOTIFICATION_TITLE } from "../constants/project";
 import Fuse from "fuse.js";
 import { setSearchBar } from "../actions/user";
@@ -31,6 +31,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         [key: string]: boolean,
         active: boolean,
         inactive: boolean,
+        all: boolean,
     };
     private initialMetadata: {
         [key: string]: PollInitialMetadata;
@@ -44,19 +45,23 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         this.showNoSearchResult = {
             active: false,
             inactive: false,
+            all: false,
         };
         this.state = {
+            polls: null,
             amountPolls: null,
             inactivePolls: null,
             activePolls: null,
             inactiveCollapse: true,
             activeCollapse: true,
             filteredPolls: null,
+            filteredView: "all",
         };
         this.inactiveCollapseToggle = this.inactiveCollapseToggle.bind(this);
         this.activeCollapseToggle = this.activeCollapseToggle.bind(this);
         this.syncAdditionalData = this.syncAdditionalData.bind(this);
         this.linkPoll = this.linkPoll.bind(this);
+        this.selectedFilteredView = this.selectedFilteredView.bind(this);
         bluebird.config(bluebirdConfig);
     }
 
@@ -92,6 +97,12 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         if (this.props !== prevProps) {
             await this.refreshPolls();
         }
+    }
+
+    selectedFilteredView(filteredView: FilteredViewOptions) {
+        this.setState({
+            filteredView,
+        });
     }
 
     updateInitialMetadataStorage(polls: PollInitialMetadata[]) {
@@ -184,6 +195,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
             }
 
             this.setState({
+                polls,
                 amountPolls,
                 activePolls,
                 inactivePolls,
@@ -289,7 +301,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         });
     }
 
-    renderFiltered(polls: PollInitialMetadata[], filter: AddressType[], listType: "active" | "inactive") {
+    renderFiltered(polls: PollInitialMetadata[], filter: AddressType[], listType: FilteredViewOptions) {
         const categoriedPolls = polls.map((pollInitialMetadata) => {
             if (filter.includes(pollInitialMetadata.address)) {
                 return Object.assign(pollInitialMetadata, {
@@ -304,6 +316,9 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
 
         if (categoriedPolls.filter((pollInitialMetadata) => pollInitialMetadata.filtered === true).length === 0) {
             switch (listType) {
+                case "all":
+                    this.showNoSearchResult.all = true;
+                    break;
                 case "active":
                     this.showNoSearchResult.active = true;
                     break;
@@ -324,6 +339,9 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         }
 
         switch (listType) {
+            case "all":
+                this.showNoSearchResult.all = false;
+                break;
             case "active":
                 this.showNoSearchResult.active = false;
                 break;
@@ -368,7 +386,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         );
     }
 
-    renderComponent() {
+    renderContent() {
         let state: "loading" | "completed" | null = null;
 
         if (this.state.amountPolls === null) {
@@ -398,106 +416,113 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                     );
                 }
 
-                return (
-                    <Item.Group divided={true}>
-                        <div className={style["inline-container"]}>
-                            <div className={style["inline-title"]}>
-                                <Header size="large" content="Active Polls" />
-                            </div>
-                            {
-                                (this.state.activePolls && this.state.activePolls.length !== 0) && (
-                                    <div className={style["inline-button"]}>
-                                        {
-                                            (this.state.activeCollapse) ? (
-                                                <Button icon={true} onClick={this.activeCollapseToggle}><Icon name="chevron down" size="big" /></Button>
-                                            ) : (
-                                                    <Button icon={true} onClick={this.activeCollapseToggle}><Icon name="chevron up" size="big" /></Button>
+                switch (this.state.filteredView) {
+                    case "all":
+                        return (
+                            <div className={style["poll-content"]}>
+                                {
+                                    (this.state.polls && this.state.polls.length !== 0) ? (
+                                        <div>
+                                            {
+                                                (this.state.filteredPolls !== null) ? this.renderFiltered(this.state.polls, this.state.filteredPolls, "all") : (
+                                                    this.state.polls.map((pollInitialMetadata) => {
+                                                        const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
+                                                        return (
+                                                            <PollCard display={true} status="active" web3={this.props.web3} web3Rpc={this.props.web3Rpc} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
+                                                        );
+                                                    })
                                                 )
-                                        }
-
-                                    </div>
-                                )
-                            }
-                        </div>
-                        {
-                            (this.state.activePolls && this.state.activePolls.length !== 0) ? (
-                                <div className={
-                                    (this.state.activeCollapse) ? (
-                                        [style.collapse, style["active-list"]].join(" ")
-                                    ) : (
-                                            style["active-list"]
-                                        )}>
-                                    <Segment>
-                                        {
-                                            (this.state.filteredPolls !== null) ? this.renderFiltered(this.state.activePolls, this.state.filteredPolls, "active") : (
-                                                this.state.activePolls.map((pollInitialMetadata) => {
-                                                    const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
-                                                    return (
-                                                        <PollCard display={true} status="active" web3={this.props.web3} web3Rpc={this.props.web3Rpc} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
-                                                    );
-                                                })
-                                            )
-                                        }
-                                        {
-                                            (this.showNoSearchResult.active) && this.renderNoMatchesAvailable()
-                                        }
-                                    </Segment>
-                                </div>
-                            ) : this.renderNoPollsAvailable()
-                        }
-
-                        <br />
-                        <div className={style["inline-container"]}>
-                            <div className={style["inline-title"]}>
-                                <Header size="large" content="Expired Polls" />
+                                            }
+                                            {
+                                                (this.showNoSearchResult.all) && this.renderNoMatchesAvailable()
+                                            }
+                                        </div>
+                                    ) : this.renderNoPollsAvailable()
+                                }
                             </div>
-                            {
-                                (this.state.inactivePolls && this.state.inactivePolls.length !== 0) && (
-                                    <div className={style["inline-button"]}>
-                                        {
-                                            (this.state.inactiveCollapse) ? (
-                                                <Button icon={true} onClick={this.inactiveCollapseToggle}><Icon name="chevron down" size="big" /></Button>
-                                            ) : (
-                                                    <Button icon={true} onClick={this.inactiveCollapseToggle}><Icon name="chevron up" size="big" /></Button>
+                        );
+                    case "active":
+                        return (
+                            <div className={style["poll-content"]}>
+                                {
+                                    (this.state.activePolls && this.state.activePolls.length !== 0) ? (
+                                        <div>
+                                            {
+                                                (this.state.filteredPolls !== null) ? this.renderFiltered(this.state.activePolls, this.state.filteredPolls, "active") : (
+                                                    this.state.activePolls.map((pollInitialMetadata) => {
+                                                        const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
+                                                        return (
+                                                            <PollCard display={true} status="inactive" web3={this.props.web3} web3Rpc={this.props.web3Rpc} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
+                                                        );
+                                                    })
                                                 )
-                                        }
-                                    </div>
-                                )
-                            }
-                        </div>
-                        {
-                            (this.state.inactivePolls && this.state.inactivePolls.length !== 0) ? (
-                                <div className={
-                                    (this.state.inactiveCollapse) ? (
-                                        [style.collapse, style["inactive-list"]].join(" ")
-                                    ) : (
-                                            style["inactive-list"]
-                                        )}>
-                                    <Segment>
-                                        {
-                                            (this.state.filteredPolls !== null) ? this.renderFiltered(this.state.inactivePolls, this.state.filteredPolls, "inactive") : (
-                                                this.state.inactivePolls.map((pollInitialMetadata) => {
-                                                    const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
-                                                    return (
-                                                        <PollCard display={true} status="inactive" web3={this.props.web3} web3Rpc={this.props.web3Rpc} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
-                                                    );
-                                                })
-                                            )
-                                        }
-                                        {
-                                            (this.showNoSearchResult.inactive) && this.renderNoMatchesAvailable()
-                                        }
-                                    </Segment>
-                                </div>
-                            ) : this.renderNoPollsAvailable()
-                        }
-                    </Item.Group>
-                );
+                                            }
+                                            {
+                                                (this.showNoSearchResult.active) && this.renderNoMatchesAvailable()
+                                            }
+                                        </div>
+                                    ) : this.renderNoPollsAvailable()
+                                }
+                            </div>
+                        );
+                    case "inactive":
+                        return (
+                            <div className={style["poll-content"]}>
+                                {
+                                    (this.state.inactivePolls && this.state.inactivePolls.length !== 0) ? (
+                                        <div>
+                                            {
+                                                (this.state.filteredPolls !== null) ? this.renderFiltered(this.state.inactivePolls, this.state.filteredPolls, "inactive") : (
+                                                    this.state.inactivePolls.map((pollInitialMetadata) => {
+                                                        const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
+                                                        return (
+                                                            <PollCard display={true} status="inactive" web3={this.props.web3} web3Rpc={this.props.web3Rpc} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
+                                                        );
+                                                    })
+                                                )
+                                            }
+                                            {
+                                                (this.showNoSearchResult.inactive) && this.renderNoMatchesAvailable()
+                                            }
+                                        </div>
+                                    ) : this.renderNoPollsAvailable()
+                                }
+                            </div>
+                        );
+                }
         }
     }
 
+    renderMenu() {
+        return (
+            <Menu pointing={true} secondary={true}>
+                <Menu.Item
+                    name="all"
+                    active={this.state.filteredView === "all"}
+                    onClick={this.selectedFilteredView.bind(this, "all")}
+                />
+                <Menu.Item
+                    name="active"
+                    active={this.state.filteredView === "active"}
+                    onClick={this.selectedFilteredView.bind(this, "active")}
+                />
+                <Menu.Item
+                    name="inactive"
+                    active={this.state.filteredView === "inactive"}
+                    onClick={this.selectedFilteredView.bind(this, "inactive")}
+                />
+            </Menu>
+        );
+    }
+
     render() {
-        return this.renderComponent();
+        return (
+            <div>
+                <Header size="huge">Latest polls</Header>
+                {this.renderMenu()}
+                {this.renderContent()}
+            </div>
+        );
     }
 }
 
