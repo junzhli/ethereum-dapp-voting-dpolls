@@ -33,12 +33,16 @@ export interface PollInitialMetadata {
 }
 export interface IMainListingPollState {
     amountPolls: number | null;
+    polls: PollInitialMetadata[] | null;
     inactivePolls: PollInitialMetadata[] | null;
     activePolls: PollInitialMetadata[] | null;
     filteredPolls: AddressType[] | null;
     inactiveCollapse: boolean;
     activeCollapse: boolean;
+    filteredView: FilteredViewOptions;
 }
+
+export type FilteredViewOptions = "all" | "active" | "inactive";
 
 export interface AdditionalData {
     contractAddress: AddressType;

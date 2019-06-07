@@ -2,7 +2,7 @@ import { ToastContainerProps, Slide } from "react-toastify";
 import style from "../commons/styles/index.module.css";
 
 const toastConfig: ToastContainerProps = {
-    position: "bottom-left",
+    position: "bottom-right",
     hideProgressBar: true,
     transition: Slide,
     style: {
