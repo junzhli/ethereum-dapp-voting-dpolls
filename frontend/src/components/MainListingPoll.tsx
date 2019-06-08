@@ -1,7 +1,7 @@
 import React, { Dispatch } from "react";
 import { connect } from "react-redux";
-import { Header, Icon, Item, Loader, Segment, Menu } from "semantic-ui-react";
-import { setStatistics, removeMonitoringPoll, setSearchResultsAmount } from "../actions/poll";
+import { Header, Icon, Item, Loader, Segment, Menu, Dimmer } from "semantic-ui-react";
+import { setStatistics, removeMonitoringPoll, setSearchResultsAmount, setActivePollDetail, setActivePollDetailInProgress } from "../actions/poll";
 import { BlockHeightType, AddressType } from "../actions/types/eth";
 import { PollActionType } from "../actions/types/poll";
 import { VOTING_ABI, VOTING_CORE_ABI } from "../constants/contractABIs";
@@ -20,6 +20,8 @@ import bluebird from "bluebird";
 import bluebirdConfig from "../commons/bluebirdConfig";
 import Toast from "./Toast";
 import { DBInstance, IListing } from "../utils/db";
+import { PollDetailArguments } from "./types/PollDetail";
+import PollDetail from "./PollDetail";
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 
@@ -54,10 +56,13 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
             activePolls: null,
             filteredPolls: null,
             filteredView: "all",
+            showDetailView: null,
         };
         this.syncAdditionalData = this.syncAdditionalData.bind(this);
         this.linkPoll = this.linkPoll.bind(this);
         this.selectedFilteredView = this.selectedFilteredView.bind(this);
+        this.renderDetailView = this.renderDetailView.bind(this);
+        this.detailViewToggleHandler = this.detailViewToggleHandler.bind(this);
         bluebird.config(bluebirdConfig);
     }
 
@@ -92,6 +97,20 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
     async componentDidUpdate(prevProps: IMainListingPollProps) {
         if (this.props !== prevProps) {
             await this.refreshPolls();
+        }
+
+        if (this.state.polls) {
+            const pollAddresses = this.state.polls.map((poll) => poll.address);
+            pollAddresses.forEach((address, index) => {
+                const detailPath = Routes.POLLS_BASE + address;
+                if (this.props.location.pathname === detailPath && (address !== this.props.activeDetailAddress.address) && this.state.polls) {
+                    this.setState({
+                        showDetailView: null,
+                    });
+                    this.props.setActiveDetailAddress(address, index);
+                    this.props.setActiveDetailViewInProgress(true);
+                }
+            });
         }
     }
 
@@ -285,6 +304,33 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         };
     }
 
+    detailViewToggleHandler(args: PollDetailArguments | null) {
+        if (args === null) {
+            return this.setState({
+                showDetailView: null,
+            });
+        }
+
+        const { web3, web3Rpc, contract, address, title, options, expiryBlockHeight, isExpired, isVoted, votesAmount } = args;
+        this.setState({
+            showDetailView: {
+                web3,
+                web3Rpc,
+                contract,
+                address,
+                title,
+                options,
+                expiryBlockHeight,
+                isExpired,
+                isVoted,
+                votesAmount,
+            },
+        });
+
+        const detailPath = Routes.POLLS_BASE + address;
+        this.props.history.push(detailPath);
+    }
+
     renderFiltered(polls: PollInitialMetadata[], filter: AddressType[], listType: FilteredViewOptions) {
         const categoriedPolls = polls.map((pollInitialMetadata) => {
             if (filter.includes(pollInitialMetadata.address)) {
@@ -412,7 +458,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                                                     this.state.polls.map((pollInitialMetadata) => {
                                                         const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
                                                         return (
-                                                            <PollCard display={true} status="active" web3={this.props.web3} web3Rpc={this.props.web3Rpc} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
+                                                            <PollCard display={true} status={(!isExpired) ? "active" : "inactive"} web3={this.props.web3} web3Rpc={this.props.web3Rpc} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
                                                         );
                                                     })
                                                 )
@@ -429,14 +475,19 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                         return (
                             <div className={style["poll-content"]}>
                                 {
-                                    (this.state.activePolls && this.state.activePolls.length !== 0) ? (
+                                    (this.state.polls && this.state.activePolls && this.state.activePolls.length !== 0) ? (
                                         <div>
                                             {
                                                 (this.state.filteredPolls !== null) ? this.renderFiltered(this.state.activePolls, this.state.filteredPolls, "active") : (
-                                                    this.state.activePolls.map((pollInitialMetadata) => {
+                                                    this.state.polls.map((pollInitialMetadata) => {
+                                                        let activePollAddresses: AddressType[] = [];
+                                                        if (this.state.activePolls) {
+                                                            activePollAddresses = this.state.activePolls.map((poll) => poll.address);
+                                                        }
+
                                                         const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
                                                         return (
-                                                            <PollCard display={true} status="active" web3={this.props.web3} web3Rpc={this.props.web3Rpc} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
+                                                            <PollCard display={activePollAddresses.includes(pollInitialMetadata.address)} status="inactive" web3={this.props.web3} web3Rpc={this.props.web3Rpc} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
                                                         );
                                                     })
                                                 )
@@ -453,14 +504,19 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                         return (
                             <div className={style["poll-content"]}>
                                 {
-                                    (this.state.inactivePolls && this.state.inactivePolls.length !== 0) ? (
+                                    (this.state.polls && this.state.inactivePolls && this.state.inactivePolls.length !== 0) ? (
                                         <div>
                                             {
                                                 (this.state.filteredPolls !== null) ? this.renderFiltered(this.state.inactivePolls, this.state.filteredPolls, "inactive") : (
-                                                    this.state.inactivePolls.map((pollInitialMetadata) => {
+                                                    this.state.polls.map((pollInitialMetadata) => {
+                                                        let inactivePollAddresses: AddressType[] = [];
+                                                        if (this.state.inactivePolls) {
+                                                            inactivePollAddresses = this.state.inactivePolls.map((poll) => poll.address);
+                                                        }
+
                                                         const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
                                                         return (
-                                                            <PollCard display={true} status="inactive" web3={this.props.web3} web3Rpc={this.props.web3Rpc} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
+                                                            <PollCard display={inactivePollAddresses.includes(pollInitialMetadata.address)} status="inactive" web3={this.props.web3} web3Rpc={this.props.web3Rpc} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
                                                         );
                                                     })
                                                 )
@@ -499,12 +555,62 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         );
     }
 
+    renderDetailView() {
+        if (!this.state.showDetailView) {
+            return;
+        }
+
+        const { web3, web3Rpc, contract, address, title, options, expiryBlockHeight, isExpired, isVoted, votesAmount } = this.state.showDetailView;
+        return (
+            <PollDetail
+                web3={web3}
+                web3Rpc={web3Rpc}
+                address={address}
+                title={title}
+                options={options}
+                votesAmount={votesAmount}
+                expiryBlockHeight={expiryBlockHeight}
+                isExpired={isExpired}
+                isVoted={isVoted}
+                contract={contract}
+            />
+        );
+    }
+
+    initialDetailView() {
+        if (!this.props.activeDetailAddress.address) {
+            return new Error("Can't invoke without activeDetailAddress");
+        }
+
+        if (!this.state.polls) {
+            return;
+        }
+
+        return (
+            <PollCard
+                detailViewDataConnecter={this.detailViewToggleHandler}
+                display={false}
+                detailViewOnly={true}
+                status="inactive"
+                web3={this.props.web3}
+                web3Rpc={this.props.web3Rpc}
+                address={this.props.activeDetailAddress.address}
+                isExpired={(this.state.polls && this.state.polls[this.props.activeDetailAddress.index as number].isExpired) as boolean}
+                expiryBlockNumber={(this.state.polls && this.state.polls[this.props.activeDetailAddress.index as number].expiryBlockNumber) as number}
+                contract={(this.state.polls && this.state.polls[this.props.activeDetailAddress.index as number].contract) as any}
+                key={this.props.activeDetailAddress.address}
+            />
+        );
+    }
+
     render() {
         return (
             <div>
                 <Header size="huge">Latest polls</Header>
                 {this.renderMenu()}
                 {this.renderContent()}
+                {this.props.activeDetailAddress.address && this.initialDetailView()}
+                {this.props.activeDetailAddress.address && this.renderDetailView()}
             </div>
         );
     }
@@ -517,6 +623,10 @@ const mapStateToProps = (state: StoreState, ownProps: IMainListingPoll.IInnerPro
         notificationStatus: state.userMisc.notificationStatus,
         userSearchKeywords: state.pollMisc.keywords,
         userWindowFocus: state.userMisc.userWindowsFocus,
+        activeDetailAddress: {
+            address: state.pollMisc.activeDetailAddress.address,
+            index: state.pollMisc.activeDetailAddress.index,
+        },
     };
 };
 
@@ -526,6 +636,8 @@ const mapDispatchToProps = (dispatch: Dispatch<PollActionType | UserActionType>,
         removeMonitoringPolls: (addresses: AddressType[]) => dispatch(removeMonitoringPoll(addresses)),
         setSearchResultsAmount: (amount: number | null) => dispatch(setSearchResultsAmount(amount)),
         setSearchBar: (enabled: boolean) => dispatch(setSearchBar(enabled)),
+        setActiveDetailAddress: (address: AddressType | null, index: number) => dispatch(setActivePollDetail(address, index)),
+        setActiveDetailViewInProgress: (inProgress: boolean) => dispatch(setActivePollDetailInProgress(inProgress)),
     };
 };
 

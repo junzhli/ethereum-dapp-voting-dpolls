@@ -22,6 +22,10 @@
 
  export const SET_SEARCH_RESULTS_AMOUNT = "SET-SEARCH-RESULTS-AMOUNT";
 
+ export const SET_ACTIVE_POLL_DETAIL = "SET-ACTIVE-POLL-DETAIL";
+
+ export const SET_ACTIVE_POLL_DETAIL_IN_PROGRESS = "SET-ACTIVE-POLL-DETAIL-IN-PROGRESS";
+
 /**
  * User runtime configurations
  */

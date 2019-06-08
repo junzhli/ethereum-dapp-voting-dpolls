@@ -61,9 +61,9 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
         const ONE_SECONDS = 1000;
         this.checkBlockNumberInterval = setInterval(async () => {
             try {
-                const blockNumber = await promiseTimeout(ONE_SECONDS * 20, this.props.web3Rpc.eth.getBlockNumber());
+                const blockNumber2 = await promiseTimeout<number>(ONE_SECONDS * 20, this.props.web3Rpc.eth.getBlockNumber());
                 if (blockNumber !== this.props.blockHeight) {
-                    this.props.setBlockHeight(blockNumber);
+                    this.props.setBlockHeight(blockNumber2);
                 }
             } catch (error) {
                 if (error instanceof Error && error.message === PROMISE_TIMEOUT_MESSAGE) {

@@ -19,10 +19,17 @@ export namespace IPollDetail {
     export interface IStateFromProps {
         accountAddress: AddressType | null;
         blockHeight: BlockHeightType;
+        activeDetailAddress: AddressType | null;
+        activeDetailViewInProgress: boolean;
+    }
+
+    export interface IPropsFromDispatch {
+        setActiveDetailAddress: (address: AddressType | null) => void;
+        setActiveDetailViewInProgress: (inProgress: boolean) => void;
     }
 }
 
-export type IPollDetailProps = RouteComponentProps<{}> & IPollDetail.IInnerProps & IPollDetail.IStateFromProps;
+export type IPollDetailProps = RouteComponentProps<{}> & IPollDetail.IInnerProps & IPollDetail.IStateFromProps & IPollDetail.IPropsFromDispatch;
 
 export interface IPollDetailStates {
     waitingMessage: {
@@ -41,11 +48,23 @@ export interface IPollDetailStates {
         show: boolean,
         message: JSX.Element | null,
     };
-    votedOption: number | null;
     votesByIndex: number[] | null;
     chart: {
         option: ChartData<Chart.ChartData>;
     } | null;
     opened: boolean;
     inProgress: boolean;
+}
+
+export interface PollDetailArguments {
+    web3: any;
+    web3Rpc: any;
+    contract: any;
+    address: AddressType;
+    title: string;
+    options: string[];
+    expiryBlockHeight: BlockHeightType;
+    isExpired: boolean;
+    isVoted: boolean | null;
+    votesAmount: number;
 }

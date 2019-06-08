@@ -6,3 +6,20 @@
 .hidden { 
     display:none; 
 }
+
+.align-right {
+    margin-left:auto;
+    float: right;
+    margin-top: -40px;
+}
+
+.voted-hint {
+    text-align: center;
+    margin-bottom: 10px;
+    font-style: italic;
+    color: brown;
+}
+
+.show-voted-hint {
+    margin-top: -70px !important;
+}
