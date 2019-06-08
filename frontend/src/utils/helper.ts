@@ -1,8 +1,8 @@
 export const PROMISE_TIMEOUT_MESSAGE = "Promise timeout";
 
-export const promiseTimeout = (ms: number, promise: Promise<any>) => {
+export const promiseTimeout = <T>(ms: number, promise: Promise<T>) => {
     // Create a promise that rejects in <ms> milliseconds
-    const timeout = new Promise((resolve, reject) => {
+    const timeout = new Promise<T>((resolve, reject) => {
         const id = setTimeout(() => {
         clearTimeout(id);
         reject(new Error(PROMISE_TIMEOUT_MESSAGE));
@@ -10,7 +10,7 @@ export const promiseTimeout = (ms: number, promise: Promise<any>) => {
     });
 
     // Returns a race between our timeout and the passed in promise
-    return Promise.race([
+    return Promise.race<Promise<T>>([
         promise,
         timeout,
     ]);

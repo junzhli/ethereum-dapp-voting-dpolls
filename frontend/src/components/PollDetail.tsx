@@ -1,4 +1,4 @@
-import React, { SyntheticEvent } from "react";
+import React, { SyntheticEvent, Dispatch } from "react";
 import { ChartData, Pie } from "react-chartjs-2";
 import { connect } from "react-redux";
 import { Button, Checkbox, Form, Header, Icon, Message, Modal, ButtonProps, ModalProps } from "semantic-ui-react";
@@ -13,6 +13,9 @@ import { withRouter } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ERROR_METAMASK_NOT_INSTALLED } from "../constants/project";
 import Toast from "./Toast";
+import { AddressType } from "../actions/types/eth";
+import { setActivePollDetail, setActivePollDetailInProgress } from "../actions/poll";
+import { PollActionType } from "../actions/types/poll";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
@@ -44,10 +47,9 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                 show: false,
                 message: null,
             },
-            votedOption: null,
             chart: null,
             votesByIndex: null,
-            opened: (this.props.location.pathname === this.path) ? true : false,
+            opened: false,
             inProgress: false,
         };
         this.handleOptionVoted = this.handleOptionVoted.bind(this);
@@ -140,6 +142,34 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
         }
     }
 
+    componentDidUpdate(prevProps: IPollDetailProps) {
+        if (!this.state.opened) {
+            const dataArrived = this.checkAllDataReady();
+            if (dataArrived) {
+                this.props.setActiveDetailViewInProgress(false);
+                this.setState({
+                    opened: true,
+                });
+            }
+        }
+    }
+
+    checkAllDataReady() {
+        if (this.state.votesByIndex) {
+            if (this.props.votesAmount !== 0 && !this.state.chart) {
+                return false;
+            }
+
+            if (this.props.isVoted && !this.state.votingMessage) {
+                return false;
+            }
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     linkSelf() {
         this.props.history.push(this.path);
     }
@@ -159,6 +189,8 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                 opened: false,
             });
             this.props.history.push(Routes.ROOT);
+
+            this.props.setActiveDetailAddress(null);
 
             if (this.state.inProgress) {
                 const title = "Vote";
@@ -353,132 +385,117 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
 
     renderComponent() {
         return (
-            <div className={
-                (this.props.isVoted) ? [style["align-right"], style["show-voted-hint"]].join(" ") : style["align-right"]
-            }>
-                {
-                    (this.props.isVoted) && (
-                        <div className={style["voted-hint"]}>
-                            (Voted)
-                        </div>
-                    )
-                }
-                <Modal
-                    dimmer={true}
-                    trigger={
-                        <Button basic={true} color="vk" size="medium">View details</Button>
-                    }
-                    closeIcon={true}
-                    closeOnDimmerClick={false}
-                    open={this.state.opened}
-                    onOpen={this.onOpenHandler}
-                    onClose={this.onCloseHandler}
-                >
-                    <Modal.Header>
-                        {this.props.title}
-                    </Modal.Header>
-                    <Modal.Content image={true}>
-                        <Modal.Description>
-                            {
-                                this.state.waitingMessage.show && (
-                                    <Message icon={true}>
-                                        <Icon name="circle notched" loading={true} />
-                                        <Message.Content>
-                                        <Message.Header>Just a few seconds</Message.Header>
-                                        {this.state.waitingMessage.message}
-                                        </Message.Content>
-                                    </Message>
-                                )
-                            }
-                            {
-                                this.state.errorMessage.show && (
-                                    <Message
-                                        error={true}
-                                        header="There was some errors with your submission"
-                                        list={[
-                                            this.state.errorMessage.message,
-                                        ]}
-                                    />
-                                )
-                            }
-                            {
-                                this.state.successfulMessage.show && (
-                                    <Message positive={true}>
-                                        <Message.Header>You vote successfully!</Message.Header>
-                                        {this.state.successfulMessage.message}
-                                    </Message>
-                                )
-                            }
-                            <div className={style["inline-container"]}>
-                                <div className={style["inline-left"]}>
-                                    {
-                                        (!this.props.web3) && (
-                                            <Header color="red">({ERROR_METAMASK_NOT_INSTALLED})</Header>
-                                        )
-                                    }
-                                    <Form className={style["voting-box"]} size="huge">
-                                        {
-                                            this.props.options.map((option, index) => {
-                                                return (
-                                                    <Form.Field key={this.props.address + " " + index}>
-                                                        <Checkbox
-                                                            radio={true}
-                                                            label={
-                                                                (this.state.votesByIndex && this.props.votesAmount > 0) ? (
-                                                                    option + " (" + Math.floor((this.state.votesByIndex[index] / this.props.votesAmount) * 100) + "%)"
-                                                                ) : option
-                                                            }
-                                                            name={option}
-                                                            value={index}
-                                                            checked={this.state.votingMessage.selectedIndex === index}
-                                                            onChange={this.handleOptionVoted}
-                                                            disabled={!this.props.web3 || this.props.isVoted || this.props.isExpired || this.state.inProgress}
-                                                        />
-                                                    </Form.Field>
-                                                );
-                                            })
-                                        }
-                                        {
-                                            this.state.votingMessage.selectedOption && (
-                                                <Form.Field>
-                                                    {this.props.isVoted ? ("You have voted for") : ("You are voting for")} <b>{this.state.votingMessage.selectedOption}</b>
-                                                </Form.Field>
-                                            )
-                                        }
-                                    </Form>
-                                    {
-                                        (this.state.votingMessage.selectedIndex !== null && !this.props.isVoted) && (
-                                            <div className={style["voting-button"]}>
-                                                <Button disabled={this.state.inProgress} loading={this.state.inProgress} value={this.state.votingMessage.selectedIndex} content="Vote!" onClick={this.voteOnSubmitHandler}/>
-                                            </div>
-                                        )
-                                    }
-                                </div>
+            <Modal
+                dimmer={true}
+                closeIcon={true}
+                closeOnDimmerClick={false}
+                open={this.state.opened}
+                onClose={this.onCloseHandler}
+            >
+                <Modal.Header>
+                    {this.props.title}
+                </Modal.Header>
+                <Modal.Content image={true}>
+                    <Modal.Description>
+                        {
+                            this.state.waitingMessage.show && (
+                                <Message icon={true}>
+                                    <Icon name="circle notched" loading={true} />
+                                    <Message.Content>
+                                    <Message.Header>Just a few seconds</Message.Header>
+                                    {this.state.waitingMessage.message}
+                                    </Message.Content>
+                                </Message>
+                            )
+                        }
+                        {
+                            this.state.errorMessage.show && (
+                                <Message
+                                    error={true}
+                                    header="There was some errors with your submission"
+                                    list={[
+                                        this.state.errorMessage.message,
+                                    ]}
+                                />
+                            )
+                        }
+                        {
+                            this.state.successfulMessage.show && (
+                                <Message positive={true}>
+                                    <Message.Header>You vote successfully!</Message.Header>
+                                    {this.state.successfulMessage.message}
+                                </Message>
+                            )
+                        }
+                        <div className={style["inline-container"]}>
+                            <div className={style["inline-left"]}>
                                 {
-                                    (this.state.chart) ?  (
-                                        <div className={style["inline-right"]}>
-                                            <Pie height={180} width={180} data={this.state.chart.option as ChartData<Chart.ChartData>} options={{cutoutPercentage: 8, legend: {display: false}}} />
-                                        </div>
-                                    ) : (
-                                        <div className={style["inline-right"]}>
-                                            <Header size="medium" color="grey">
-                                                (No enough data available in the poll)
-                                            </Header>
+                                    (!this.props.web3) && (
+                                        <Header color="red">({ERROR_METAMASK_NOT_INSTALLED})</Header>
+                                    )
+                                }
+                                <Form className={style["voting-box"]} size="huge">
+                                    {
+                                        this.props.options.map((option, index) => {
+                                            return (
+                                                <Form.Field key={this.props.address + " " + index}>
+                                                    <Checkbox
+                                                        radio={true}
+                                                        label={
+                                                            (this.state.votesByIndex && this.props.votesAmount > 0) ? (
+                                                                option + " (" + Math.floor((this.state.votesByIndex[index] / this.props.votesAmount) * 100) + "%)"
+                                                            ) : option
+                                                        }
+                                                        name={option}
+                                                        value={index}
+                                                        checked={this.state.votingMessage.selectedIndex === index}
+                                                        onChange={this.handleOptionVoted}
+                                                        disabled={!this.props.web3 || this.props.isVoted || this.props.isExpired || this.state.inProgress}
+                                                    />
+                                                </Form.Field>
+                                            );
+                                        })
+                                    }
+                                    {
+                                        this.state.votingMessage.selectedOption && (
+                                            <Form.Field>
+                                                {this.props.isVoted ? ("You have voted for") : ("You are voting for")} <b>{this.state.votingMessage.selectedOption}</b>
+                                            </Form.Field>
+                                        )
+                                    }
+                                </Form>
+                                {
+                                    (this.state.votingMessage.selectedIndex !== null && !this.props.isVoted) && (
+                                        <div className={style["voting-button"]}>
+                                            <Button disabled={this.state.inProgress} loading={this.state.inProgress} value={this.state.votingMessage.selectedIndex} content="Vote!" onClick={this.voteOnSubmitHandler}/>
                                         </div>
                                     )
                                 }
                             </div>
                             {
-                                this.props.isExpired && (
-                                    <div className={[style.stamp, style.ended].join(" ")}>
-                                        Poll ended
+                                (this.state.chart) ?  (
+                                    <div className={style["inline-right"]}>
+                                        <Pie height={180} width={180} data={this.state.chart.option as ChartData<Chart.ChartData>} options={{cutoutPercentage: 8, legend: {display: false}}} />
+                                    </div>
+                                ) : (
+                                    <div className={style["inline-right"]}>
+                                        <Header size="medium" color="grey">
+                                            (No enough data available in the poll)
+                                        </Header>
                                     </div>
                                 )
                             }
-                        </Modal.Description>
-                    </Modal.Content>
-                </Modal>
-            </div>
+                        </div>
+                        {
+                            this.props.isExpired && (
+                                <div className={[style.stamp, style.ended].join(" ")}>
+                                    Poll ended
+                                </div>
+                            )
+                        }
+                    </Modal.Description>
+                </Modal.Content>
+            </Modal>
         );
     }
 
@@ -491,10 +508,19 @@ const mapStateToProps = (state: StoreState, ownProps: IPollDetail.IInnerProps): 
     return {
         accountAddress: state.ethMisc.accountAddress,
         blockHeight: state.ethMisc.blockHeight,
+        activeDetailAddress: state.pollMisc.activeDetailAddress.address,
+        activeDetailViewInProgress: state.pollMisc.activeDetailAddress.inProgress,
+    };
+};
+
+const mapDispatchToProps = (dispatch: Dispatch<PollActionType>, ownProps: IPollDetail.IInnerProps): IPollDetail.IPropsFromDispatch => {
+    return {
+        setActiveDetailAddress: (address: AddressType | null) => dispatch(setActivePollDetail(address)),
+        setActiveDetailViewInProgress: (inProgress: boolean) => dispatch(setActivePollDetailInProgress(inProgress)),
     };
 };
 
 export default withRouter(connect(
     mapStateToProps,
-    null,
+    mapDispatchToProps,
 )(PollDetail));

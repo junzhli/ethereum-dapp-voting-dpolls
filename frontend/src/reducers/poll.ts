@@ -1,4 +1,4 @@
-import { SET_POLL_STATISTICS, ADD_MONITORING_POLLS, REMOVE_MONITORING_POLLS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT } from "../actions/constant";
+import { SET_POLL_STATISTICS, ADD_MONITORING_POLLS, REMOVE_MONITORING_POLLS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT, SET_ACTIVE_POLL_DETAIL, SET_ACTIVE_POLL_DETAIL_IN_PROGRESS } from "../actions/constant";
 import { PollActionType } from "../actions/types/poll";
 import { IPollMisc } from "../store/types";
 import { AddressType } from "../actions/types/eth";
@@ -9,6 +9,11 @@ const initialState: IPollMisc = {
     monitoring: [],
     keywords: null,
     searchResultsAmount: null,
+    activeDetailAddress: {
+        address: null,
+        index: null,
+        inProgress: false,
+    },
 };
 
 const poll = (state: IPollMisc = initialState, action: PollActionType): IPollMisc => {
@@ -54,6 +59,29 @@ const poll = (state: IPollMisc = initialState, action: PollActionType): IPollMis
             return {
                 ...state,
                 searchResultsAmount,
+            };
+        }
+        case SET_ACTIVE_POLL_DETAIL: {
+            const { address, index } = action.payload;
+            const activeDetailAddress = Object.assign(state.activeDetailAddress, {
+                address,
+                index: (index === undefined) ? null : index,
+            });
+
+            return {
+                ...state,
+                activeDetailAddress,
+            };
+        }
+        case SET_ACTIVE_POLL_DETAIL_IN_PROGRESS: {
+            const inProgress = action.payload;
+            const activeDetailAddress = Object.assign(state.activeDetailAddress, {
+                inProgress,
+            });
+
+            return {
+                ...state,
+                activeDetailAddress,
             };
         }
     }

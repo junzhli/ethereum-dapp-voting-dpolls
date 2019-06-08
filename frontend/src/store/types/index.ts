@@ -13,6 +13,11 @@ export interface IPollMisc {
     monitoring: string[];
     keywords: string | null;
     searchResultsAmount: number | null;
+    activeDetailAddress: {
+        address: AddressType | null;
+        index: number | null;
+        inProgress: boolean;
+    };
 }
 
 export interface IUserMisc {

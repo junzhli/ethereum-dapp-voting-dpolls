@@ -1,4 +1,4 @@
-import { SET_POLL_STATISTICS, ADD_MONITORING_POLLS, REMOVE_MONITORING_POLLS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT } from "../constant";
+import { SET_POLL_STATISTICS, ADD_MONITORING_POLLS, REMOVE_MONITORING_POLLS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT, SET_ACTIVE_POLL_DETAIL, SET_ACTIVE_POLL_DETAIL_IN_PROGRESS } from "../constant";
 import { AddressType } from "./eth";
 
 export interface ISetStatistics {
@@ -29,4 +29,17 @@ export interface ISetSearchResultsAmount {
     payload: number | null;
 }
 
-export type PollActionType = ISetStatistics | IAddMonitoringPolls | IRemoveMonitoringPolls | ISetUserSearchKeywords | ISetSearchResultsAmount;
+export interface ISetActivePollDetail {
+    type: typeof SET_ACTIVE_POLL_DETAIL;
+    payload: {
+        address: AddressType | null,
+        index?: number,
+    };
+}
+
+export interface ISetActivePollDetailInProgress {
+    type: typeof SET_ACTIVE_POLL_DETAIL_IN_PROGRESS;
+    payload: boolean;
+}
+
+export type PollActionType = ISetStatistics | IAddMonitoringPolls | IRemoveMonitoringPolls | ISetUserSearchKeywords | ISetSearchResultsAmount | ISetActivePollDetail | ISetActivePollDetailInProgress;

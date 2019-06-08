@@ -13,6 +13,10 @@ export namespace IMainListingPoll {
         notificationStatus: boolean | null;
         userSearchKeywords: string | null;
         userWindowFocus: boolean;
+        activeDetailAddress: {
+            address: AddressType | null;
+            index: number | null;
+        };
     }
 
     export interface IPropsFromDispatch {
@@ -20,6 +24,8 @@ export namespace IMainListingPoll {
         removeMonitoringPolls: (addresses: AddressType[]) => void;
         setSearchResultsAmount: (amount: number | null) => void;
         setSearchBar: (enabled: boolean) => void;
+        setActiveDetailAddress: (address: AddressType, index: number) => void;
+        setActiveDetailViewInProgress: (inProgress: boolean) => void;
     }
 }
 
@@ -37,9 +43,19 @@ export interface IMainListingPollState {
     inactivePolls: PollInitialMetadata[] | null;
     activePolls: PollInitialMetadata[] | null;
     filteredPolls: AddressType[] | null;
-    inactiveCollapse: boolean;
-    activeCollapse: boolean;
     filteredView: FilteredViewOptions;
+    showDetailView: {
+        web3: any;
+        web3Rpc: any;
+        contract: any;
+        address: AddressType;
+        title: string;
+        options: string[];
+        expiryBlockHeight: BlockHeightType;
+        isExpired: boolean;
+        isVoted: boolean | null;
+        votesAmount: number;
+    } | null;
 }
 
 export type FilteredViewOptions = "all" | "active" | "inactive";

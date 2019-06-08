@@ -1,15 +1,17 @@
 import React from "react";
 import { connect } from "react-redux";
-import { Header, Icon, Item, Placeholder, Segment } from "semantic-ui-react";
+import { Header, Icon, Item, Placeholder, Segment, Button } from "semantic-ui-react";
 import { StoreState } from "../store/types";
 import { Address } from "../types";
 import style from "./PollCard.module.css";
-import PollDetail from "./PollDetail";
 import { IPollCard, IPollCardProps, IPollCardStates, IPollCardStatus } from "./types/PollCard";
 import { IDetail, DBInstance, IOptions } from "../utils/db";
+import Routes from "../constants/routes";
+import { withRouter } from "react-router-dom";
 
 class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     private contract: any;
+    private detailPath: string;
     private status: {
         [key in IPollCardStatus]: {
             border: "teal" | "grey" | "red" | "orange" | "yellow" | "olive" | "green" | "blue" | "violet" | "purple" | "pink" | "brown" | "black" | undefined,
@@ -19,6 +21,7 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     constructor(props: IPollCardProps) {
         super(props);
         this.contract = this.props.contract;
+        this.detailPath = Routes.POLLS_BASE + this.props.address;
         this.status = {
             active: {
                 border: "teal",
@@ -31,20 +34,19 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
         };
         this.state = {
             externalData: null,
+            detailViewLoading: false,
         };
-    }
-
-    async checkIfVoted(address: Address | null) {
-        if (address === null) {
-            return null;
-        }
-
-        const isExpired = await this.contract.methods.isVoted(address).call() as boolean;
-        return isExpired;
+        this.clickDetailViewHandler = this.clickDetailViewHandler.bind(this);
     }
 
     async componentWillReceiveProps(nextProps: IPollCardProps) {
-        if (this.props !== nextProps && nextProps.web3) {
+        if (this.props !== nextProps) {
+            if (!this.props.detailViewOnly && (nextProps.activeDetailViewAddress === this.props.address) && (nextProps.activeDetailViewInProgress === false)) {
+                this.setState({
+                    detailViewLoading: false,
+                });
+            }
+
             const isVoted = await this.checkIfVoted(nextProps.accountAddress);
             if (this.state.externalData) {
                 if (isVoted !== this.state.externalData.isVoted) {
@@ -53,9 +55,27 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
                             isVoted,
                         }),
                     });
+
+                    if (this.props.detailViewOnly) {
+                        if (!this.props.detailViewDataConnecter) {
+                            throw new Error("detailViewOnly is available with detailViewDataConnecter provided");
+                        }
+
+                        this.props.detailViewDataConnecter({
+                            web3: nextProps.web3,
+                            web3Rpc: nextProps.web3Rpc,
+                            contract: nextProps.contract,
+                            address: nextProps.address,
+                            title: this.state.externalData && this.state.externalData.title,
+                            options: this.state.externalData && this.state.externalData.options,
+                            expiryBlockHeight: nextProps.expiryBlockNumber,
+                            isExpired: nextProps.isExpired,
+                            isVoted,
+                            votesAmount: this.state.externalData && this.state.externalData.votesAmount,
+                        });
+                    }
                 }
             }
-
         }
     }
 
@@ -74,6 +94,25 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
                         votesAmount,
                     }),
                 });
+
+                if (this.props.detailViewOnly) {
+                    if (!this.props.detailViewDataConnecter) {
+                        throw new Error("detailViewOnly is available with detailViewDataConnecter provided");
+                    }
+
+                    this.props.detailViewDataConnecter({
+                        web3: this.props.web3,
+                        web3Rpc: this.props.web3Rpc,
+                        contract: this.props.contract,
+                        address: this.props.address,
+                        title: this.state.externalData && this.state.externalData.title,
+                        options: this.state.externalData && this.state.externalData.options,
+                        expiryBlockHeight: this.props.expiryBlockNumber,
+                        isExpired: this.props.isExpired,
+                        isVoted,
+                        votesAmount,
+                    });
+                }
             }
         }
     }
@@ -166,13 +205,53 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
                 votesAmount,
             },
         });
-        this.props.additionalDataConnecter(this.props.address, title, chairperson);
+
+        if (this.props.detailViewOnly) {
+            if (!this.props.detailViewDataConnecter) {
+                throw new Error("detailViewOnly is available with detailViewDataConnecter provided");
+            }
+
+            this.props.detailViewDataConnecter({
+                web3: this.props.web3,
+                web3Rpc: this.props.web3Rpc,
+                contract: this.props.contract,
+                address: this.props.address,
+                title,
+                options,
+                expiryBlockHeight: this.props.expiryBlockNumber,
+                isExpired: this.props.isExpired,
+                isVoted,
+                votesAmount,
+            });
+        }
+
+        if (this.props.additionalDataConnecter) {
+            this.props.additionalDataConnecter(this.props.address, title, chairperson);
+        }
+    }
+
+    async checkIfVoted(address: Address | null) {
+        if (address === null) {
+            return null;
+        }
+
+        const isExpired = await this.contract.methods.isVoted(address).call() as boolean;
+        return isExpired;
+    }
+
+    clickDetailViewHandler() {
+        this.props.history.push(this.detailPath);
+        this.setState({
+            detailViewLoading: true,
+        });
     }
 
     renderComponent() {
-        let state: "loading" | "non-loaded-completely/web3-not-injected" | "completed" | null = null;
+        let state: "detail-view-only" | "loading" | "non-loaded-completely/web3-not-injected" | "completed" | null = null;
 
-        if (this.state.externalData && (this.state.externalData.isVoted !== null)) {
+        if (this.props.detailViewOnly) {
+            state = "detail-view-only";
+        } else if (this.state.externalData && (this.state.externalData.isVoted !== null)) {
             state = "completed";
         } else if (this.state.externalData && (this.state.externalData.isVoted === null)) {
             state = "non-loaded-completely/web3-not-injected";
@@ -181,6 +260,8 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
         }
 
         switch (state) {
+            case "detail-view-only":
+                return (<div className={style.hidden} />);
             case "loading":
                 return (
                     <Segment className={!this.props.display ? style.hidden : undefined} color={this.status.inactive.border}>
@@ -224,17 +305,18 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
                                 <Icon color="brown" name="users" /> {this.state.externalData && this.state.externalData.votesAmount} vote(s)
                             </Item.Extra>
                         </Item.Content>
-                        <PollDetail
-                        web3={this.props.web3}
-                        web3Rpc={this.props.web3Rpc}
-                        address={this.props.address}
-                        title={(this.state.externalData && this.state.externalData.title) as string}
-                        options={(this.state.externalData && this.state.externalData.options) as string[]}
-                        votesAmount={(this.state.externalData && this.state.externalData.votesAmount) as number}
-                        expiryBlockHeight={this.props.expiryBlockNumber}
-                        isExpired={this.props.isExpired}
-                        isVoted={this.state.externalData && this.state.externalData.isVoted}
-                        contract={this.contract} />
+                        <div className={
+                            (this.state.externalData && this.state.externalData.isVoted) ? [style["align-right"], style["show-voted-hint"]].join(" ") : style["align-right"]
+                        }>
+                            {
+                                (this.state.externalData && this.state.externalData.isVoted) && (
+                                    <div className={style["voted-hint"]}>
+                                        (Voted)
+                                    </div>
+                                )
+                            }
+                            <Button loading={((this.props.activeDetailViewAddress === this.props.address) && this.props.activeDetailViewInProgress) || this.state.detailViewLoading} basic={true} color="vk" size="medium" onClick={this.clickDetailViewHandler}>View details</Button>
+                        </div>
                     </Segment>
                 );
         }
@@ -249,10 +331,12 @@ const mapStateToProps = (state: StoreState, ownProps: IPollCard.IInnerProps): IP
     return {
         accountAddress: state.ethMisc.accountAddress,
         blockHeight: state.ethMisc.blockHeight,
+        activeDetailViewInProgress: state.pollMisc.activeDetailAddress.inProgress,
+        activeDetailViewAddress: state.pollMisc.activeDetailAddress.address,
     };
 };
 
-export default connect(
+export default withRouter(connect(
     mapStateToProps,
     null,
-)(PollCard);
+)(PollCard));
