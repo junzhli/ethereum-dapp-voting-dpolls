@@ -1,5 +1,5 @@
-import { SET_POLL_STATISTICS, REMOVE_MONITORING_POLLS, ADD_MONITORING_POLLS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT, SET_ACTIVE_POLL_DETAIL, SET_ACTIVE_POLL_DETAIL_IN_PROGRESS } from "./constant";
-import { ISetStatistics, IAddMonitoringPolls, IRemoveMonitoringPolls, ISetUserSearchKeywords, ISetSearchResultsAmount, ISetActivePollDetail, ISetActivePollDetailInProgress } from "./types/poll";
+import { SET_POLL_STATISTICS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT, SET_ACTIVE_POLL_DETAIL, SET_ACTIVE_POLL_DETAIL_IN_PROGRESS, ADD_MONITORING_CREATED_POLLS, REMOVE_MONITORING_CREATED_POLLS, ADD_MONITORING_VOTED_POLLS, REMOVE_MONITORING_VOTED_POLLS } from "./constant";
+import { ISetStatistics, ISetUserSearchKeywords, ISetSearchResultsAmount, ISetActivePollDetail, ISetActivePollDetailInProgress, IAddMonitoringCreatedPolls, IRemoveMonitoringCreatedPolls, IAddMonitoringVotedPolls, IRemoveMonitoringVotedPolls } from "./types/poll";
 import { AddressType } from "./types/eth";
 
 export const setStatistics = (amount: number, active: number): ISetStatistics => {
@@ -12,16 +12,30 @@ export const setStatistics = (amount: number, active: number): ISetStatistics =>
     };
 };
 
-export const addMonitoringPoll = (addresses: AddressType[]): IAddMonitoringPolls => {
+export const addMonitoringCreatedPoll = (addresses: AddressType[]): IAddMonitoringCreatedPolls => {
     return {
-        type: ADD_MONITORING_POLLS,
+        type: ADD_MONITORING_CREATED_POLLS,
         payload: addresses,
     };
 };
 
-export const removeMonitoringPoll = (addresses: AddressType[]): IRemoveMonitoringPolls => {
+export const removeMonitoringCreatedPoll = (addresses: AddressType[]): IRemoveMonitoringCreatedPolls => {
     return {
-        type: REMOVE_MONITORING_POLLS,
+        type: REMOVE_MONITORING_CREATED_POLLS,
+        payload: addresses,
+    };
+};
+
+export const addMonitoringVotedPoll = (addresses: AddressType[]): IAddMonitoringVotedPolls => {
+    return {
+        type: ADD_MONITORING_VOTED_POLLS,
+        payload: addresses,
+    };
+};
+
+export const removeMonitoringVotedPoll = (addresses: AddressType[]): IRemoveMonitoringVotedPolls => {
+    return {
+        type: REMOVE_MONITORING_VOTED_POLLS,
         payload: addresses,
     };
 };

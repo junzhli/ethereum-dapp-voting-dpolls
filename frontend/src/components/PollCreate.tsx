@@ -13,7 +13,7 @@ import { IPollCreate, IPollCreateProps, IPollCreateStates } from "./types/PollCr
 import { getEtherscanTxURL } from "../utils/etherscan";
 import { withRouter } from "react-router-dom";
 import Routes from "../constants/routes";
-import { addMonitoringPoll } from "../actions/poll";
+import { addMonitoringCreatedPoll } from "../actions/poll";
 import { PollActionType } from "../actions/types/poll";
 import { toast } from "react-toastify";
 import { ERROR_METAMASK_NOT_INSTALLED } from "../constants/project";
@@ -534,7 +534,7 @@ const mapStateToProps = (state: StoreState, ownProps: IPollCreate.IInnerProps): 
 const mapDispatchToProps = (dispatch: Dispatch<ETHActionType | PollActionType>, ownProps: IPollCreate.IInnerProps): IPollCreate.IPropsFromDispatch => {
     return {
         setMembership: (nextMembership: Membership) => dispatch(setMembership(nextMembership)),
-        addMonitoringPolls: (polls: AddressType[]) => dispatch(addMonitoringPoll(polls)),
+        addMonitoringPolls: (polls: AddressType[]) => dispatch(addMonitoringCreatedPoll(polls)),
     };
 };
 
