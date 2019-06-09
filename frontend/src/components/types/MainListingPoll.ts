@@ -29,7 +29,7 @@ export namespace IMainListingPoll {
         removeMonitoringVotedPoll: (address: AddressType) => void;
         setSearchResultsAmount: (amount: number | null) => void;
         setSearchBar: (enabled: boolean) => void;
-        setActiveDetailAddress: (address: AddressType, index: number) => void;
+        setActiveDetailAddress: (address: AddressType | null, index?: number) => void;
         setActiveDetailViewInProgress: (inProgress: boolean) => void;
     }
 }

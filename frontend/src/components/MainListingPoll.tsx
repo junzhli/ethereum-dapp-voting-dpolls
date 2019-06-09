@@ -41,6 +41,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
     private monitoringVotedPollLock: {
         [key: string]: boolean;
     }; // lock down to single op at the same time to prevent redundent toast notifications
+    private checkURLIsPollDetail: boolean;
     constructor(props: IMainListingPollProps) {
         super(props);
         this.contract = new this.props.web3Rpc.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
@@ -48,6 +49,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         this.initialMetadata = {};
         this.monitoringVotedPollLock = {};
         this.pollCardsSearchable = null;
+        this.checkURLIsPollDetail = false;
         this.showNoSearchResult = {
             active: false,
             inactive: false,
@@ -69,6 +71,34 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         this.detailViewToggleHandler = this.detailViewToggleHandler.bind(this);
         this.linkPollDetail = this.linkPollDetail.bind(this);
         bluebird.config(bluebirdConfig);
+
+        // listening on route url changes related to poll details except for the first coming url
+        this.props.history.listen((location, action) => {
+            if (this.state.polls) {
+                const pollAddresses = this.state.polls.map((poll) => poll.address);
+                let matched: boolean = false;
+                pollAddresses.forEach((address, index) => {
+                    const detailPath = Routes.POLLS_BASE + address;
+                    if (location.pathname === detailPath && (address !== this.props.activeDetailAddress.address) && this.state.polls) {
+                        if (!matched) {
+                            matched = true;
+                        }
+                        this.setState({
+                            showDetailView: null,
+                        });
+                        this.props.setActiveDetailAddress(address, index);
+                        this.props.setActiveDetailViewInProgress(true);
+                    }
+                    if (!matched) {
+                        this.setState({
+                            showDetailView: null,
+                        });
+                        this.props.setActiveDetailAddress(null);
+                        this.props.setActiveDetailViewInProgress(false);
+                    }
+                });
+            }
+        });
     }
 
     async componentWillReceiveProps(nextProps: IMainListingPollProps) {
@@ -104,7 +134,8 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
             await this.refreshPolls();
         }
 
-        if (this.state.polls) {
+        // check the first coming url if matches detail poll's path or not
+        if (this.state.polls && !this.checkURLIsPollDetail) {
             const pollAddresses = this.state.polls.map((poll) => poll.address);
             pollAddresses.forEach((address, index) => {
                 const detailPath = Routes.POLLS_BASE + address;
@@ -116,6 +147,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                     this.props.setActiveDetailViewInProgress(true);
                 }
             });
+            this.checkURLIsPollDetail = true;
         }
     }
 
@@ -361,9 +393,6 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                 votesAmount,
             },
         });
-
-        const detailPath = Routes.POLLS_BASE + address;
-        this.props.history.push(detailPath);
     }
 
     renderFiltered(polls: PollInitialMetadata[], filter: AddressType[], listType: FilteredViewOptions) {
@@ -673,7 +702,7 @@ const mapDispatchToProps = (dispatch: Dispatch<PollActionType | UserActionType>,
         removeMonitoringVotedPoll: (address: AddressType) => dispatch(removeMonitoringVotedPoll([address])),
         setSearchResultsAmount: (amount: number | null) => dispatch(setSearchResultsAmount(amount)),
         setSearchBar: (enabled: boolean) => dispatch(setSearchBar(enabled)),
-        setActiveDetailAddress: (address: AddressType | null, index: number) => dispatch(setActivePollDetail(address, index)),
+        setActiveDetailAddress: (address: AddressType | null, index?: number) => dispatch(setActivePollDetail(address, index)),
         setActiveDetailViewInProgress: (inProgress: boolean) => dispatch(setActivePollDetailInProgress(inProgress)),
     };
 };
