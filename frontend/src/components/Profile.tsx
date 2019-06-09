@@ -60,7 +60,7 @@ class Profile extends React.Component<IProfileProps, IProfileStates> {
         return (
             <Card>
                 <Card.Content>
-                    <Card.Header><Icon color="black" name="clock outline" />Latest block</Card.Header>
+                    <Card.Header><Icon color="black" name="clock outline" />Latest Block</Card.Header>
                     <Card.Description>
                         <div>
                              {
