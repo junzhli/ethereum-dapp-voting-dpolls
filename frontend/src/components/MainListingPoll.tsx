@@ -1,7 +1,7 @@
 import React, { Dispatch } from "react";
 import { connect } from "react-redux";
 import { Header, Icon, Item, Loader, Segment, Menu, Dimmer } from "semantic-ui-react";
-import { setStatistics, removeMonitoringPoll, setSearchResultsAmount, setActivePollDetail, setActivePollDetailInProgress } from "../actions/poll";
+import { setStatistics, removeMonitoringCreatedPoll, setSearchResultsAmount, setActivePollDetail, setActivePollDetailInProgress, removeMonitoringVotedPoll } from "../actions/poll";
 import { BlockHeightType, AddressType } from "../actions/types/eth";
 import { PollActionType } from "../actions/types/poll";
 import { VOTING_ABI, VOTING_CORE_ABI } from "../constants/contractABIs";
@@ -38,11 +38,15 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
     private initialMetadata: {
         [key: string]: PollInitialMetadata;
     };
+    private monitoringVotedPollLock: {
+        [key: string]: boolean;
+    }; // lock down to single op at the same time to prevent redundent toast notifications
     constructor(props: IMainListingPollProps) {
         super(props);
         this.contract = new this.props.web3Rpc.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
         this.additionalData = [];
         this.initialMetadata = {};
+        this.monitoringVotedPollLock = {};
         this.pollCardsSearchable = null;
         this.showNoSearchResult = {
             active: false,
@@ -63,6 +67,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         this.selectedFilteredView = this.selectedFilteredView.bind(this);
         this.renderDetailView = this.renderDetailView.bind(this);
         this.detailViewToggleHandler = this.detailViewToggleHandler.bind(this);
+        this.linkPollDetail = this.linkPollDetail.bind(this);
         bluebird.config(bluebirdConfig);
     }
 
@@ -112,6 +117,10 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                 }
             });
         }
+    }
+
+    linkPollDetail(address: string) {
+        this.props.history.push(Routes.POLLS_BASE + address);
     }
 
     selectedFilteredView(filteredView: FilteredViewOptions) {
@@ -182,10 +191,12 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
 
             this.props.setPollStatistics(amountPolls, activePolls.length);
 
-            const notifiedVotings: AddressType[] = [];
-            polls.forEach((poll) => {
-                if (this.props.monitoring.includes(poll.address)) {
-                    notifiedVotings.push(poll.address);
+            // iterate over poll list to find out monitoring polls asynchronously
+            const notifiedCreatedVotings: AddressType[] = [];
+            const pollAddresses = polls.map((poll) => poll.address);
+            for (const poll of polls) {
+                if (this.props.monitoring.created.includes(poll.address)) {
+                    notifiedCreatedVotings.push(poll.address);
 
                     this.props.history.replace("/");
 
@@ -199,10 +210,34 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                         });
                     }
                 }
-            });
 
-            if (notifiedVotings.length !== 0) {
-                this.props.removeMonitoringPolls(notifiedVotings);
+                if (this.props.monitoring.voted.includes(poll.address) && this.props.accountAddress) {
+                    if (!(poll.address in this.monitoringVotedPollLock)) {
+                        this.monitoringVotedPollLock[poll.address] = true;
+                        const atIndex = pollAddresses.indexOf(poll.address);
+                        const contract = polls[atIndex].contract;
+                        const isVoted = await contract.methods.isVoted(this.props.accountAddress).call() as boolean;
+
+                        const detailContent = "Your vote has been submitted.";
+                        if (!this.props.userWindowFocus && this.props.notificationStatus === true) {
+                            const notification = new Notification(NOTIFICATION_TITLE, {
+                                body: detailContent,
+                            });
+                        }
+
+                        if (isVoted) {
+                            const title = "Vote";
+                            const detail = (<div>{detailContent} <Icon size="small" name="external alternate" onClick={this.linkPollDetail.bind(this, poll.address)} /></div>);
+                            this.props.removeMonitoringVotedPoll(poll.address);
+                            toast(<Toast title={title} detail={detail} />);
+                        }
+                        delete this.monitoringVotedPollLock[poll.address];
+                    }
+                }
+            }
+
+            if (notifiedCreatedVotings.length !== 0) {
+                this.props.removeMonitoringCreatedPolls(notifiedCreatedVotings);
             }
 
             if (this.state.amountPolls && this.state.amountPolls < amountPolls) {
@@ -487,7 +522,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
 
                                                         const { address, isExpired, expiryBlockNumber, contract } = pollInitialMetadata;
                                                         return (
-                                                            <PollCard display={activePollAddresses.includes(pollInitialMetadata.address)} status="inactive" web3={this.props.web3} web3Rpc={this.props.web3Rpc} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
+                                                            <PollCard display={activePollAddresses.includes(pollInitialMetadata.address)} status="active" web3={this.props.web3} web3Rpc={this.props.web3Rpc} address={address} isExpired={isExpired} expiryBlockNumber={expiryBlockNumber} contract={contract} additionalDataConnecter={this.syncAdditionalData} key={address} />
                                                         );
                                                     })
                                                 )
@@ -627,13 +662,15 @@ const mapStateToProps = (state: StoreState, ownProps: IMainListingPoll.IInnerPro
             address: state.pollMisc.activeDetailAddress.address,
             index: state.pollMisc.activeDetailAddress.index,
         },
+        accountAddress: state.ethMisc.accountAddress,
     };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch<PollActionType | UserActionType>, ownProps: IMainListingPoll.IInnerProps): IMainListingPoll.IPropsFromDispatch => {
     return {
         setPollStatistics: (amount: number, active: number) => dispatch(setStatistics(amount, active)),
-        removeMonitoringPolls: (addresses: AddressType[]) => dispatch(removeMonitoringPoll(addresses)),
+        removeMonitoringCreatedPolls: (addresses: AddressType[]) => dispatch(removeMonitoringCreatedPoll(addresses)),
+        removeMonitoringVotedPoll: (address: AddressType) => dispatch(removeMonitoringVotedPoll([address])),
         setSearchResultsAmount: (amount: number | null) => dispatch(setSearchResultsAmount(amount)),
         setSearchBar: (enabled: boolean) => dispatch(setSearchBar(enabled)),
         setActiveDetailAddress: (address: AddressType | null, index: number) => dispatch(setActivePollDetail(address, index)),

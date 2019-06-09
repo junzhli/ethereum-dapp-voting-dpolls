@@ -10,7 +10,10 @@ export interface IEthMisc {
 export interface IPollMisc {
     active: number | null;
     amount: number | null;
-    monitoring: string[];
+    monitoring: {
+        created: string[],
+        voted: string[],
+    };
     keywords: string | null;
     searchResultsAmount: number | null;
     activeDetailAddress: {

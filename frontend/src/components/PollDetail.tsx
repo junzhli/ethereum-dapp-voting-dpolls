@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 import { ERROR_METAMASK_NOT_INSTALLED } from "../constants/project";
 import Toast from "./Toast";
 import { AddressType } from "../actions/types/eth";
-import { setActivePollDetail, setActivePollDetailInProgress } from "../actions/poll";
+import { setActivePollDetail, setActivePollDetailInProgress, addMonitoringVotedPoll } from "../actions/poll";
 import { PollActionType } from "../actions/types/poll";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
@@ -51,12 +51,11 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             votesByIndex: null,
             opened: false,
             inProgress: false,
+            waitingVerified: false,
         };
         this.handleOptionVoted = this.handleOptionVoted.bind(this);
         this.voteOnSubmitHandler = this.voteOnSubmitHandler.bind(this);
-        this.onOpenHandler = this.onOpenHandler.bind(this);
         this.onCloseHandler = this.onCloseHandler.bind(this);
-        this.linkSelf = this.linkSelf.bind(this);
     }
 
     async componentWillReceiveProps(nextProps: IPollDetailProps) {
@@ -170,19 +169,6 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
         }
     }
 
-    linkSelf() {
-        this.props.history.push(this.path);
-    }
-
-    onOpenHandler(event: React.MouseEvent<HTMLElement, MouseEvent>, data: ModalProps) {
-        if (data.open === false) {
-            this.setState({
-                opened: true,
-            });
-            this.props.history.push(this.path);
-        }
-    }
-
     onCloseHandler(event: React.MouseEvent<HTMLElement, MouseEvent>, data: ModalProps) {
         if (data.open === true) {
             this.setState({
@@ -196,6 +182,10 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                 const title = "Vote";
                 const detail = "Your submission is still in progress...";
                 toast(<Toast title={title} detail={detail} />);
+            }
+
+            if (this.state.waitingVerified) {
+                this.props.addMonitoringVotedPoll(this.props.address);
             }
         }
     }
@@ -256,6 +246,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                         </div>
                     ),
                 },
+                waitingVerified: true,
             });
 
             const lastBlockNumber = this.props.blockHeight;
@@ -290,13 +281,8 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                                 option: chartOptions,
                             },
                             inProgress: false,
+                            waitingVerified: false,
                         });
-
-                        if (!this.state.opened) {
-                            const title = "Vote";
-                            const detail = (<div>Your vote has been submitted. <Icon size="small" name="external alternate" onClick={this.linkSelf} /></div>);
-                            toast(<Toast title={title} detail={detail} />);
-                        }
 
                         clearInterval(this.checkConfirmedInterval);
                         if (this.setTimeoutHolder) {
@@ -517,6 +503,7 @@ const mapDispatchToProps = (dispatch: Dispatch<PollActionType>, ownProps: IPollD
     return {
         setActiveDetailAddress: (address: AddressType | null) => dispatch(setActivePollDetail(address)),
         setActiveDetailViewInProgress: (inProgress: boolean) => dispatch(setActivePollDetailInProgress(inProgress)),
+        addMonitoringVotedPoll: (address: AddressType) => dispatch(addMonitoringVotedPoll([address])),
     };
 };
 

@@ -1,4 +1,4 @@
-import { SET_POLL_STATISTICS, ADD_MONITORING_POLLS, REMOVE_MONITORING_POLLS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT, SET_ACTIVE_POLL_DETAIL, SET_ACTIVE_POLL_DETAIL_IN_PROGRESS } from "../actions/constant";
+import { SET_POLL_STATISTICS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT, SET_ACTIVE_POLL_DETAIL, SET_ACTIVE_POLL_DETAIL_IN_PROGRESS, ADD_MONITORING_CREATED_POLLS, REMOVE_MONITORING_CREATED_POLLS, ADD_MONITORING_VOTED_POLLS, REMOVE_MONITORING_VOTED_POLLS } from "../actions/constant";
 import { PollActionType } from "../actions/types/poll";
 import { IPollMisc } from "../store/types";
 import { AddressType } from "../actions/types/eth";
@@ -6,7 +6,10 @@ import { AddressType } from "../actions/types/eth";
 const initialState: IPollMisc = {
     active: null,
     amount: null,
-    monitoring: [],
+    monitoring: {
+        created: [],
+        voted: [],
+    },
     keywords: null,
     searchResultsAmount: null,
     activeDetailAddress: {
@@ -26,22 +29,55 @@ const poll = (state: IPollMisc = initialState, action: PollActionType): IPollMis
                 active,
             };
         }
-        case ADD_MONITORING_POLLS: {
-            const monitoring = Object.assign([], state.monitoring);
+        case ADD_MONITORING_CREATED_POLLS: {
+            const created = Object.assign([], state.monitoring.created);
             const addresses = action.payload;
-            Array.prototype.push.apply(monitoring, addresses);
+            Array.prototype.push.apply(created, addresses);
+            const monitoring = Object.assign(state.monitoring, {
+                created,
+            });
             return {
                 ...state,
                 monitoring,
             };
         }
-        case REMOVE_MONITORING_POLLS: {
-            const monitoring = Object.assign([], state.monitoring);
+        case REMOVE_MONITORING_CREATED_POLLS: {
+            const created = Object.assign([], state.monitoring.created);
             const addresses: AddressType[] = action.payload;
             for (const item of addresses) {
-                const atIndex = monitoring.indexOf(item);
-                monitoring.splice(atIndex, 1);
+                const atIndex = created.indexOf(item);
+                created.splice(atIndex, 1);
             }
+            const monitoring = Object.assign(state.monitoring, {
+                created,
+            });
+            return {
+                ...state,
+                monitoring,
+            };
+        }
+        case ADD_MONITORING_VOTED_POLLS: {
+            const voted = Object.assign([], state.monitoring.voted);
+            const addresses = action.payload;
+            Array.prototype.push.apply(voted, addresses);
+            const monitoring = Object.assign(state.monitoring, {
+                voted,
+            });
+            return {
+                ...state,
+                monitoring,
+            };
+        }
+        case REMOVE_MONITORING_VOTED_POLLS: {
+            const voted = Object.assign([], state.monitoring.voted);
+            const addresses: AddressType[] = action.payload;
+            for (const item of addresses) {
+                const atIndex = voted.indexOf(item);
+                voted.splice(atIndex, 1);
+            }
+            const monitoring = Object.assign(state.monitoring, {
+                voted,
+            });
             return {
                 ...state,
                 monitoring,

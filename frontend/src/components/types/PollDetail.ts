@@ -26,6 +26,7 @@ export namespace IPollDetail {
     export interface IPropsFromDispatch {
         setActiveDetailAddress: (address: AddressType | null) => void;
         setActiveDetailViewInProgress: (inProgress: boolean) => void;
+        addMonitoringVotedPoll: (address: AddressType) => void;
     }
 }
 
@@ -54,6 +55,7 @@ export interface IPollDetailStates {
     } | null;
     opened: boolean;
     inProgress: boolean;
+    waitingVerified: boolean;
 }
 
 export interface PollDetailArguments {

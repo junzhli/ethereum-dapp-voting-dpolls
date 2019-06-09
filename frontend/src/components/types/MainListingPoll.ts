@@ -9,7 +9,10 @@ export namespace IMainListingPoll {
 
     export interface IStateFromProps {
         blockHeight: BlockHeightType;
-        monitoring: AddressType[];
+        monitoring: {
+            created: string[],
+            voted: string[],
+        };
         notificationStatus: boolean | null;
         userSearchKeywords: string | null;
         userWindowFocus: boolean;
@@ -17,11 +20,13 @@ export namespace IMainListingPoll {
             address: AddressType | null;
             index: number | null;
         };
+        accountAddress: AddressType | null;
     }
 
     export interface IPropsFromDispatch {
         setPollStatistics: (amount: number, active: number) => void;
-        removeMonitoringPolls: (addresses: AddressType[]) => void;
+        removeMonitoringCreatedPolls: (addresses: AddressType[]) => void;
+        removeMonitoringVotedPoll: (address: AddressType) => void;
         setSearchResultsAmount: (amount: number | null) => void;
         setSearchBar: (enabled: boolean) => void;
         setActiveDetailAddress: (address: AddressType, index: number) => void;

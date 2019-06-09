@@ -1,4 +1,4 @@
-import { SET_POLL_STATISTICS, ADD_MONITORING_POLLS, REMOVE_MONITORING_POLLS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT, SET_ACTIVE_POLL_DETAIL, SET_ACTIVE_POLL_DETAIL_IN_PROGRESS } from "../constant";
+import { SET_POLL_STATISTICS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT, SET_ACTIVE_POLL_DETAIL, SET_ACTIVE_POLL_DETAIL_IN_PROGRESS, ADD_MONITORING_CREATED_POLLS, ADD_MONITORING_VOTED_POLLS, REMOVE_MONITORING_VOTED_POLLS, REMOVE_MONITORING_CREATED_POLLS } from "../constant";
 import { AddressType } from "./eth";
 
 export interface ISetStatistics {
@@ -9,13 +9,23 @@ export interface ISetStatistics {
     };
 }
 
-export interface IAddMonitoringPolls {
-    type: typeof ADD_MONITORING_POLLS;
+export interface IAddMonitoringCreatedPolls {
+    type: typeof ADD_MONITORING_CREATED_POLLS;
     payload: AddressType[];
 }
 
-export interface IRemoveMonitoringPolls {
-    type: typeof REMOVE_MONITORING_POLLS;
+export interface IRemoveMonitoringCreatedPolls {
+    type: typeof REMOVE_MONITORING_CREATED_POLLS;
+    payload: AddressType[];
+}
+
+export interface IAddMonitoringVotedPolls {
+    type: typeof ADD_MONITORING_VOTED_POLLS;
+    payload: AddressType[];
+}
+
+export interface IRemoveMonitoringVotedPolls {
+    type: typeof REMOVE_MONITORING_VOTED_POLLS;
     payload: AddressType[];
 }
 
@@ -42,4 +52,4 @@ export interface ISetActivePollDetailInProgress {
     payload: boolean;
 }
 
-export type PollActionType = ISetStatistics | IAddMonitoringPolls | IRemoveMonitoringPolls | ISetUserSearchKeywords | ISetSearchResultsAmount | ISetActivePollDetail | ISetActivePollDetailInProgress;
+export type PollActionType = ISetStatistics | IAddMonitoringCreatedPolls | IRemoveMonitoringCreatedPolls | IAddMonitoringVotedPolls | IRemoveMonitoringVotedPolls | ISetUserSearchKeywords | ISetSearchResultsAmount | ISetActivePollDetail | ISetActivePollDetailInProgress;
