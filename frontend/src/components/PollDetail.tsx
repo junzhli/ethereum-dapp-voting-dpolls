@@ -447,7 +447,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                             {
                                 (this.state.chart) ?  (
                                     <div className={style["inline-right"]}>
-                                        <Pie height={200} width={400} data={this.state.chart.option as ChartData<Chart.ChartData>} options={{cutoutPercentage: 50, animation: {duration: 1600}, legend: {display: true, position: "left"}}} />
+                                        <Pie height={200} width={400} data={this.state.chart.option as ChartData<Chart.ChartData>} options={{cutoutPercentage: 50, layout: {padding: {bottom: 20}}, animation: {duration: 1600}, legend: {display: true, position: "left"}}} />
                                     </div>
                                 ) : (
                                     <div className={style["inline-right"]}>
