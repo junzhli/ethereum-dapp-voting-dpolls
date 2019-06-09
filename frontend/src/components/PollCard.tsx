@@ -41,18 +41,60 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
 
     async componentWillReceiveProps(nextProps: IPollCardProps) {
         if (this.props !== nextProps) {
-            if (!this.props.detailViewOnly && (nextProps.activeDetailViewAddress === this.props.address) && (nextProps.activeDetailViewInProgress === false)) {
+            if (!nextProps.detailViewOnly && (nextProps.activeDetailViewAddress === nextProps.address) && (nextProps.activeDetailViewInProgress === false)) {
                 this.setState({
                     detailViewLoading: false,
                 });
             }
 
-            const isVoted = await this.checkIfVoted(nextProps.accountAddress);
+            if ((this.props.blockHeight !== nextProps.blockHeight) || (this.props.accountAddress !== nextProps.accountAddress)) {
+                const isVoted = await this.checkIfVoted(nextProps.accountAddress);
+                if (this.state.externalData) {
+                    if (isVoted !== this.state.externalData.isVoted) {
+                        this.setState({
+                            externalData: Object.assign(this.state.externalData, {
+                                isVoted,
+                            }),
+                        });
+
+                        if (this.props.detailViewOnly) {
+                            if (!this.props.detailViewDataConnecter) {
+                                throw new Error("detailViewOnly is available with detailViewDataConnecter provided");
+                            }
+
+                            this.props.detailViewDataConnecter({
+                                web3: nextProps.web3,
+                                web3Rpc: nextProps.web3Rpc,
+                                contract: nextProps.contract,
+                                address: nextProps.address,
+                                title: this.state.externalData && this.state.externalData.title,
+                                options: this.state.externalData && this.state.externalData.options,
+                                expiryBlockHeight: nextProps.expiryBlockNumber,
+                                isExpired: nextProps.isExpired,
+                                isVoted,
+                                votesAmount: this.state.externalData && this.state.externalData.votesAmount,
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    async componentDidUpdate(prevProps: IPollCardProps) {
+        if ((this.props.blockHeight !== prevProps.blockHeight) || (this.props.accountAddress !== prevProps.accountAddress)) {
+            let isVoted = null;
+            if (this.props.web3) {
+                isVoted = await this.checkIfVoted(this.props.accountAddress);
+            }
+
+            const votesAmount = (await this.contract.methods.votesAmount().call()).toNumber();
             if (this.state.externalData) {
-                if (isVoted !== this.state.externalData.isVoted) {
+                if (votesAmount !== this.state.externalData.votesAmount) {
                     this.setState({
                         externalData: Object.assign(this.state.externalData, {
                             isVoted,
+                            votesAmount,
                         }),
                     });
 
@@ -62,56 +104,18 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
                         }
 
                         this.props.detailViewDataConnecter({
-                            web3: nextProps.web3,
-                            web3Rpc: nextProps.web3Rpc,
-                            contract: nextProps.contract,
-                            address: nextProps.address,
+                            web3: this.props.web3,
+                            web3Rpc: this.props.web3Rpc,
+                            contract: this.props.contract,
+                            address: this.props.address,
                             title: this.state.externalData && this.state.externalData.title,
                             options: this.state.externalData && this.state.externalData.options,
-                            expiryBlockHeight: nextProps.expiryBlockNumber,
-                            isExpired: nextProps.isExpired,
+                            expiryBlockHeight: this.props.expiryBlockNumber,
+                            isExpired: this.props.isExpired,
                             isVoted,
-                            votesAmount: this.state.externalData && this.state.externalData.votesAmount,
+                            votesAmount,
                         });
                     }
-                }
-            }
-        }
-    }
-
-    async componentDidUpdate(prevProps: IPollCardProps) {
-        let isVoted = null;
-        if (this.props.web3) {
-            isVoted = await this.checkIfVoted(this.props.accountAddress);
-        }
-
-        const votesAmount = (await this.contract.methods.votesAmount().call()).toNumber();
-        if (this.state.externalData) {
-            if (votesAmount !== this.state.externalData.votesAmount) {
-                this.setState({
-                    externalData: Object.assign(this.state.externalData, {
-                        isVoted,
-                        votesAmount,
-                    }),
-                });
-
-                if (this.props.detailViewOnly) {
-                    if (!this.props.detailViewDataConnecter) {
-                        throw new Error("detailViewOnly is available with detailViewDataConnecter provided");
-                    }
-
-                    this.props.detailViewDataConnecter({
-                        web3: this.props.web3,
-                        web3Rpc: this.props.web3Rpc,
-                        contract: this.props.contract,
-                        address: this.props.address,
-                        title: this.state.externalData && this.state.externalData.title,
-                        options: this.state.externalData && this.state.externalData.options,
-                        expiryBlockHeight: this.props.expiryBlockNumber,
-                        isExpired: this.props.isExpired,
-                        isVoted,
-                        votesAmount,
-                    });
                 }
             }
         }
