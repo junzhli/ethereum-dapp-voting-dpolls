@@ -22,11 +22,9 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
     private checkConfirmedInterval: any;
     private setTimeoutHolder: any;
     private contract: any;
-    private path: string;
 
     constructor(props: IPollDetailProps) {
         super(props);
-        this.path = Routes.POLLS_BASE + this.props.address;
         this.contract = new this.props.web3Rpc.eth.Contract(VOTING_ABI, this.props.address);
         this.checkConfirmedInterval = null;
         this.setTimeoutHolder = null;
@@ -60,18 +58,6 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
 
     async componentWillReceiveProps(nextProps: IPollDetailProps) {
         if (this.props !== nextProps) {
-            if (nextProps.location.pathname !== this.props.location.pathname) {
-                if (nextProps.location.pathname === this.path) {
-                    this.setState({
-                        opened: true,
-                    });
-                } else {
-                    this.setState({
-                        opened: false,
-                    });
-                }
-            }
-
             if ((this.props.votesAmount !== nextProps.votesAmount) && nextProps.votesAmount !== 0) {
                 const votesByIndex = await this.fetchVotesByIndex();
                 this.setState({
@@ -461,7 +447,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                             {
                                 (this.state.chart) ?  (
                                     <div className={style["inline-right"]}>
-                                        <Pie height={180} width={180} data={this.state.chart.option as ChartData<Chart.ChartData>} options={{cutoutPercentage: 8, legend: {display: false}}} />
+                                        <Pie height={200} width={400} data={this.state.chart.option as ChartData<Chart.ChartData>} options={{cutoutPercentage: 50, animation: {duration: 1600}, legend: {display: true, position: "left"}}} />
                                     </div>
                                 ) : (
                                     <div className={style["inline-right"]}>
