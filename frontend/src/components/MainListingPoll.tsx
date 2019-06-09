@@ -543,7 +543,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                         return (
                             <div className={style["poll-content"]}>
                                 {
-                                    (this.state.polls && this.state.activePolls && this.state.activePolls.length !== 0) ? (
+                                    (this.state.polls && this.state.activePolls) && (
                                         <div>
                                             {
                                                 (this.state.filteredPolls !== null) ? this.renderFiltered(this.state.activePolls, this.state.filteredPolls, "active") : (
@@ -563,8 +563,11 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                                             {
                                                 (this.showNoSearchResult.active) && this.renderNoMatchesAvailable()
                                             }
+                                            {
+                                                (this.state.activePolls.length === 0) && this.renderNoPollsAvailable()
+                                            }
                                         </div>
-                                    ) : this.renderNoPollsAvailable()
+                                    )
                                 }
                             </div>
                         );
@@ -572,7 +575,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                         return (
                             <div className={style["poll-content"]}>
                                 {
-                                    (this.state.polls && this.state.inactivePolls && this.state.inactivePolls.length !== 0) ? (
+                                    (this.state.polls && this.state.inactivePolls) && (
                                         <div>
                                             {
                                                 (this.state.filteredPolls !== null) ? this.renderFiltered(this.state.inactivePolls, this.state.filteredPolls, "inactive") : (
@@ -592,8 +595,11 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                                             {
                                                 (this.showNoSearchResult.inactive) && this.renderNoMatchesAvailable()
                                             }
+                                            {
+                                                (this.state.inactivePolls.length === 0) && this.renderNoPollsAvailable()
+                                            }
                                         </div>
-                                    ) : this.renderNoPollsAvailable()
+                                    )
                                 }
                             </div>
                         );
