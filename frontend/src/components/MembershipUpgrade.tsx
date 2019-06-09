@@ -194,7 +194,9 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
 
                         const title = "Membership Upgrade";
                         const detail = notificationText;
-                        toast(<Toast title={title} detail={detail} />);
+                        toast(<Toast title={title} detail={detail} />, {
+                            autoClose: false,
+                        });
 
                         clearInterval(this.checkConfirmedInterval);
                         this.setTimeoutHolder = setTimeout(() => {

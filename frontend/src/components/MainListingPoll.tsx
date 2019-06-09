@@ -130,7 +130,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
     }
 
     async componentDidUpdate(prevProps: IMainListingPollProps) {
-        if (this.props !== prevProps) {
+        if ((this.props !== prevProps) && (this.props.blockHeight !== prevProps.blockHeight)) {
             await this.refreshPolls();
         }
 
@@ -234,7 +234,9 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
 
                     const title = "Poll Creation";
                     const detail = (<div>Your poll have just been published! <Icon size="small" name="external alternate" onClick={this.linkPoll.bind(this, poll.address)} /></div>);
-                    toast(<Toast title={title} detail={detail} />);
+                    toast(<Toast title={title} detail={detail} />,  {
+                        autoClose: false,
+                    });
 
                     if (!this.props.userWindowFocus && this.props.notificationStatus === true) {
                         const notification = new Notification(NOTIFICATION_TITLE, {
@@ -261,7 +263,9 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                             const title = "Vote";
                             const detail = (<div>{detailContent} <Icon size="small" name="external alternate" onClick={this.linkPollDetail.bind(this, poll.address)} /></div>);
                             this.props.removeMonitoringVotedPoll(poll.address);
-                            toast(<Toast title={title} detail={detail} />);
+                            toast(<Toast title={title} detail={detail} />, {
+                                autoClose: false,
+                            });
                         }
                         delete this.monitoringVotedPollLock[poll.address];
                     }
