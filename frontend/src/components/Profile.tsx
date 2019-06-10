@@ -58,7 +58,7 @@ class Profile extends React.Component<IProfileProps, IProfileStates> {
 
     render() {
         return (
-            <Card>
+            <Card className={style.stretchable}>
                 <Card.Content>
                     <Card.Header><Icon color="black" name="clock outline" />Latest Block</Card.Header>
                     <Card.Description>

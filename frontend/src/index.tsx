@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import "semantic-ui-css/semantic.min.css";
 import "react-toastify/dist/ReactToastify.css";
-import { Dimmer, Loader } from "semantic-ui-react";
+import { Dimmer, Loader, Button, Icon } from "semantic-ui-react";
 import Web3 from "web3";
 import commonStyle from "./commons/styles/index.module.css";
 import MainBanner from "./components/MainBanner";
@@ -19,6 +19,7 @@ import MainFooter from "./components/MainFooter";
 import MainSearchBar from "./components/MainSearchBar";
 import { toast } from "react-toastify";
 import toastConfig from "./commons/toastConfig";
+import { animateScroll as scroll } from "react-scroll";
 
 const GOOGLE_ANALYTICS_TRACKING_ID = process.env.REACT_APP_GOOGLE_ANALYTICS_TRACKING_CODE;
 if (GOOGLE_ANALYTICS_TRACKING_ID) {
@@ -66,9 +67,12 @@ class App extends React.Component<{}, IIndexStates> {
             voting: {
                 selector: null,
             },
+            showScrollToButton: false,
         };
         this.networkName = null;
         this.userWalletUnlockApproval = this.userWalletUnlockApproval.bind(this);
+        this.scrollToTop = this.scrollToTop.bind(this);
+        this.showScrollToTopButton = this.showScrollToTopButton.bind(this);
         toast.configure(toastConfig);
     }
 
@@ -104,6 +108,31 @@ class App extends React.Component<{}, IIndexStates> {
                 });
             }
         }
+
+        window.addEventListener("scroll", this.showScrollToTopButton);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener("scroll", this.showScrollToTopButton);
+    }
+
+    showScrollToTopButton() {
+        const { showScrollToButton } = this.state;
+        if (window.pageYOffset > 350 && !showScrollToButton) {
+            this.setState({
+                showScrollToButton: true,
+            });
+        }
+
+        if (window.pageYOffset <= 350 && showScrollToButton) {
+            this.setState({
+                showScrollToButton: false,
+            });
+        }
+    }
+
+    scrollToTop() {
+        scroll.scrollToTop();
     }
 
     async userWalletUnlockApproval() {
@@ -195,27 +224,28 @@ class App extends React.Component<{}, IIndexStates> {
         } else {
             return (
                 <Router>
-                    <div className={style["page-container"]}>
-                        <div>
-                            <MainBanner web3={this.state.web3} web3Rpc={this.state.web3Rpc} userWalletUnlockApproval={this.userWalletUnlockApproval} />
-                        </div>
+                    <div>
+                        <div className={style.bg} />
+                        <MainBanner web3={this.state.web3} web3Rpc={this.state.web3Rpc} userWalletUnlockApproval={this.userWalletUnlockApproval} />
 
                         <div className={style["content-wrap"]}>
-                            <div className={style["content-part"]}>
-                                <div className={[commonStyle.border, style["listing-outer"]].join(" ")}>
-                                    <div className={style["listing-inner"]}>
-                                        <div className={style["listing-inner-content"]}>
-                                            <MainListingPoll web3={this.state.web3} web3Rpc={this.state.web3Rpc} />
-                                        </div>
-                                    </div>
+                            <div className={style.listing}>
+                                <div className={style["listing-inner"]}>
+                                    <MainListingPoll web3={this.state.web3} web3Rpc={this.state.web3Rpc} />
                                 </div>
-                                <div className={style.infobar}>
+                            </div>
+                            <div className={style.infobar}>
+                                <div className={style["infobar-inner"]}>
                                     <MainSearchBar />
                                     <Profile web3={this.state.web3} />
                                 </div>
                             </div>
                         </div>
-
+                        <div className={(this.state.showScrollToButton) ? style["scroll-to-top"] : [style["scroll-to-top"], commonStyle.hidden].join(" ")}>
+                            <Button color="black" icon={true} onClick={this.scrollToTop}>
+                                <Icon name="chevron up" size="big" />
+                            </Button>
+                        </div>
                         <div className={style.footer}>
                             <MainFooter />
                         </div>
