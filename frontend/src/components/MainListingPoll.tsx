@@ -1,7 +1,7 @@
 import React, { Dispatch } from "react";
 import { connect } from "react-redux";
 import { Header, Icon, Item, Loader, Segment, Menu, Dimmer } from "semantic-ui-react";
-import { setStatistics, removeMonitoringCreatedPoll, setSearchResultsAmount, setActivePollDetail, setActivePollDetailInProgress, removeMonitoringVotedPoll } from "../actions/poll";
+import { setStatistics, removeMonitoringCreatedPoll, setSearchResultsAmount, setActivePollDetail, setActivePollDetailInProgress, removeMonitoringVotedPoll, removeVoteInProgress } from "../actions/poll";
 import { BlockHeightType, AddressType } from "../actions/types/eth";
 import { PollActionType } from "../actions/types/poll";
 import { VOTING_ABI, VOTING_CORE_ABI } from "../constants/contractABIs";
@@ -39,7 +39,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         [key: string]: PollInitialMetadata;
     };
     private monitoringVotedPollLock: {
-        [key: string]: boolean;
+        [key: string]: true;
     }; // lock down to single op at the same time to prevent redundent toast notifications
     private checkURLIsPollDetail: boolean;
     constructor(props: IMainListingPollProps) {
@@ -266,6 +266,8 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                             toast(<Toast title={title} detail={detail} />, {
                                 autoClose: false,
                             });
+
+                            this.props.removeVoteInProgress(poll.address);
                         }
                         delete this.monitoringVotedPollLock[poll.address];
                     }
@@ -714,6 +716,7 @@ const mapDispatchToProps = (dispatch: Dispatch<PollActionType | UserActionType>,
         setSearchBar: (enabled: boolean) => dispatch(setSearchBar(enabled)),
         setActiveDetailAddress: (address: AddressType | null, index?: number) => dispatch(setActivePollDetail(address, index)),
         setActiveDetailViewInProgress: (inProgress: boolean) => dispatch(setActivePollDetailInProgress(inProgress)),
+        removeVoteInProgress: (address: AddressType) => dispatch(removeVoteInProgress(address)),
     };
 };
 
