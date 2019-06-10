@@ -2,6 +2,10 @@
     margin: 10px;
 }
 
+.hidden {
+    display: none;
+}
+
 .toast-card {
     background: #464646;
     border-radius: 5px;

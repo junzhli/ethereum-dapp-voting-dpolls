@@ -49,3 +49,9 @@
     margin: 0 auto;
     vertical-align: middle;
 }
+
+.scroll-to-top {
+    position: fixed;
+    left: 5%;
+    bottom: 10%;
+}

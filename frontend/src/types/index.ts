@@ -18,4 +18,5 @@ export interface IIndexStates {
     voting: {
         selector: AddressType | null,
     };
+    showScrollToButton: boolean;
 }

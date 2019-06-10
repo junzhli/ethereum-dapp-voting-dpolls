@@ -1,6 +1,6 @@
 import React, { Dispatch } from "react";
 import { connect } from "react-redux";
-import { Header, Icon, Item, Loader, Segment, Menu, Dimmer } from "semantic-ui-react";
+import { Header, Icon, Item, Loader, Segment, Menu } from "semantic-ui-react";
 import { setStatistics, removeMonitoringCreatedPoll, setSearchResultsAmount, setActivePollDetail, setActivePollDetailInProgress, removeMonitoringVotedPoll, removeVoteInProgress } from "../actions/poll";
 import { BlockHeightType, AddressType } from "../actions/types/eth";
 import { PollActionType } from "../actions/types/poll";
