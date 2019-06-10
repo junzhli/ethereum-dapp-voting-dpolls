@@ -161,9 +161,8 @@ class MembershipUpgrade extends React.Component<IMembershipUpgradeProps, IMember
             }
             this.checkConfirmedInterval = setInterval(async () => {
                 try {
-                    const blockNumber = await this.props.web3Rpc.eth.getBlockNumber();
                     const receipt = await this.props.web3Rpc.eth.getTransactionReceipt(txid);
-                    if (receipt && (receipt.blockNumber === blockNumber)) {
+                    if (receipt && (receipt.blockNumber <= this.props.blockHeight)) {
                         this.setState({
                             waitingMessage: {
                                 show: false,

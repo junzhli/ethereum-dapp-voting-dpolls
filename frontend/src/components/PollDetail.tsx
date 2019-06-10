@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 import { ERROR_METAMASK_NOT_INSTALLED } from "../constants/project";
 import Toast from "./Toast";
 import { AddressType } from "../actions/types/eth";
-import { setActivePollDetail, setActivePollDetailInProgress, addMonitoringVotedPoll } from "../actions/poll";
+import { setActivePollDetail, setActivePollDetailInProgress, addMonitoringVotedPoll, setVoteInProgress, removeVoteInProgress } from "../actions/poll";
 import { PollActionType } from "../actions/types/poll";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
@@ -22,14 +22,23 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
     private checkConfirmedInterval: any;
     private setTimeoutHolder: any;
     private contract: any;
+    private txInProgress: string | null;
+    private stillInProgress: boolean;
 
     constructor(props: IPollDetailProps) {
         super(props);
         this.contract = new this.props.web3Rpc.eth.Contract(VOTING_ABI, this.props.address);
-        this.checkConfirmedInterval = null;
+        this.stillInProgress = false;
+        // restore state if something is still processing (e.g. waiting transaction)
+        if (this.props.address in this.props.voteInProgress) {
+            this.stillInProgress = true;
+        }
+
+        this.txInProgress = (this.stillInProgress) ? (this.props.voteInProgress[this.props.address].txid) : null;
+        this.checkConfirmedInterval = (this.stillInProgress) ? this.setTxCheck() : null;
         this.setTimeoutHolder = null;
         this.state = {
-            waitingMessage: {
+            waitingMessage: (this.stillInProgress) ? this.getWaitingTxConfirmedState() : {
                 show: false,
                 message: null,
             },
@@ -38,8 +47,8 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                 message: null,
             },
             votingMessage: {
-                selectedIndex: null,
-                selectedOption: null,
+                selectedIndex: (this.stillInProgress) ? (this.props.voteInProgress[this.props.address].votedIndex) : null,
+                selectedOption: (this.stillInProgress) ? (this.props.options[this.props.voteInProgress[this.props.address].votedIndex]) : null,
             },
             successfulMessage: {
                 show: false,
@@ -48,7 +57,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             chart: null,
             votesByIndex: null,
             opened: false,
-            inProgress: false,
+            inProgress: (this.stillInProgress) ? true : false,
             waitingVerified: false,
         };
         this.handleOptionVoted = this.handleOptionVoted.bind(this);
@@ -160,9 +169,10 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             this.setState({
                 opened: false,
             });
-            this.props.history.push(Routes.ROOT);
 
-            this.props.setActiveDetailAddress(null);
+            if (this.txInProgress) {
+                this.props.addVoteInProgress(this.props.address, this.txInProgress, this.state.votingMessage.selectedIndex as number);
+            }
 
             if (this.state.inProgress) {
                 const title = "Vote";
@@ -173,6 +183,9 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             if (this.state.waitingVerified) {
                 this.props.addMonitoringVotedPoll(this.props.address);
             }
+
+            this.props.history.push(Routes.ROOT);
+            this.props.setActiveDetailAddress(null);
         }
     }
 
@@ -185,6 +198,78 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
 
     async voteOnSubmitHandler(event: React.MouseEvent<HTMLButtonElement, MouseEvent>, data: ButtonProps) {
         await this.vote(data.value);
+    }
+
+    setTxCheck() {
+        return setInterval(async () => {
+            try {
+                const receipt = await this.props.web3Rpc.eth.getTransactionReceipt(this.txInProgress);
+                if (receipt && (receipt.blockNumber <= this.props.blockHeight)) {
+                    const chartOptions = await this.fetchChartOption();
+                    this.setState({
+                        waitingMessage: {
+                            show: false,
+                            message: null,
+                        },
+                        successfulMessage: {
+                            show: true,
+                            message: (
+                                <div>
+                                    <p>Your transaction has been confirmed. {
+                                        (getEtherscanTxURL(NETWORK_ID, this.txInProgress as string)) && (
+                                            <a target="_blank" rel="noopener noreferrer" href={getEtherscanTxURL(NETWORK_ID, this.txInProgress as string) as string}>View on Etherscan</a>
+                                        )
+                                    }</p>
+                                </div>
+                            ),
+                        },
+                        chart: {
+                            option: chartOptions,
+                        },
+                        inProgress: false,
+                        waitingVerified: false,
+                    });
+
+                    this.props.removeVoteInProgress(this.props.address);
+                    clearInterval(this.checkConfirmedInterval);
+                    if (this.setTimeoutHolder) {
+                        clearTimeout(this.setTimeoutHolder);
+                    }
+                    this.setTimeoutHolder = setTimeout(() => {
+                        this.setState({
+                            successfulMessage: {
+                                show: false,
+                                message: null,
+                            },
+                        });
+                    }, 5000);
+                    this.txInProgress = null;
+                }
+            } catch (error) {
+                // we skip any error
+                console.log("checkConfirmedInterval error occurred: " + error);
+            }
+
+        }, 1000);
+    }
+
+    getWaitingTxConfirmedState() {
+        if (!this.txInProgress) {
+            throw new Error("txInProgress should not be null");
+        }
+
+        return {
+            show: true,
+            message: (
+                <div>
+                    Waiting for the transaction being confirmed. {
+                        (getEtherscanTxURL(NETWORK_ID, this.txInProgress)) && (
+                            <a target="_blank" rel="noopener noreferrer" href={getEtherscanTxURL(NETWORK_ID, this.txInProgress) as string}>View on Etherscan</a>
+                        )
+                    }
+                </div>
+            ),
+        };
     }
 
     async vote(option: number) {
@@ -209,7 +294,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
         const to = this.props.address;
         const data = this.props.contract.methods.vote(option).encodeABI();
         try {
-            const txid = await sendTransaction(
+            this.txInProgress = await sendTransaction(
                 web3,
                 from,
                 to,
@@ -220,75 +305,14 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                     show: false,
                     message: null,
                 },
-                waitingMessage: {
-                    show: true,
-                    message: (
-                        <div>
-                            Waiting for the transaction being confirmed. {
-                                (getEtherscanTxURL(NETWORK_ID, txid)) && (
-                                    <a target="_blank" rel="noopener noreferrer" href={getEtherscanTxURL(NETWORK_ID, txid) as string}>View on Etherscan</a>
-                                )
-                            }
-                        </div>
-                    ),
-                },
+                waitingMessage: this.getWaitingTxConfirmedState(),
                 waitingVerified: true,
             });
-
-            const lastBlockNumber = this.props.blockHeight;
 
             if (this.checkConfirmedInterval) {
                 clearInterval(this.checkConfirmedInterval);
             }
-            this.checkConfirmedInterval = setInterval(async () => {
-                try {
-                    const blockNumber = await this.props.web3Rpc.eth.getBlockNumber();
-                    const receipt = await this.props.web3Rpc.eth.getTransactionReceipt(txid);
-                    if (receipt && (receipt.blockNumber === blockNumber)) {
-                        const chartOptions = await this.fetchChartOption();
-                        this.setState({
-                            waitingMessage: {
-                                show: false,
-                                message: null,
-                            },
-                            successfulMessage: {
-                                show: true,
-                                message: (
-                                    <div>
-                                        <p>Your transaction has been confirmed. {
-                                            (getEtherscanTxURL(NETWORK_ID, txid)) && (
-                                                <a target="_blank" rel="noopener noreferrer" href={getEtherscanTxURL(NETWORK_ID, txid) as string}>View on Etherscan</a>
-                                            )
-                                        }</p>
-                                    </div>
-                                ),
-                            },
-                            chart: {
-                                option: chartOptions,
-                            },
-                            inProgress: false,
-                            waitingVerified: false,
-                        });
-
-                        clearInterval(this.checkConfirmedInterval);
-                        if (this.setTimeoutHolder) {
-                            clearTimeout(this.setTimeoutHolder);
-                        }
-                        this.setTimeoutHolder = setTimeout(() => {
-                            this.setState({
-                                successfulMessage: {
-                                    show: false,
-                                    message: null,
-                                },
-                            });
-                        }, 5000);
-                    }
-                } catch (error) {
-                    // we skip any error
-                    console.log("checkConfirmedInterval error occurred: " + error);
-                }
-
-            }, 1000);
+            this.checkConfirmedInterval = this.setTxCheck();
         } catch (error) {
             this.setState({
                 waitingMessage: {
@@ -482,6 +506,7 @@ const mapStateToProps = (state: StoreState, ownProps: IPollDetail.IInnerProps): 
         blockHeight: state.ethMisc.blockHeight,
         activeDetailAddress: state.pollMisc.activeDetailAddress.address,
         activeDetailViewInProgress: state.pollMisc.activeDetailAddress.inProgress,
+        voteInProgress: state.pollMisc.voteInProgress,
     };
 };
 
@@ -490,6 +515,8 @@ const mapDispatchToProps = (dispatch: Dispatch<PollActionType>, ownProps: IPollD
         setActiveDetailAddress: (address: AddressType | null) => dispatch(setActivePollDetail(address)),
         setActiveDetailViewInProgress: (inProgress: boolean) => dispatch(setActivePollDetailInProgress(inProgress)),
         addMonitoringVotedPoll: (address: AddressType) => dispatch(addMonitoringVotedPoll([address])),
+        addVoteInProgress: (address: AddressType, txid: string, votedIndex: number) => dispatch(setVoteInProgress(address, txid, votedIndex)),
+        removeVoteInProgress: (address: AddressType) => dispatch(removeVoteInProgress(address)),
     };
 };
 
