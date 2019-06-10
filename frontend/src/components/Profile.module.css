@@ -50,3 +50,7 @@
 .no-wallet-found {
     margin-top: .3em !important;
 }
+
+.stretchable {
+    width: initial !important;
+}

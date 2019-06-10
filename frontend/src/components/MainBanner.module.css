@@ -1,8 +1,9 @@
 .main-banner {
     font-family: 'Open Sans', 'PingFang TC', sans-serif;
     z-index: 999;
-    position: sticky;
+    position: fixed;
     top: 0;
+    width: 100%;
     background-color: teal;
     color: white;
     transition-property: background, padding, z-index;

@@ -195,21 +195,18 @@ class App extends React.Component<{}, IIndexStates> {
         } else {
             return (
                 <Router>
-                    <div className={style["page-container"]}>
-                        <div>
-                            <MainBanner web3={this.state.web3} web3Rpc={this.state.web3Rpc} userWalletUnlockApproval={this.userWalletUnlockApproval} />
-                        </div>
+                    <div>
+                        <div className={style.bg} />
+                        <MainBanner web3={this.state.web3} web3Rpc={this.state.web3Rpc} userWalletUnlockApproval={this.userWalletUnlockApproval} />
 
                         <div className={style["content-wrap"]}>
-                            <div className={style["content-part"]}>
-                                <div className={[commonStyle.border, style["listing-outer"]].join(" ")}>
-                                    <div className={style["listing-inner"]}>
-                                        <div className={style["listing-inner-content"]}>
-                                            <MainListingPoll web3={this.state.web3} web3Rpc={this.state.web3Rpc} />
-                                        </div>
-                                    </div>
+                            <div className={style.listing}>
+                                <div className={style["listing-inner"]}>
+                                    <MainListingPoll web3={this.state.web3} web3Rpc={this.state.web3Rpc} />
                                 </div>
-                                <div className={style.infobar}>
+                            </div>
+                            <div className={style.infobar}>
+                                <div className={style["infobar-inner"]}>
                                     <MainSearchBar />
                                     <Profile web3={this.state.web3} />
                                 </div>
