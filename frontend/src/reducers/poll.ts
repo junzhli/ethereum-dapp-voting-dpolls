@@ -1,4 +1,4 @@
-import { SET_POLL_STATISTICS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT, SET_ACTIVE_POLL_DETAIL, SET_ACTIVE_POLL_DETAIL_IN_PROGRESS, ADD_MONITORING_CREATED_POLLS, REMOVE_MONITORING_CREATED_POLLS, ADD_MONITORING_VOTED_POLLS, REMOVE_MONITORING_VOTED_POLLS } from "../actions/constant";
+import { SET_POLL_STATISTICS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT, SET_ACTIVE_POLL_DETAIL, SET_ACTIVE_POLL_DETAIL_IN_PROGRESS, ADD_MONITORING_CREATED_POLLS, REMOVE_MONITORING_CREATED_POLLS, ADD_MONITORING_VOTED_POLLS, REMOVE_MONITORING_VOTED_POLLS, SET_VOTE_IN_PROGRESS, REMOVE_VOTE_IN_PROGRESS } from "../actions/constant";
 import { PollActionType } from "../actions/types/poll";
 import { IPollMisc } from "../store/types";
 import { AddressType } from "../actions/types/eth";
@@ -17,6 +17,7 @@ const initialState: IPollMisc = {
         index: null,
         inProgress: false,
     },
+    voteInProgress: {},
 };
 
 const poll = (state: IPollMisc = initialState, action: PollActionType): IPollMisc => {
@@ -118,6 +119,32 @@ const poll = (state: IPollMisc = initialState, action: PollActionType): IPollMis
             return {
                 ...state,
                 activeDetailAddress,
+            };
+        }
+        case SET_VOTE_IN_PROGRESS: {
+            const { address, txid, votedIndex } = action.payload;
+            const voteInProgress = Object.assign([], state.voteInProgress);
+            voteInProgress[address] = {
+                txid,
+                votedIndex,
+            };
+
+            return {
+                ...state,
+                voteInProgress,
+            };
+        }
+        case REMOVE_VOTE_IN_PROGRESS: {
+            const address = action.payload;
+            if (!(address in state.voteInProgress)) {
+                return state;
+            }
+
+            const voteInProgress = Object.assign([], state.voteInProgress);
+            delete voteInProgress[address];
+            return {
+                ...state,
+                voteInProgress,
             };
         }
     }

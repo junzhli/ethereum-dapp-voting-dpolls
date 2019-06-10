@@ -1,5 +1,5 @@
-import { SET_POLL_STATISTICS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT, SET_ACTIVE_POLL_DETAIL, SET_ACTIVE_POLL_DETAIL_IN_PROGRESS, ADD_MONITORING_CREATED_POLLS, REMOVE_MONITORING_CREATED_POLLS, ADD_MONITORING_VOTED_POLLS, REMOVE_MONITORING_VOTED_POLLS } from "./constant";
-import { ISetStatistics, ISetUserSearchKeywords, ISetSearchResultsAmount, ISetActivePollDetail, ISetActivePollDetailInProgress, IAddMonitoringCreatedPolls, IRemoveMonitoringCreatedPolls, IAddMonitoringVotedPolls, IRemoveMonitoringVotedPolls } from "./types/poll";
+import { SET_POLL_STATISTICS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT, SET_ACTIVE_POLL_DETAIL, SET_ACTIVE_POLL_DETAIL_IN_PROGRESS, ADD_MONITORING_CREATED_POLLS, REMOVE_MONITORING_CREATED_POLLS, ADD_MONITORING_VOTED_POLLS, REMOVE_MONITORING_VOTED_POLLS, SET_VOTE_IN_PROGRESS, REMOVE_VOTE_IN_PROGRESS } from "./constant";
+import { ISetStatistics, ISetUserSearchKeywords, ISetSearchResultsAmount, ISetActivePollDetail, ISetActivePollDetailInProgress, IAddMonitoringCreatedPolls, IRemoveMonitoringCreatedPolls, IAddMonitoringVotedPolls, IRemoveMonitoringVotedPolls, ISetVoteInProgress, IRemoveVoteInProgress } from "./types/poll";
 import { AddressType } from "./types/eth";
 
 export const setStatistics = (amount: number, active: number): ISetStatistics => {
@@ -68,5 +68,23 @@ export const setActivePollDetailInProgress = (inProgress: boolean): ISetActivePo
     return {
         type: SET_ACTIVE_POLL_DETAIL_IN_PROGRESS,
         payload: inProgress,
+    };
+};
+
+export const setVoteInProgress = (address: AddressType, txid: string, votedIndex: number): ISetVoteInProgress => {
+    return {
+        type: SET_VOTE_IN_PROGRESS,
+        payload: {
+            address,
+            txid,
+            votedIndex,
+        },
+    };
+};
+
+export const removeVoteInProgress = (address: AddressType): IRemoveVoteInProgress => {
+    return {
+        type: REMOVE_VOTE_IN_PROGRESS,
+        payload: address,
     };
 };

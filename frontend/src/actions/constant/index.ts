@@ -30,6 +30,10 @@
 
  export const SET_ACTIVE_POLL_DETAIL_IN_PROGRESS = "SET-ACTIVE-POLL-DETAIL-IN-PROGRESS";
 
+ export const SET_VOTE_IN_PROGRESS = "SET-VOTE-IN-PROGRESS";
+
+ export const REMOVE_VOTE_IN_PROGRESS = "REMOVE-VOTE-IN-PROGRESS";
+
 /**
  * User runtime configurations
  */

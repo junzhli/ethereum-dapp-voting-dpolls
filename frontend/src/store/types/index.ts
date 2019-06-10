@@ -21,6 +21,12 @@ export interface IPollMisc {
         index: number | null;
         inProgress: boolean;
     };
+    voteInProgress: {
+        [key: string]: {
+            txid: string,
+            votedIndex: number,
+        },
+    };
 }
 
 export interface IUserMisc {

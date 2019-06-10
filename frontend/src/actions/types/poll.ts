@@ -1,4 +1,4 @@
-import { SET_POLL_STATISTICS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT, SET_ACTIVE_POLL_DETAIL, SET_ACTIVE_POLL_DETAIL_IN_PROGRESS, ADD_MONITORING_CREATED_POLLS, ADD_MONITORING_VOTED_POLLS, REMOVE_MONITORING_VOTED_POLLS, REMOVE_MONITORING_CREATED_POLLS } from "../constant";
+import { SET_POLL_STATISTICS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT, SET_ACTIVE_POLL_DETAIL, SET_ACTIVE_POLL_DETAIL_IN_PROGRESS, ADD_MONITORING_CREATED_POLLS, ADD_MONITORING_VOTED_POLLS, REMOVE_MONITORING_VOTED_POLLS, REMOVE_MONITORING_CREATED_POLLS, SET_VOTE_IN_PROGRESS, REMOVE_VOTE_IN_PROGRESS } from "../constant";
 import { AddressType } from "./eth";
 
 export interface ISetStatistics {
@@ -52,4 +52,18 @@ export interface ISetActivePollDetailInProgress {
     payload: boolean;
 }
 
-export type PollActionType = ISetStatistics | IAddMonitoringCreatedPolls | IRemoveMonitoringCreatedPolls | IAddMonitoringVotedPolls | IRemoveMonitoringVotedPolls | ISetUserSearchKeywords | ISetSearchResultsAmount | ISetActivePollDetail | ISetActivePollDetailInProgress;
+export interface ISetVoteInProgress {
+    type: typeof SET_VOTE_IN_PROGRESS;
+    payload: {
+        address: AddressType,
+        txid: string,
+        votedIndex: number,
+    };
+}
+
+export interface IRemoveVoteInProgress {
+    type: typeof REMOVE_VOTE_IN_PROGRESS;
+    payload: AddressType;
+}
+
+export type PollActionType = ISetStatistics | IAddMonitoringCreatedPolls | IRemoveMonitoringCreatedPolls | IAddMonitoringVotedPolls | IRemoveMonitoringVotedPolls | ISetUserSearchKeywords | ISetSearchResultsAmount | ISetActivePollDetail | ISetActivePollDetailInProgress | ISetVoteInProgress | IRemoveVoteInProgress;

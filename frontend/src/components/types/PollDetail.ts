@@ -21,12 +21,20 @@ export namespace IPollDetail {
         blockHeight: BlockHeightType;
         activeDetailAddress: AddressType | null;
         activeDetailViewInProgress: boolean;
+        voteInProgress: {
+            [key: string]: {
+                txid: string,
+                votedIndex: number,
+            },
+        };
     }
 
     export interface IPropsFromDispatch {
         setActiveDetailAddress: (address: AddressType | null) => void;
         setActiveDetailViewInProgress: (inProgress: boolean) => void;
         addMonitoringVotedPoll: (address: AddressType) => void;
+        addVoteInProgress: (address: AddressType, txid: string, votedIndex: number) => void;
+        removeVoteInProgress: (address: AddressType) => void;
     }
 }
 
