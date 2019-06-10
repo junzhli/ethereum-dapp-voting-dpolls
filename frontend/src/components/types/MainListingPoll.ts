@@ -31,6 +31,7 @@ export namespace IMainListingPoll {
         setSearchBar: (enabled: boolean) => void;
         setActiveDetailAddress: (address: AddressType | null, index?: number) => void;
         setActiveDetailViewInProgress: (inProgress: boolean) => void;
+        removeVoteInProgress: (address: AddressType) => void;
     }
 }
 
