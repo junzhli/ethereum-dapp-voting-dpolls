@@ -100,9 +100,11 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
     }
 
     onLastOptionInputHandler(event: React.FocusEvent<HTMLInputElement>) {
-        this.setState({
-            optionsAmount: this.state.optionsAmount + 1,
-        });
+        if (this.state.optionsAmount < 256) {
+            this.setState({
+                optionsAmount: this.state.optionsAmount + 1,
+            });
+        }
     }
 
     onOpenHandler(event: React.MouseEvent<HTMLElement, MouseEvent>, data: ModalProps) {
