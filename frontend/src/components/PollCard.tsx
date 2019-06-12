@@ -319,7 +319,7 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
                                     </div>
                                 )
                             }
-                            <Button loading={((this.props.activeDetailViewAddress === this.props.address) && this.props.activeDetailViewInProgress) || this.state.detailViewLoading} basic={true} color="vk" size="medium" onClick={this.clickDetailViewHandler}>View details</Button>
+                            <Button loading={((this.props.activeDetailViewAddress === this.props.address) && this.props.activeDetailViewInProgress) || this.state.detailViewLoading} basic={true} color="vk" size="medium" onClick={this.clickDetailViewHandler}>View details<Icon name="angle right" /></Button>
                         </div>
                     </Segment>
                 );
