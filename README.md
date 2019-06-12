@@ -8,7 +8,7 @@ A decentralized voting system proposed in NTU DApp course - [https://dpolls.netl
   * Anyone can host their own polls
   * Anyone can vote for polls
   * Adding up to 256 options for a poll
-  * Poll closed on a specific block number
+  * Poll closed at a specific block number
   * Anyone can view results anytime
 * Be a host by applying for a membership
 * Membership Plan
