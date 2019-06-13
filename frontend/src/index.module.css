@@ -52,6 +52,6 @@
 
 .scroll-to-top {
     position: fixed;
-    left: 5%;
-    bottom: 10%;
+    left: 1%;
+    bottom: 46px;
 }

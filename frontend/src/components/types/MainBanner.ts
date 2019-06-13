@@ -13,6 +13,7 @@ export namespace IMainBanner {
         blockHeight: BlockHeightType;
         accountAddress: AddressType | null;
         membership: Membership | null;
+        loadingHintEnabled: boolean;
     }
 
     export interface IPropsFromDispatch {

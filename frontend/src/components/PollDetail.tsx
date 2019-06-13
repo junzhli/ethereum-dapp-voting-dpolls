@@ -16,6 +16,8 @@ import Toast from "./Toast";
 import { AddressType } from "../actions/types/eth";
 import { setActivePollDetail, setActivePollDetailInProgress, addMonitoringVotedPoll, setVoteInProgress, removeVoteInProgress } from "../actions/poll";
 import { PollActionType } from "../actions/types/poll";
+import { setLoadingHint } from "../actions/user";
+import { UserActionType } from "../actions/types/user";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
@@ -141,6 +143,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             const dataArrived = this.checkAllDataReady();
             if (dataArrived) {
                 this.props.setActiveDetailViewInProgress(false);
+                this.props.setLoadingHint(false);
                 this.setState({
                     opened: true,
                 });
@@ -510,13 +513,14 @@ const mapStateToProps = (state: StoreState, ownProps: IPollDetail.IInnerProps): 
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<PollActionType>, ownProps: IPollDetail.IInnerProps): IPollDetail.IPropsFromDispatch => {
+const mapDispatchToProps = (dispatch: Dispatch<PollActionType | UserActionType>, ownProps: IPollDetail.IInnerProps): IPollDetail.IPropsFromDispatch => {
     return {
         setActiveDetailAddress: (address: AddressType | null) => dispatch(setActivePollDetail(address)),
         setActiveDetailViewInProgress: (inProgress: boolean) => dispatch(setActivePollDetailInProgress(inProgress)),
         addMonitoringVotedPoll: (address: AddressType) => dispatch(addMonitoringVotedPoll([address])),
         addVoteInProgress: (address: AddressType, txid: string, votedIndex: number) => dispatch(setVoteInProgress(address, txid, votedIndex)),
         removeVoteInProgress: (address: AddressType) => dispatch(removeVoteInProgress(address)),
+        setLoadingHint: (show: boolean) => dispatch(setLoadingHint(show)),
     };
 };
 

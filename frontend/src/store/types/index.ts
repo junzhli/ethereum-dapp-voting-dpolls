@@ -33,6 +33,7 @@ export interface IUserMisc {
     notificationStatus: boolean | null;
     searchbarEnabled: boolean;
     userWindowsFocus: boolean;
+    loadingHintEnabled: boolean;
 }
 
 export interface StoreState {

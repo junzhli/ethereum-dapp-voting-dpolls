@@ -35,6 +35,7 @@ export namespace IPollDetail {
         addMonitoringVotedPoll: (address: AddressType) => void;
         addVoteInProgress: (address: AddressType, txid: string, votedIndex: number) => void;
         removeVoteInProgress: (address: AddressType) => void;
+        setLoadingHint: (show: boolean) => void;
     }
 }
 

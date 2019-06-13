@@ -1,6 +1,6 @@
 import React, { Dispatch } from "react";
 import { connect } from "react-redux";
-import { Button, Form, Icon, Label, Menu, Message, Modal, ModalProps, Input, Header, Ref } from "semantic-ui-react";
+import { Button, Form, Icon, Label, Menu, Message, Modal, ModalProps, Input, Header } from "semantic-ui-react";
 import { setMembership } from "../actions/eth";
 import { ETHActionType, AddressType } from "../actions/types/eth";
 import { VOTING_CORE_ABI } from "../constants/contractABIs";

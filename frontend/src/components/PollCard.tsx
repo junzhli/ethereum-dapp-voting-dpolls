@@ -244,6 +244,9 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     }
 
     clickDetailViewHandler() {
+        if (((this.props.activeDetailViewAddress === this.props.address) && this.props.activeDetailViewInProgress) || this.state.detailViewLoading) {
+            return;
+        }
         this.props.history.push(this.detailPath);
         this.setState({
             detailViewLoading: true,
@@ -319,7 +322,7 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
                                     </div>
                                 )
                             }
-                            <Button loading={((this.props.activeDetailViewAddress === this.props.address) && this.props.activeDetailViewInProgress) || this.state.detailViewLoading} basic={true} color="vk" size="medium" onClick={this.clickDetailViewHandler}>View details<Icon name="angle right" /></Button>
+                            <Button basic={true} color="vk" size="medium" onClick={this.clickDetailViewHandler}>View details<Icon name="angle right" /></Button>
                         </div>
                     </Segment>
                 );

@@ -32,6 +32,7 @@ export namespace IMainListingPoll {
         setActiveDetailAddress: (address: AddressType | null, index?: number) => void;
         setActiveDetailViewInProgress: (inProgress: boolean) => void;
         removeVoteInProgress: (address: AddressType) => void;
+        setLoadingHint: (show: boolean) => void;
     }
 }
 
