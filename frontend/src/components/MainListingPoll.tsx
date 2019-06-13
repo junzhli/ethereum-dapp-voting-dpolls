@@ -41,7 +41,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
     private monitoringVotedPollLock: {
         [key: string]: true;
     }; // lock down to single op at the same time to prevent redundent toast notifications
-    private checkURLIsPollDetail: boolean;
+    private checkedURLIsPollDetail: boolean;
     constructor(props: IMainListingPollProps) {
         super(props);
         this.contract = new this.props.web3Rpc.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
@@ -49,7 +49,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         this.initialMetadata = {};
         this.monitoringVotedPollLock = {};
         this.pollCardsSearchable = null;
-        this.checkURLIsPollDetail = false;
+        this.checkedURLIsPollDetail = false;
         this.showNoSearchResult = {
             active: false,
             inactive: false,
@@ -75,11 +75,15 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         // listening on route url changes related to poll details except for the first coming url
         this.props.history.listen((location, action) => {
             if (this.state.polls) {
-                const pollAddresses = this.state.polls.map((poll) => poll.address);
+                const pollDetailPaths = this.state.polls.map((poll) => {
+                    return {
+                        address: poll.address,
+                        path: Routes.POLLS_BASE + poll.address,
+                    };
+                });
                 let matched: boolean = false;
-                pollAddresses.forEach((address, index) => {
-                    const detailPath = Routes.POLLS_BASE + address;
-                    if (location.pathname === detailPath && (address !== this.props.activeDetailAddress.address) && this.state.polls) {
+                for (const [index, {path, address}] of pollDetailPaths.entries()) {
+                    if (location.pathname === path && (address !== this.props.activeDetailAddress.address) && this.state.polls) {
                         if (!matched) {
                             matched = true;
                         }
@@ -89,16 +93,17 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                         this.props.setActiveDetailAddress(address, index);
                         this.props.setActiveDetailViewInProgress(true);
                         this.props.setLoadingHint(true);
+                        break;
                     }
-                    if (!matched) {
-                        this.setState({
-                            showDetailView: null,
-                        });
-                        this.props.setActiveDetailAddress(null);
-                        this.props.setActiveDetailViewInProgress(false);
-                        this.props.setLoadingHint(false);
-                    }
-                });
+                }
+                if (!matched) {
+                    this.setState({
+                        showDetailView: null,
+                    });
+                    this.props.setActiveDetailAddress(null);
+                    this.props.setActiveDetailViewInProgress(false);
+                    this.props.setLoadingHint(false);
+                };
             }
         });
     }
@@ -137,20 +142,26 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         }
 
         // check the first coming url if matches detail poll's path or not
-        if (this.state.polls && !this.checkURLIsPollDetail) {
-            const pollAddresses = this.state.polls.map((poll) => poll.address);
-            pollAddresses.forEach((address, index) => {
-                const detailPath = Routes.POLLS_BASE + address;
-                if (this.props.location.pathname === detailPath && (address !== this.props.activeDetailAddress.address) && this.state.polls) {
+        if (this.state.polls && !this.checkedURLIsPollDetail) {
+            const pollDetailPaths = this.state.polls.map((poll) => {
+                return {
+                    address: poll.address,
+                    path: Routes.POLLS_BASE + poll.address,
+                };
+            });
+            for (const [index, {address, path}] of pollDetailPaths.entries()) {
+                if (this.props.location.pathname === path && (address !== this.props.activeDetailAddress.address) && this.state.polls) {
                     this.setState({
                         showDetailView: null,
                     });
                     this.props.setActiveDetailAddress(address, index);
                     this.props.setActiveDetailViewInProgress(true);
                     this.props.setLoadingHint(true);
+                    break;
                 }
-            });
-            this.checkURLIsPollDetail = true;
+            }
+
+            this.checkedURLIsPollDetail = true;
         }
     }
 
