@@ -7,11 +7,12 @@ import { VOTING_CORE_ABI } from "../constants/contractABIs";
 import { StoreState } from "../store/types";
 import { Membership } from "../types";
 import style from "./MainBanner.module.css";
+import commonStyle from "../commons/styles/index.module.css";
 import MembershipUpgrade from "./MembershipUpgrade";
 import PollCreate from "./PollCreate";
 import { IMainBanner, IMainBannerProps, IMainBannerStates } from "./types/MainBanner";
 import { withRouter } from "react-router-dom";
-import { setNotificationStatus, setUserWindowsFocusStatus } from "../actions/user";
+import { setNotificationStatus, setUserWindowsFocusStatus, setLoadingHint } from "../actions/user";
 import { UserActionType } from "../actions/types/user";
 import { NOTIFICATION_TITLE, LOCAL_STORAGE } from "../constants/project";
 import { toast, ToastOptions } from "react-toastify";
@@ -175,6 +176,7 @@ class MainBanner extends React.Component<IMainBannerProps, IMainBannerStates> {
     render() {
         return (
             <div className={style["main-banner"]}>
+                <div className={(this.props.loadingHintEnabled) ? style["loading-hint"] : [style["loading-hint"], commonStyle.hidden].join(" ")}>Loading...</div>
                 <div className={[style.banner, style.center].join(" ")}>
                     <div className={style.logo}>
                         <Header inverted={true} as="h2">
@@ -203,6 +205,7 @@ const mapStateToProps = (state: StoreState, ownProps: IMainBanner.IInnerProps): 
         blockHeight: state.ethMisc.blockHeight,
         accountAddress: state.ethMisc.accountAddress,
         membership: state.ethMisc.membership,
+        loadingHintEnabled: state.userMisc.loadingHintEnabled,
     };
 };
 

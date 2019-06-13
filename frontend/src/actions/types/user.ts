@@ -1,4 +1,4 @@
-import { SET_NOTIFICATION_STATUS, SET_SEARCH_BAR, SET_USER_WINDOW_FOCUS_STATUS } from "../constant";
+import { SET_NOTIFICATION_STATUS, SET_SEARCH_BAR, SET_USER_WINDOW_FOCUS_STATUS, SET_LOADING_HINT } from "../constant";
 
 export interface ISetNotificationStatus {
     type: typeof SET_NOTIFICATION_STATUS;
@@ -15,4 +15,9 @@ export interface ISetUserIsFocus {
     payload: boolean;
 }
 
-export type UserActionType = ISetNotificationStatus | ISetSearchBar | ISetUserIsFocus;
+export interface ISetLoadingHint {
+    type: typeof SET_LOADING_HINT,
+    payload: boolean;
+}
+
+export type UserActionType = ISetNotificationStatus | ISetSearchBar | ISetUserIsFocus | ISetLoadingHint;

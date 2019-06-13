@@ -11,7 +11,7 @@ import PollCard from "./PollCard";
 import { IMainListingPoll, IMainListingPollProps, IMainListingPollState, PollInitialMetadata, AdditionalData, FilteredViewOptions } from "./types/MainListingPoll";
 import { NOTIFICATION_TITLE } from "../constants/project";
 import Fuse from "fuse.js";
-import { setSearchBar } from "../actions/user";
+import { setSearchBar, setLoadingHint } from "../actions/user";
 import { UserActionType } from "../actions/types/user";
 import { withRouter } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -88,6 +88,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                         });
                         this.props.setActiveDetailAddress(address, index);
                         this.props.setActiveDetailViewInProgress(true);
+                        this.props.setLoadingHint(true);
                     }
                     if (!matched) {
                         this.setState({
@@ -95,6 +96,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                         });
                         this.props.setActiveDetailAddress(null);
                         this.props.setActiveDetailViewInProgress(false);
+                        this.props.setLoadingHint(false);
                     }
                 });
             }
@@ -145,6 +147,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                     });
                     this.props.setActiveDetailAddress(address, index);
                     this.props.setActiveDetailViewInProgress(true);
+                    this.props.setLoadingHint(true);
                 }
             });
             this.checkURLIsPollDetail = true;
@@ -703,6 +706,7 @@ const mapDispatchToProps = (dispatch: Dispatch<PollActionType | UserActionType>,
         setActiveDetailAddress: (address: AddressType | null, index?: number) => dispatch(setActivePollDetail(address, index)),
         setActiveDetailViewInProgress: (inProgress: boolean) => dispatch(setActivePollDetailInProgress(inProgress)),
         removeVoteInProgress: (address: AddressType) => dispatch(removeVoteInProgress(address)),
+        setLoadingHint: (show: boolean) => dispatch(setLoadingHint(show)),
     };
 };
 
