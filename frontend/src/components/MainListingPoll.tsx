@@ -22,6 +22,7 @@ import Toast from "./Toast";
 import { DBInstance, IListing } from "../utils/db";
 import { PollDetailArguments } from "./types/PollDetail";
 import PollDetail from "./PollDetail";
+import { UnregisterCallback } from "history";
 
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS;
 
@@ -42,6 +43,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         [key: string]: true;
     }; // lock down to single op at the same time to prevent redundent toast notifications
     private checkedURLIsPollDetail: boolean;
+    private unregisterHistoryChangeListener: UnregisterCallback;
     constructor(props: IMainListingPollProps) {
         super(props);
         this.contract = new this.props.web3Rpc.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
@@ -73,7 +75,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
         bluebird.config(bluebirdConfig);
 
         // listening on route url changes related to poll details except for the first coming url
-        this.props.history.listen((location, action) => {
+        this.unregisterHistoryChangeListener = this.props.history.listen((location, action) => {
             if (this.state.polls) {
                 const pollDetailPaths = this.state.polls.map((poll) => {
                     return {
@@ -103,7 +105,7 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
                     this.props.setActiveDetailAddress(null);
                     this.props.setActiveDetailViewInProgress(false);
                     this.props.setLoadingHint(false);
-                };
+                }
             }
         });
     }
@@ -134,6 +136,10 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
     async componentDidMount() {
         await this.refreshPolls();
         this.pollCardsSearchable = 0;
+    }
+
+    componentWillUnmount() {
+        this.unregisterHistoryChangeListener();
     }
 
     async componentDidUpdate(prevProps: IMainListingPollProps) {
