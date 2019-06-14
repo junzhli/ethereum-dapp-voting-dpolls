@@ -8,10 +8,12 @@ import { IPollCard, IPollCardProps, IPollCardStates, IPollCardStatus } from "./t
 import { IDetail, DBInstance, IOptions } from "../utils/db";
 import Routes from "../constants/routes";
 import { withRouter } from "react-router-dom";
+import { UnregisterCallback } from "history";
 
 class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
     private contract: any;
     private detailPath: string;
+    private unregisterHistoryChangeListener: UnregisterCallback | null;
     private status: {
         [key in IPollCardStatus]: {
             border: "teal" | "grey" | "red" | "orange" | "yellow" | "olive" | "green" | "blue" | "violet" | "purple" | "pink" | "brown" | "black" | undefined,
@@ -37,6 +39,7 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
             detailViewLoading: false,
         };
         this.clickDetailViewHandler = this.clickDetailViewHandler.bind(this);
+        this.unregisterHistoryChangeListener = null;
     }
 
     async componentWillReceiveProps(nextProps: IPollCardProps) {
@@ -248,6 +251,14 @@ class PollCard extends React.Component<IPollCardProps, IPollCardStates> {
             return;
         }
         this.props.history.push(this.detailPath);
+        this.unregisterHistoryChangeListener = this.props.history.listen((location, action) => {
+            if (location.pathname !== this.detailPath) {
+                this.setState({
+                    detailViewLoading: false,
+                });
+                (this.unregisterHistoryChangeListener as UnregisterCallback)();
+            }
+        });
         this.setState({
             detailViewLoading: true,
         });
