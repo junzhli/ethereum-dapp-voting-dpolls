@@ -20,7 +20,7 @@ import { ERROR_METAMASK_NOT_INSTALLED } from "../constants/project";
 import Toast from "./Toast";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { getEstimatedBlockNumber } from "../utils/helper";
+import { getEstimatedBlockNumber, BLOCK_TIME } from "../utils/helper";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS as string;
@@ -177,7 +177,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     {props.children}
                 </div>
                 <div className={style["date-picker-hint"]}>
-                    <p>Estimate future block height by <span style={{fontStyle: "italic"}}>block time of<br /> ~14.5 seconds</span></p>
+                    <p>Estimate future block height by <span style={{fontStyle: "italic"}}>block time of<br /> ~{BLOCK_TIME} seconds</span></p>
                     <p style={{fontStyle: "italic"}}>Disclaimer: the block time of Ethereum network <br />varies in reality</p>
                 </div>
             </div>
@@ -501,7 +501,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     <Form.Field>
                         <label>Expiry Block Height</label>
                         <Ref innerRef={this.blockRef}>
-                            <Input icon={<Icon name="calendar" link={true} onClick={this.calendarButtonHandler} />} disabled={this.state.inProgress || !this.props.web3} onFocus={this.blockHeightFocusInHandler} onBlur={this.blockHeightFocusOutHandler} onKeyPress={this.blockHeightCheckHandler} placeholder="When will the poll expire?" />
+                            <Input icon={<Icon name="calendar" link={(this.state.inProgress || !this.props.web3) ? false : true} onClick={this.calendarButtonHandler} />} disabled={this.state.inProgress || !this.props.web3} onFocus={this.blockHeightFocusInHandler} onBlur={this.blockHeightFocusOutHandler} onKeyPress={this.blockHeightCheckHandler} placeholder="When will the poll expire?" />
                         </Ref>
                         {
                             (this.state.calendar.opened) && (
