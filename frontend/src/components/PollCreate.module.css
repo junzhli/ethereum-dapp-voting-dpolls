@@ -50,3 +50,26 @@
 .inline-component {
     display: inline-block;
 }
+
+.date-picker-input {
+    display: none;
+}
+
+.date-picker-wrapper {
+    padding-top: 1px;
+    padding-left: 1px;
+    padding-right: 1px;
+    padding-bottom: 6px;
+    background-color: whitesmoke;
+    border-radius: 5px;
+}
+
+.date-picker-popper {
+    left: -72px !important;
+}
+
+.date-picker-hint {
+    font-size: 14px;
+    padding-left: 8px;
+    padding-bottom: 5px;
+}

@@ -1,6 +1,6 @@
-import React, { Dispatch } from "react";
+import React, { Dispatch, createRef } from "react";
 import { connect } from "react-redux";
-import { Button, Form, Icon, Label, Menu, Message, Modal, ModalProps, Input, Header } from "semantic-ui-react";
+import { Button, Form, Icon, Label, Menu, Message, Modal, ModalProps, Input, Header, Popup, Ref } from "semantic-ui-react";
 import { setMembership } from "../actions/eth";
 import { ETHActionType, AddressType } from "../actions/types/eth";
 import { VOTING_CORE_ABI } from "../constants/contractABIs";
@@ -18,6 +18,9 @@ import { PollActionType } from "../actions/types/poll";
 import { toast } from "react-toastify";
 import { ERROR_METAMASK_NOT_INSTALLED } from "../constants/project";
 import Toast from "./Toast";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { getEstimatedBlockNumber } from "../utils/helper";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 const VOTING_CORE_ADDRESS = process.env.REACT_APP_VOTING_CORE_ADDRESS as string;
@@ -28,6 +31,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
     private setTimeoutHolder: any;
     private initialState: IPollCreateStates;
     private formOnSubmitHandler: any;
+    private blockRef: React.RefObject<any>;
     constructor(props: IPollCreateProps) {
         super(props);
         this.contract = new this.props.web3Rpc.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
@@ -56,6 +60,9 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             },
             opened: (this.props.location.pathname === Routes.CREATE) ? true : false,
             inProgress: false,
+            calendar: {
+                opened: false,
+            },
         };
         this.state = Object.assign({}, this.initialState);
         this.formOnSubmitHandler = this.createPoll.bind(this);
@@ -65,6 +72,10 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         this.onOpenHandler = this.onOpenHandler.bind(this);
         this.onCloseHandler = this.onCloseHandler.bind(this);
         this.onLastOptionInputHandler = this.onLastOptionInputHandler.bind(this);
+        this.calendarButtonHandler = this.calendarButtonHandler.bind(this);
+        this.calendarSelectorOnChangeHandler = this.calendarSelectorOnChangeHandler.bind(this);
+        this.calendarSelectorOnSelectOutsideHandler = this.calendarSelectorOnSelectOutsideHandler.bind(this);
+        this.blockRef = createRef();
     }
 
     async componentDidMount() {
@@ -129,6 +140,48 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                 toast(<Toast title={title} detail={detail} />);
             }
         }
+    }
+
+    calendarButtonHandler() {
+        this.setState({
+            calendar: {
+                opened: true,
+            },
+        });
+    }
+
+    calendarSelectorOnChangeHandler(date: Date | null, event: React.SyntheticEvent<any, Event> | undefined) {
+        if (!date) {
+            return;
+        }
+
+        const futureTime = date.getTime();
+        const currentTime = Date.now();
+        const currentBlockHeight = this.props.blockHeight;
+        const estimated = String(getEstimatedBlockNumber(currentTime, currentBlockHeight, futureTime));
+        this.blockRef.current.firstChild.value = estimated;
+    }
+
+    calendarSelectorOnSelectOutsideHandler(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+        this.setState({
+            calendar: {
+                opened: false,
+            },
+        });
+    }
+
+    calendarContainer(props: {className: any, children: React.ReactNode[]}) {
+        return (
+            <div className={style["date-picker-wrapper"]}>
+                <div className={props.className}>
+                    {props.children}
+                </div>
+                <div className={style["date-picker-hint"]}>
+                    <p>Estimate future block height by <span style={{fontStyle: "italic"}}>block time of<br /> ~14.5 seconds</span></p>
+                    <p style={{fontStyle: "italic"}}>Disclaimer: the block time of Ethereum network <br />varies in reality</p>
+                </div>
+            </div>
+        );
     }
 
     blockHeightFocusOutHandler(event: React.FocusEvent<HTMLInputElement>) {
@@ -224,7 +277,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         }
         title = this.props.web3Rpc.utils.padRight(this.props.web3Rpc.utils.utf8ToHex(title), 64);
 
-        const block = (this.refs.block as any as HTMLInputElement).value;
+        const block = this.blockRef.current.firstChild.value;
         if (block === "") {
             errors.push("Expiry block height is empty");
         } else if (isNaN(Number(block))) {
@@ -447,7 +500,27 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     </Form.Field>
                     <Form.Field>
                         <label>Expiry Block Height</label>
-                        <input disabled={this.state.inProgress || !this.props.web3} onFocus={this.blockHeightFocusInHandler} onBlur={this.blockHeightFocusOutHandler} onKeyPress={this.blockHeightCheckHandler} placeholder="When will the poll expire?" ref="block" />
+                        <Ref innerRef={this.blockRef}>
+                            <Input icon={<Icon name="calendar" link={true} onClick={this.calendarButtonHandler} />} disabled={this.state.inProgress || !this.props.web3} onFocus={this.blockHeightFocusInHandler} onBlur={this.blockHeightFocusOutHandler} onKeyPress={this.blockHeightCheckHandler} placeholder="When will the poll expire?" />
+                        </Ref>
+                        {
+                            (this.state.calendar.opened) && (
+                                <DatePicker
+                                    open={true}
+                                    className={style["date-picker-input"]}
+                                    popperClassName={style["date-picker-popper"]}
+                                    onChange={this.calendarSelectorOnChangeHandler}
+                                    onClickOutside={this.calendarSelectorOnSelectOutsideHandler}
+                                    showTimeSelect={true}
+                                    timeFormat="HH:mm"
+                                    timeIntervals={15}
+                                    dateFormat="MMMM d, yyyy h:mm aa"
+                                    timeCaption="time"
+                                    calendarContainer={this.calendarContainer}
+                                    minDate={new Date()}
+                                />
+                            )
+                        }
                         {
                             (this.state.inputHints.blockHeight) && (
                                 <Label size="large" basic={true} color="teal" pointing={true}>
