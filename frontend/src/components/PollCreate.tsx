@@ -1,7 +1,7 @@
 import React, { Dispatch, createRef } from "react";
 import { connect } from "react-redux";
 import { Button, Form, Icon, Label, Menu, Message, Modal, ModalProps, Input, Header, Popup, Ref } from "semantic-ui-react";
-import { setMembership } from "../actions/eth";
+import { setMembership, setBlockHeight } from "../actions/eth";
 import { ETHActionType, AddressType } from "../actions/types/eth";
 import { VOTING_CORE_ABI } from "../constants/contractABIs";
 import { StoreState } from "../store/types";
@@ -421,6 +421,10 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                             clearTimeout(this.setTimeoutHolder);
                         }
                         this.setTimeoutHolder = setTimeout(async () => {
+                            const blockNumber = await this.props.web3Rpc.eth.getBlockNumber();
+                            if (blockNumber !== this.props.blockHeight) {
+                                this.props.setBlockHeight(blockNumber);
+                            }
                             const membership = (await this.contract.methods.getMembership(this.props.accountAddress).call()).toNumber();
                             this.props.setMembership(membership);
                             this.setState({
@@ -629,6 +633,7 @@ const mapDispatchToProps = (dispatch: Dispatch<ETHActionType | PollActionType>, 
     return {
         setMembership: (nextMembership: Membership) => dispatch(setMembership(nextMembership)),
         addMonitoringPolls: (polls: AddressType[]) => dispatch(addMonitoringCreatedPoll(polls)),
+        setBlockHeight: (blockNumber: number) => dispatch(setBlockHeight(blockNumber)),
     };
 };
 

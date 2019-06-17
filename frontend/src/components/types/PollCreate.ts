@@ -18,6 +18,7 @@ export namespace IPollCreate {
     export interface IPropsFromDispatch {
         setMembership: (nextMembership: Membership) => void;
         addMonitoringPolls: (polls: AddressType[]) => void;
+        setBlockHeight: (blockNumber: number) => void;
     }
 }
 

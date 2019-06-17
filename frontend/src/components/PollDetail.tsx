@@ -207,7 +207,7 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
         return setInterval(async () => {
             try {
                 const receipt = await this.props.web3Rpc.eth.getTransactionReceipt(this.txInProgress);
-                if (receipt && (receipt.blockNumber <= this.props.blockHeight)) {
+                if (receipt && ((receipt.blockNumber - 1) <= this.props.blockHeight)) {
                     const chartOptions = await this.fetchChartOption();
                     this.setState({
                         waitingMessage: {
