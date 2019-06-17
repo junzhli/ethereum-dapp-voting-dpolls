@@ -1,4 +1,4 @@
-import { SET_POLL_STATISTICS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT, SET_ACTIVE_POLL_DETAIL, SET_ACTIVE_POLL_DETAIL_IN_PROGRESS, ADD_MONITORING_CREATED_POLLS, ADD_MONITORING_VOTED_POLLS, REMOVE_MONITORING_VOTED_POLLS, REMOVE_MONITORING_CREATED_POLLS, SET_VOTE_IN_PROGRESS, REMOVE_VOTE_IN_PROGRESS, SET_VOTE_CREATION_IN_PROGRESS, RESET_VOTE_CREATION_IN_PROGRESS } from "../constant";
+import { SET_POLL_STATISTICS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT, SET_ACTIVE_POLL_DETAIL, SET_ACTIVE_POLL_DETAIL_IN_PROGRESS, ADD_MONITORING_CREATED_POLLS, ADD_MONITORING_VOTED_POLLS, REMOVE_MONITORING_VOTED_POLLS, REMOVE_MONITORING_CREATED_POLLS, SET_VOTE_IN_PROGRESS, REMOVE_VOTE_IN_PROGRESS } from "../constant";
 import { AddressType, BlockHeightType } from "./eth";
 
 export interface ISetStatistics {
@@ -66,20 +66,4 @@ export interface IRemoveVoteInProgress {
     payload: AddressType;
 }
 
-export interface ISetVoteCreationInProgress {
-    type: typeof SET_VOTE_CREATION_IN_PROGRESS;
-    payload: {
-        title: string,
-        expiryBlockHeight: BlockHeightType,
-        optionAmount: number,
-        options: {
-            [key: string]: string,
-        };
-    };
-}
-
-export interface IRemoveVoteCreationInProgress {
-    type: typeof RESET_VOTE_CREATION_IN_PROGRESS;
-}
-
-export type PollActionType = ISetStatistics | IAddMonitoringCreatedPolls | IRemoveMonitoringCreatedPolls | IAddMonitoringVotedPolls | IRemoveMonitoringVotedPolls | ISetUserSearchKeywords | ISetSearchResultsAmount | ISetActivePollDetail | ISetActivePollDetailInProgress | ISetVoteInProgress | IRemoveVoteInProgress | ISetVoteCreationInProgress | IRemoveVoteCreationInProgress;
+export type PollActionType = ISetStatistics | IAddMonitoringCreatedPolls | IRemoveMonitoringCreatedPolls | IAddMonitoringVotedPolls | IRemoveMonitoringVotedPolls | ISetUserSearchKeywords | ISetSearchResultsAmount | ISetActivePollDetail | ISetActivePollDetailInProgress | ISetVoteInProgress | IRemoveVoteInProgress;
