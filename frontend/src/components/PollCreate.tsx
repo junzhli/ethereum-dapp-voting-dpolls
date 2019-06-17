@@ -123,7 +123,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         if (this.state.opened && this.state.inProgress) {
             // put user's input back when poll creation is in progress
             const titleRef = (this.refs.title as any as HTMLInputElement);
-            const blockRef = (this.refs.block as any as HTMLInputElement);
+            const blockRef = this.blockRef.current.firstChild;
 
             Object.entries(this.userInput.options).forEach(([index, value]) => {
                 const option = (this.refs["option" + index] as any).inputRef.current;
@@ -581,7 +581,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     <Form.Field>
                         <label>Expiry Block Height</label>
                         <Ref innerRef={this.blockRef}>
-                            <Input onChange={this.expiryBlockHeightOnChangeHandler} icon={<Icon name="calendar" link={(this.state.inProgress || !this.props.web3) ? false : true} onClick={this.calendarButtonHandler} />} disabled={this.state.inProgress || !this.props.web3} onFocus={this.blockHeightFocusInHandler} onBlur={this.blockHeightFocusOutHandler} onKeyPress={this.blockHeightCheckHandler} placeholder="When will the poll expire?" ref="block" />
+                            <Input onChange={this.expiryBlockHeightOnChangeHandler} icon={<Icon name="calendar" link={(this.state.inProgress || !this.props.web3) ? false : true} onClick={this.calendarButtonHandler} />} disabled={this.state.inProgress || !this.props.web3} onFocus={this.blockHeightFocusInHandler} onBlur={this.blockHeightFocusOutHandler} onKeyPress={this.blockHeightCheckHandler} placeholder="When will the poll expire?" />
                         </Ref>
                         {
                             (this.state.calendar.opened) && (
