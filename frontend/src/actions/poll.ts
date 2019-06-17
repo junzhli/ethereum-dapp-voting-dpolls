@@ -1,6 +1,6 @@
-import { SET_POLL_STATISTICS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT, SET_ACTIVE_POLL_DETAIL, SET_ACTIVE_POLL_DETAIL_IN_PROGRESS, ADD_MONITORING_CREATED_POLLS, REMOVE_MONITORING_CREATED_POLLS, ADD_MONITORING_VOTED_POLLS, REMOVE_MONITORING_VOTED_POLLS, SET_VOTE_IN_PROGRESS, REMOVE_VOTE_IN_PROGRESS } from "./constant";
-import { ISetStatistics, ISetUserSearchKeywords, ISetSearchResultsAmount, ISetActivePollDetail, ISetActivePollDetailInProgress, IAddMonitoringCreatedPolls, IRemoveMonitoringCreatedPolls, IAddMonitoringVotedPolls, IRemoveMonitoringVotedPolls, ISetVoteInProgress, IRemoveVoteInProgress } from "./types/poll";
-import { AddressType } from "./types/eth";
+import { SET_POLL_STATISTICS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT, SET_ACTIVE_POLL_DETAIL, SET_ACTIVE_POLL_DETAIL_IN_PROGRESS, ADD_MONITORING_CREATED_POLLS, REMOVE_MONITORING_CREATED_POLLS, ADD_MONITORING_VOTED_POLLS, REMOVE_MONITORING_VOTED_POLLS, SET_VOTE_IN_PROGRESS, REMOVE_VOTE_IN_PROGRESS, SET_VOTE_CREATION_IN_PROGRESS, RESET_VOTE_CREATION_IN_PROGRESS } from "./constant";
+import { ISetStatistics, ISetUserSearchKeywords, ISetSearchResultsAmount, ISetActivePollDetail, ISetActivePollDetailInProgress, IAddMonitoringCreatedPolls, IRemoveMonitoringCreatedPolls, IAddMonitoringVotedPolls, IRemoveMonitoringVotedPolls, ISetVoteInProgress, IRemoveVoteInProgress, ISetVoteCreationInProgress, IRemoveVoteCreationInProgress } from "./types/poll";
+import { AddressType, BlockHeightType } from "./types/eth";
 
 export const setStatistics = (amount: number, active: number): ISetStatistics => {
     return {
@@ -86,5 +86,23 @@ export const removeVoteInProgress = (address: AddressType): IRemoveVoteInProgres
     return {
         type: REMOVE_VOTE_IN_PROGRESS,
         payload: address,
+    };
+};
+
+export const setVoteCreationInProgress = (title: string, expiryBlockHeight: BlockHeightType, optionAmount: number, options: {}): ISetVoteCreationInProgress => {
+    return {
+        type: SET_VOTE_CREATION_IN_PROGRESS,
+        payload: {
+            title,
+            expiryBlockHeight,
+            optionAmount,
+            options,
+        },
+    };
+};
+
+export const removeVoteCreationInProgress = (): IRemoveVoteCreationInProgress => {
+    return {
+        type: RESET_VOTE_CREATION_IN_PROGRESS,
     };
 };

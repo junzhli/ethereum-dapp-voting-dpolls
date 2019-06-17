@@ -1,8 +1,8 @@
 import React, { Dispatch, createRef } from "react";
 import { connect } from "react-redux";
-import { Button, Form, Icon, Label, Menu, Message, Modal, ModalProps, Input, Header, Popup, Ref } from "semantic-ui-react";
+import { Button, Form, Icon, Label, Menu, Message, Modal, ModalProps, Input, Header, Popup, Ref, InputOnChangeData } from "semantic-ui-react";
 import { setMembership, setBlockHeight } from "../actions/eth";
-import { ETHActionType, AddressType } from "../actions/types/eth";
+import { ETHActionType, AddressType, BlockHeightType } from "../actions/types/eth";
 import { VOTING_CORE_ABI } from "../constants/contractABIs";
 import { StoreState } from "../store/types";
 import { Membership } from "../types";
@@ -13,7 +13,7 @@ import { IPollCreate, IPollCreateProps, IPollCreateStates } from "./types/PollCr
 import { getEtherscanTxURL } from "../utils/etherscan";
 import { withRouter } from "react-router-dom";
 import Routes from "../constants/routes";
-import { addMonitoringCreatedPoll } from "../actions/poll";
+import { addMonitoringCreatedPoll, setVoteCreationInProgress } from "../actions/poll";
 import { PollActionType } from "../actions/types/poll";
 import { toast } from "react-toastify";
 import { ERROR_METAMASK_NOT_INSTALLED } from "../constants/project";
@@ -33,9 +33,21 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
     private initialState: IPollCreateStates;
     private formOnSubmitHandler: any;
     private blockRef: React.RefObject<any>;
+    private userInput: {
+        title: string,
+        expiryBlockHeight: string,
+        options: {
+            [key: string]: string,
+        };
+    };
     constructor(props: IPollCreateProps) {
         super(props);
         this.contract = new this.props.web3Rpc.eth.Contract(VOTING_CORE_ABI, VOTING_CORE_ADDRESS);
+        this.userInput = {
+            title: "",
+            expiryBlockHeight: "",
+            options: {},
+        };
         this.checkConfirmedIntervals = [];
         this.setTimeoutHolder = null;
         this.initialState = {
@@ -77,6 +89,9 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         this.calendarButtonHandler = this.calendarButtonHandler.bind(this);
         this.calendarSelectorOnChangeHandler = this.calendarSelectorOnChangeHandler.bind(this);
         this.calendarSelectorOnSelectOutsideHandler = this.calendarSelectorOnSelectOutsideHandler.bind(this);
+        this.titleOnChangeHandler = this.titleOnChangeHandler.bind(this);
+        this.expiryBlockHeightOnChangeHandler = this.expiryBlockHeightOnChangeHandler.bind(this);
+        this.optionsOnChangeHandler = this.optionsOnChangeHandler.bind(this);
         this.blockRef = createRef();
     }
 
@@ -104,12 +119,47 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         }
     }
 
+    componentDidUpdate() {
+        if (this.state.opened && this.state.inProgress) {
+            // put user's input back when poll creation is in progress
+            const titleRef = (this.refs.title as any as HTMLInputElement);
+            const blockRef = (this.refs.block as any as HTMLInputElement);
+
+            Object.entries(this.userInput.options).forEach(([index, value]) => {
+                const option = (this.refs["option" + index] as any).inputRef.current;
+                option.value = value;
+            });
+
+            titleRef.value = this.userInput.title;
+            blockRef.value = this.userInput.expiryBlockHeight;
+        }
+    }
+
     componentWillUnmount() {
         this.checkConfirmedIntervals.forEach((interval) => clearInterval(interval));
 
         if (this.setTimeoutHolder) {
             clearTimeout(this.setTimeoutHolder);
         }
+    }
+
+    titleOnChangeHandler(event: React.ChangeEvent<HTMLInputElement>) {
+        const title = (this.refs.title as any as HTMLInputElement).value;
+        this.userInput.title = title;
+    }
+
+    expiryBlockHeightOnChangeHandler(event: React.ChangeEvent<HTMLInputElement>, data: InputOnChangeData) {
+        const expiryBlockHeight = data.value;
+        this.userInput.expiryBlockHeight = expiryBlockHeight;
+    }
+
+    optionsOnChangeHandler(index: number, event: React.ChangeEvent<HTMLInputElement>, data: InputOnChangeData) {
+        const obj: {
+            [key: string]: string;
+        } = {};
+        const option = data.value;
+        obj[String(index)] = option;
+        Object.assign(this.userInput.options, obj);
     }
 
     onLastOptionInputHandler(event: React.FocusEvent<HTMLInputElement>) {
@@ -122,9 +172,18 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
 
     onOpenHandler(event: React.MouseEvent<HTMLElement, MouseEvent>, data: ModalProps) {
         if (data.open === false) {
-            this.setState({
-                opened: true,
-            });
+            if (!this.state.inProgress) {
+                // reset cache
+                this.userInput = {
+                    title: "",
+                    expiryBlockHeight: "",
+                    options: {},
+                };
+                this.setState({
+                    optionsAmount: 2,
+                });
+            }
+
             this.props.history.push(Routes.CREATE);
         }
     }
@@ -413,7 +472,6 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                                     </div>
                                 ),
                             },
-                            inProgress: false,
                         });
                         clearInterval(checkConfirmedInterval);
 
@@ -433,6 +491,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                                     message: null,
                                 },
                                 opened: false,
+                                inProgress: false,
                             });
                             await this.refreshQuota(this.props.membership);
                         }, 5000);
@@ -513,7 +572,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     }
                     <Form.Field>
                         <label>Title</label>
-                        <input disabled={this.state.inProgress || !this.props.web3} placeholder="Enter a poll question" ref="title" />
+                        <input onChange={this.titleOnChangeHandler} disabled={this.state.inProgress || !this.props.web3} placeholder="Enter a poll question" ref="title" />
                     </Form.Field>
                     <Form.Field>
                         <label>Host</label>
@@ -522,7 +581,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                     <Form.Field>
                         <label>Expiry Block Height</label>
                         <Ref innerRef={this.blockRef}>
-                            <Input icon={<Icon name="calendar" link={(this.state.inProgress || !this.props.web3) ? false : true} onClick={this.calendarButtonHandler} />} disabled={this.state.inProgress || !this.props.web3} onFocus={this.blockHeightFocusInHandler} onBlur={this.blockHeightFocusOutHandler} onKeyPress={this.blockHeightCheckHandler} placeholder="When will the poll expire?" />
+                            <Input onChange={this.expiryBlockHeightOnChangeHandler} icon={<Icon name="calendar" link={(this.state.inProgress || !this.props.web3) ? false : true} onClick={this.calendarButtonHandler} />} disabled={this.state.inProgress || !this.props.web3} onFocus={this.blockHeightFocusInHandler} onBlur={this.blockHeightFocusOutHandler} onKeyPress={this.blockHeightCheckHandler} placeholder="When will the poll expire?" ref="block" />
                         </Ref>
                         {
                             (this.state.calendar.opened) && (
@@ -568,7 +627,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                                     Array.from(Array(this.state.optionsAmount), (entity, index) => {
                                         return (
                                             <div key={index} className={style["option-divider"]}>
-                                                <Input disabled={this.state.inProgress || !this.props.web3} icon={<Header textAlign="center" className={style["form-option-id"]}>{(index + 1) + "."}</Header>} iconPosition="left" onFocus={(index === this.state.optionsAmount - 1) ? this.onLastOptionInputHandler : undefined} placeholder={"Enter an option"} ref={"option" + index} />
+                                                <Input onChange={this.optionsOnChangeHandler.bind(this, index)} disabled={this.state.inProgress || !this.props.web3} icon={<Header textAlign="center" className={style["form-option-id"]}>{(index + 1) + "."}</Header>} iconPosition="left" onFocus={(index === this.state.optionsAmount - 1) ? this.onLastOptionInputHandler : undefined} placeholder={"Enter an option"} ref={"option" + index} />
                                             </div>
                                         );
                                     })
@@ -626,6 +685,7 @@ const mapStateToProps = (state: StoreState, ownProps: IPollCreate.IInnerProps): 
         blockHeight: state.ethMisc.blockHeight,
         membership: state.ethMisc.membership,
         notificationStatus: state.userMisc.notificationStatus,
+        voteCreationInProgress: state.pollMisc.voteCreationInProgress,
     };
 };
 
@@ -634,6 +694,7 @@ const mapDispatchToProps = (dispatch: Dispatch<ETHActionType | PollActionType>, 
         setMembership: (nextMembership: Membership) => dispatch(setMembership(nextMembership)),
         addMonitoringPolls: (polls: AddressType[]) => dispatch(addMonitoringCreatedPoll(polls)),
         setBlockHeight: (blockNumber: number) => dispatch(setBlockHeight(blockNumber)),
+        setVoteCreationInProgress: (title: string, expiryBlockHeight: BlockHeightType, optionAmount: number, options: {}) => dispatch(setVoteCreationInProgress(title, expiryBlockHeight, optionAmount, options)),
     };
 };
 
