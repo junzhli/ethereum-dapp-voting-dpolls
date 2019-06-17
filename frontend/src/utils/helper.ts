@@ -15,3 +15,9 @@ export const promiseTimeout = <T>(ms: number, promise: Promise<T>) => {
         timeout,
     ]);
 };
+
+const BLOCK_TIME = 14.5;
+
+export const getEstimatedBlockNumber = (currentTime: number, currentBlockHeight: number, futureTime: number) => {
+    return currentBlockHeight + Math.round(((futureTime - currentTime) / 1000) / BLOCK_TIME);
+};

@@ -46,4 +46,7 @@ export interface IPollCreateStates {
     };
     opened: boolean;
     inProgress: boolean;
+    calendar: {
+        opened: boolean;
+    };
 }
