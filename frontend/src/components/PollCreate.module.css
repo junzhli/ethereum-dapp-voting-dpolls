@@ -56,16 +56,16 @@
 }
 
 .date-picker-wrapper {
-    padding-top: 1px;
-    padding-left: 1px;
-    padding-right: 1px;
     padding-bottom: 6px;
     background-color: whitesmoke;
     border-radius: 5px;
+    border-color: grey;
+    border-width: 0.5px;
+    border-style: solid;
 }
 
 .date-picker-popper {
-    left: -72px !important;
+    left: -290px !important;
 }
 
 .date-picker-hint {
