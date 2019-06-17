@@ -384,19 +384,17 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             const checkConfirmedInterval = setInterval(async () => {
                 try {
                     const receipt = await this.props.web3Rpc.eth.getTransactionReceipt(txid);
-                    if (receipt && (receipt.blockNumber <= this.props.blockHeight)) {
-                        if (this.props.notificationStatus === true) {
-                            const logAbi = [{
-                                type: "address",
-                                name: "_voting",
-                            }];
-                            const logData = receipt.logs[0].data;
-                            const logTopics = receipt.logs[0].topics;
+                    if (receipt && ((receipt.blockNumber - 1) <= this.props.blockHeight)) {
+                        const logAbi = [{
+                            type: "address",
+                            name: "_voting",
+                        }];
+                        const logData = receipt.logs[0].data;
+                        const logTopics = receipt.logs[0].topics;
 
-                            const decodedLog = this.props.web3Rpc.eth.abi.decodeLog(logAbi, logData, logTopics);
-                            const newVotingAddress = decodedLog._voting;
-                            this.props.addMonitoringPolls([newVotingAddress]);
-                        }
+                        const decodedLog = this.props.web3Rpc.eth.abi.decodeLog(logAbi, logData, logTopics);
+                        const newVotingAddress = decodedLog._voting;
+                        this.props.addMonitoringPolls([newVotingAddress]);
 
                         this.setState({
                             waitingMessage: {
