@@ -13,7 +13,7 @@ import { IPollCreate, IPollCreateProps, IPollCreateStates } from "./types/PollCr
 import { getEtherscanTxURL } from "../utils/etherscan";
 import { withRouter } from "react-router-dom";
 import Routes from "../constants/routes";
-import { addMonitoringCreatedPoll, setVoteCreationInProgress } from "../actions/poll";
+import { addMonitoringCreatedPoll } from "../actions/poll";
 import { PollActionType } from "../actions/types/poll";
 import { toast } from "react-toastify";
 import { ERROR_METAMASK_NOT_INSTALLED } from "../constants/project";
@@ -685,7 +685,6 @@ const mapStateToProps = (state: StoreState, ownProps: IPollCreate.IInnerProps): 
         blockHeight: state.ethMisc.blockHeight,
         membership: state.ethMisc.membership,
         notificationStatus: state.userMisc.notificationStatus,
-        voteCreationInProgress: state.pollMisc.voteCreationInProgress,
     };
 };
 
@@ -694,7 +693,6 @@ const mapDispatchToProps = (dispatch: Dispatch<ETHActionType | PollActionType>, 
         setMembership: (nextMembership: Membership) => dispatch(setMembership(nextMembership)),
         addMonitoringPolls: (polls: AddressType[]) => dispatch(addMonitoringCreatedPoll(polls)),
         setBlockHeight: (blockNumber: number) => dispatch(setBlockHeight(blockNumber)),
-        setVoteCreationInProgress: (title: string, expiryBlockHeight: BlockHeightType, optionAmount: number, options: {}) => dispatch(setVoteCreationInProgress(title, expiryBlockHeight, optionAmount, options)),
     };
 };
 
