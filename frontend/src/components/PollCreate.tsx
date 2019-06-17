@@ -18,6 +18,7 @@ import { PollActionType } from "../actions/types/poll";
 import { toast } from "react-toastify";
 import { ERROR_METAMASK_NOT_INSTALLED } from "../constants/project";
 import Toast from "./Toast";
+import moment from "moment/moment";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { getEstimatedBlockNumber, BLOCK_TIME } from "../utils/helper";
@@ -62,6 +63,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
             inProgress: false,
             calendar: {
                 opened: false,
+                minTime: this.calculateMinTime(new Date()),
             },
         };
         this.state = Object.assign({}, this.initialState);
@@ -142,11 +144,21 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         }
     }
 
+    calculateMinTime(date: Date) {
+        const isToday = moment(date).isSame(moment(), "day");
+        if (isToday) {
+            const nowAddFifteenMinutes = moment(new Date()).toDate();
+            return nowAddFifteenMinutes;
+        }
+
+        return moment().startOf("day").toDate();
+    }
+
     calendarButtonHandler() {
+        const calendar = Object.assign({}, this.state.calendar);
+        calendar.opened = true;
         this.setState({
-            calendar: {
-                opened: true,
-            },
+            calendar,
         });
     }
 
@@ -154,6 +166,13 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         if (!date) {
             return;
         }
+
+        const calendar = Object.assign({}, this.state.calendar);
+        calendar.minTime = this.calculateMinTime(date);
+        calendar.selectedDate = date;
+        this.setState({
+            calendar,
+        });
 
         const futureTime = date.getTime();
         const currentTime = Date.now();
@@ -163,10 +182,10 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
     }
 
     calendarSelectorOnSelectOutsideHandler(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+        const calendar = Object.assign({}, this.state.calendar);
+        calendar.opened = false;
         this.setState({
-            calendar: {
-                opened: false,
-            },
+            calendar,
         });
     }
 
@@ -509,6 +528,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                                     open={true}
                                     className={style["date-picker-input"]}
                                     popperClassName={style["date-picker-popper"]}
+                                    selected={this.state.calendar.selectedDate}
                                     onChange={this.calendarSelectorOnChangeHandler}
                                     onClickOutside={this.calendarSelectorOnSelectOutsideHandler}
                                     showTimeSelect={true}
@@ -518,6 +538,8 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
                                     timeCaption="time"
                                     calendarContainer={this.calendarContainer}
                                     minDate={new Date()}
+                                    minTime={this.state.calendar.minTime}
+                                    maxTime={moment().endOf("day").toDate()}
                                 />
                             )
                         }

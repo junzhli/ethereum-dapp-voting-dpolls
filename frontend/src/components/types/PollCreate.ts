@@ -48,5 +48,7 @@ export interface IPollCreateStates {
     inProgress: boolean;
     calendar: {
         opened: boolean;
+        minTime: Date;
+        selectedDate?: Date;
     };
 }
