@@ -13,11 +13,21 @@ export namespace IPollCreate {
         blockHeight: BlockHeightType;
         membership: Membership | null;
         notificationStatus: boolean | null;
+        voteCreationInProgress: {
+            title: string,
+            expiryBlockHeight: BlockHeightType,
+            optionAmount: number,
+            options: {
+                [key: string]: string;
+            };
+        } | null;
     }
 
     export interface IPropsFromDispatch {
         setMembership: (nextMembership: Membership) => void;
         addMonitoringPolls: (polls: AddressType[]) => void;
+        setBlockHeight: (blockNumber: number) => void;
+        setVoteCreationInProgress: (title: string, expiryBlockHeight: BlockHeightType, optionAmount: number, options: {}) => void;
     }
 }
 

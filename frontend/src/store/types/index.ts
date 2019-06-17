@@ -27,6 +27,14 @@ export interface IPollMisc {
             votedIndex: number,
         },
     };
+    voteCreationInProgress: {
+        title: string,
+        expiryBlockHeight: BlockHeightType,
+        optionAmount: number,
+        options: {
+            [key: string]: string;
+        };
+    } | null;
 }
 
 export interface IUserMisc {

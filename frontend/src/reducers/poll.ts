@@ -1,4 +1,4 @@
-import { SET_POLL_STATISTICS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT, SET_ACTIVE_POLL_DETAIL, SET_ACTIVE_POLL_DETAIL_IN_PROGRESS, ADD_MONITORING_CREATED_POLLS, REMOVE_MONITORING_CREATED_POLLS, ADD_MONITORING_VOTED_POLLS, REMOVE_MONITORING_VOTED_POLLS, SET_VOTE_IN_PROGRESS, REMOVE_VOTE_IN_PROGRESS } from "../actions/constant";
+import { SET_POLL_STATISTICS, SET_USER_SEARCH_KEYWORDS, SET_SEARCH_RESULTS_AMOUNT, SET_ACTIVE_POLL_DETAIL, SET_ACTIVE_POLL_DETAIL_IN_PROGRESS, ADD_MONITORING_CREATED_POLLS, REMOVE_MONITORING_CREATED_POLLS, ADD_MONITORING_VOTED_POLLS, REMOVE_MONITORING_VOTED_POLLS, SET_VOTE_IN_PROGRESS, REMOVE_VOTE_IN_PROGRESS, SET_VOTE_CREATION_IN_PROGRESS, RESET_VOTE_CREATION_IN_PROGRESS } from "../actions/constant";
 import { PollActionType } from "../actions/types/poll";
 import { IPollMisc } from "../store/types";
 import { AddressType } from "../actions/types/eth";
@@ -18,6 +18,7 @@ const initialState: IPollMisc = {
         inProgress: false,
     },
     voteInProgress: {},
+    voteCreationInProgress: null,
 };
 
 const poll = (state: IPollMisc = initialState, action: PollActionType): IPollMisc => {
@@ -145,6 +146,27 @@ const poll = (state: IPollMisc = initialState, action: PollActionType): IPollMis
             return {
                 ...state,
                 voteInProgress,
+            };
+        }
+        case SET_VOTE_CREATION_IN_PROGRESS: {
+            const { title, expiryBlockHeight, optionAmount, options } = action.payload;
+            const voteCreationInProgress = {
+                title,
+                expiryBlockHeight,
+                optionAmount,
+                options,
+            };
+
+            return {
+                ...state,
+                voteCreationInProgress,
+            };
+        }
+        case RESET_VOTE_CREATION_IN_PROGRESS: {
+            const voteCreationInProgress = null;
+            return {
+                ...state,
+                voteCreationInProgress,
             };
         }
     }
