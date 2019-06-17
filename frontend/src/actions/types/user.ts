@@ -16,7 +16,7 @@ export interface ISetUserIsFocus {
 }
 
 export interface ISetLoadingHint {
-    type: typeof SET_LOADING_HINT,
+    type: typeof SET_LOADING_HINT;
     payload: boolean;
 }
 
