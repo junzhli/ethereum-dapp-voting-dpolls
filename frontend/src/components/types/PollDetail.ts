@@ -36,6 +36,7 @@ export namespace IPollDetail {
         addVoteInProgress: (address: AddressType, txid: string, votedIndex: number) => void;
         removeVoteInProgress: (address: AddressType) => void;
         setLoadingHint: (show: boolean) => void;
+        setBlockHeight: (blockHeight: BlockHeightType) => void;
     }
 }
 

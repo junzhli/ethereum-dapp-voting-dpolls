@@ -238,6 +238,7 @@ class PollCreate extends React.Component<IPollCreateProps, IPollCreateStates> {
         const currentBlockHeight = this.props.blockHeight;
         const estimated = String(getEstimatedBlockNumber(currentTime, currentBlockHeight, futureTime));
         this.blockRef.current.firstChild.value = estimated;
+        this.userInput.expiryBlockHeight = estimated;
     }
 
     calendarSelectorOnSelectOutsideHandler(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {

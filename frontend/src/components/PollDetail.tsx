@@ -13,11 +13,12 @@ import { withRouter } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ERROR_METAMASK_NOT_INSTALLED } from "../constants/project";
 import Toast from "./Toast";
-import { AddressType } from "../actions/types/eth";
+import { AddressType, BlockHeightType, ETHActionType } from "../actions/types/eth";
 import { setActivePollDetail, setActivePollDetailInProgress, addMonitoringVotedPoll, setVoteInProgress, removeVoteInProgress } from "../actions/poll";
 import { PollActionType } from "../actions/types/poll";
 import { setLoadingHint } from "../actions/user";
 import { UserActionType } from "../actions/types/user";
+import { setBlockHeight } from "../actions/eth";
 
 const NETWORK_ID = process.env.REACT_APP_NETWORK_ID;
 class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
@@ -208,6 +209,10 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
             try {
                 const receipt = await this.props.web3Rpc.eth.getTransactionReceipt(this.txInProgress);
                 if (receipt && ((receipt.blockNumber - 1) <= this.props.blockHeight)) {
+                    const blockNumber = await this.props.web3Rpc.eth.getBlockNumber();
+                    if (blockNumber !== this.props.blockHeight) {
+                        this.props.setBlockHeight(blockNumber);
+                    }
                     const chartOptions = await this.fetchChartOption();
                     this.setState({
                         waitingMessage: {
@@ -513,7 +518,7 @@ const mapStateToProps = (state: StoreState, ownProps: IPollDetail.IInnerProps): 
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<PollActionType | UserActionType>, ownProps: IPollDetail.IInnerProps): IPollDetail.IPropsFromDispatch => {
+const mapDispatchToProps = (dispatch: Dispatch<PollActionType | UserActionType | ETHActionType>, ownProps: IPollDetail.IInnerProps): IPollDetail.IPropsFromDispatch => {
     return {
         setActiveDetailAddress: (address: AddressType | null) => dispatch(setActivePollDetail(address)),
         setActiveDetailViewInProgress: (inProgress: boolean) => dispatch(setActivePollDetailInProgress(inProgress)),
@@ -521,6 +526,7 @@ const mapDispatchToProps = (dispatch: Dispatch<PollActionType | UserActionType>,
         addVoteInProgress: (address: AddressType, txid: string, votedIndex: number) => dispatch(setVoteInProgress(address, txid, votedIndex)),
         removeVoteInProgress: (address: AddressType) => dispatch(removeVoteInProgress(address)),
         setLoadingHint: (show: boolean) => dispatch(setLoadingHint(show)),
+        setBlockHeight: (blockHeight: BlockHeightType) => dispatch(setBlockHeight(blockHeight)),
     };
 };
 
