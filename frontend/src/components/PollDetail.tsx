@@ -431,13 +431,13 @@ class PollDetail extends React.Component<IPollDetailProps, IPollDetailStates> {
                                 </Message>
                             )
                         }
+                        {
+                            (!this.props.web3) && (
+                                <Header color="red">({ERROR_METAMASK_NOT_INSTALLED})</Header>
+                            )
+                        }
                         <div className={style["inline-container"]}>
                             <div className={style["inline-left"]}>
-                                {
-                                    (!this.props.web3) && (
-                                        <Header color="red">({ERROR_METAMASK_NOT_INSTALLED})</Header>
-                                    )
-                                }
                                 <Form className={style["voting-box"]} size="huge">
                                     {
                                         this.props.options.map((option, index) => {
