@@ -32,13 +32,13 @@
 }
 
 .stamp {
-    box-shadow: 0 0 0 3px rgb(105, 195, 255), 0 0 0 2px rgb(105, 195, 255) inset;  
+    box-shadow: 0 0 0 3px rgb(70, 199, 199), 0 0 0 2px rgb(70, 199, 199) inset;  
     border: 2px solid transparent;
     border-radius: 4px;
     display: inline-block;
     padding: 5px 2px;
     line-height: 22px;
-    color: rgb(105, 195, 255);
+    color: rgb(70, 199, 199);
     font-size: 24px;
     font-family: 'Black Ops One', cursive;
     text-transform: uppercase;
@@ -49,9 +49,9 @@
 }
 
 .ended {
-    position: relative;
-    top: -55%;
-    margin-left: 15px;
+    position: absolute;
+    top: 45%;
+    left: 30%;
 }
 
 .voted-hint {
