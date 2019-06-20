@@ -356,7 +356,15 @@ class MainListingPoll extends React.Component<IMainListingPollProps, IMainListin
 
             const address = (index in this.initialMetadata && this.initialMetadata[index].address) || (localdb && localdb.address) || await this.contract.methods.getVotingItemByIndex(index).call();
             const contract = (index in this.initialMetadata && this.initialMetadata[index].contract) || new this.props.web3Rpc.eth.Contract(VOTING_ABI, address);
-            const expiryBlockNumber = (index in this.initialMetadata && this.initialMetadata[index].expiryBlockNumber) || (localdb && localdb.expiryBlockNumber) || (await contract.methods.expiryBlockNumber().call()).toNumber();
+            let expiryBlockNumber = (index in this.initialMetadata && this.initialMetadata[index].expiryBlockNumber) || (localdb && localdb.expiryBlockNumber) || -1;
+            if (expiryBlockNumber === -1) {
+                try {
+                    expiryBlockNumber = (await contract.methods.expiryBlockNumber().call()).toNumber();
+                } catch (error) {
+                    // TODO: Added support for big number (> 2^54 -1)
+                    console.log("Failed to fetch expiryBlockNumber for contract: " + address);
+                }
+            }
             const isExpired = this.checkIfExpired(expiryBlockNumber) as boolean;
 
             if (!localdbAvailable) {
